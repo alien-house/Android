@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,26 +18,25 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
+        Button button = (Button) findViewById(R.id.button2);
+//        button.setOnClickListener( new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View v) {
+//                startActivity(new Intent(MainActivity.this, SecondActivity.class));
+//            }
+//        });
+        button.setOnClickListener(new View.OnClickListener(){
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent i = new Intent(MainActivity.this, SecondActivity.class);
+                startActivity(i);
             }
         });
-        Button button = (Button) findViewById(R.id.button2);
-        button.setOnClickListener( new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, SecondActivity.class));
-            }
-        });
+        TextView txt;
+        txt = (TextView) findViewById(R.id.textView2);
 
 //        button.setOnClickListener(new View.OnClickListener() {
 //            public void onClick(View v) {

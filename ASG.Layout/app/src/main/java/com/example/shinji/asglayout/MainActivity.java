@@ -20,18 +20,10 @@ public class MainActivity extends AppCompatActivity {
 
         TextView text1 = (TextView) findViewById(R.id.text1);
 
-//        text1.setOnClickListener( new View.OnClickListener() {
-//
-//            @Override
-//            public void onClick(View v) {
-//                startActivity(new Intent(MainActivity.this, RelativeActivity.class));
-//            }
-//        });
-
         text1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, RelativeActivity.class));
+                startActivity(new Intent(MainActivity.this, ListViewActivity.class));
             }
         });
 
