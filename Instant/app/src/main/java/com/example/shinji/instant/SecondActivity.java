@@ -19,7 +19,6 @@ public class SecondActivity extends AppCompatActivity {
         setContentView(R.layout.activity_second);
 
         String s = getIntent().getStringExtra(Intent.EXTRA_TEXT);
-//        String s = getIntent().getExtras().getString("TEXT");
 
         System.out.println("========================");
         if (s != null) {

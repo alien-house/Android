@@ -1,6 +1,7 @@
 package com.example.shinji.instant;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -29,24 +30,24 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this, SecondActivity.class);
-                i.putExtra(Intent.EXTRA_TEXT, txt.getText().toString());
-//                i.putExtra(Intent.EXTRA_TEXT,"This is the");
 
-                System.out.println("========================");
-                System.out.println(txt.getText());
+//                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.ca/"));
 
+                String subject = "kokoko";
+                String boby = "this is the body text";
 
-//                i.setAction(Intent.ACTION_SEND);
-//                i.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
-//                i.setType("text/plain");
-//                startActivity(Intent.createChooser(i, getResources().getText(R.string.send_to)));
+                Intent i = new Intent(Intent.ACTION_VIEW, Uri.fromParts("mailto","ucyuujinoco@gmail.com",null));
+                i.putExtra(Intent.EXTRA_SUBJECT, subject);
+                i.putExtra(Intent.EXTRA_TEXT, boby);
+                startActivity(Intent.createChooser(i, "Send email"));
+
+//                Intent i = new Intent(MainActivity.this, SecondActivity.class);
+//                i.putExtra(Intent.EXTRA_TEXT, txt.getText().toString());
 //
-//
+//                System.out.println("========================");
+//                System.out.println(txt.getText());
 
-
-
-                startActivity(i);
+//                startActivity(i);
 //                startActivity(new Intent(MainActivity.this, SecondActivity.class));
             }
         });
