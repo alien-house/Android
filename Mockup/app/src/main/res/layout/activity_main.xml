@@ -14,29 +14,35 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="#686868"
         android:textStyle="bold"
+        android:padding="5dp"
         android:layout_marginBottom="20dp"
         style="@style/textForButton"/>
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="20dp">
+
         <TextView
             android:id="@+id/text1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18dp"
-            android:textStyle="bold"
             android:layout_marginRight="10dp"
-            android:text="NAME" />
+            android:text="NAME"
+            android:textSize="18dp"
+            android:textStyle="bold" />
+
         <EditText
             android:id="@+id/editText1"
             android:layout_width="190dp"
-            android:layout_height="44px"
-            android:layout_toRightOf="@+id/text1"
+            android:layout_height="59px"
             android:layout_alignTop="@+id/text1"
+            android:layout_toRightOf="@+id/text1"
             android:background="@drawable/rounded_edittext_states"
-            android:padding="5dip"/>
+            android:padding="5dp"
+            android:textSize="12dp" />
     </RelativeLayout>
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -54,17 +60,21 @@
                 android:layout_height="wrap_content"
                 android:text="Size" />
             <RadioGroup
+                android:id="@+id/pizzaSizeRadioGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
                 <RadioButton
+                    android:id="@+id/pzRadioReg"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="REGULAR"/>
                 <RadioButton
+                    android:id="@+id/pzRadioMed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="MEDIUM"/>
                 <RadioButton
+                    android:id="@+id/pzRadioLag"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="LARGE"/>
@@ -81,23 +91,32 @@
                 android:id="@+id/title_topping"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Toppings" />
+                android:text="Toppings"
+                android:onClick="onCheckboxClicked" />
             <CheckBox
+                android:id="@+id/checkbox_pep"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Peperoni"/>
+                android:text="Peperoni"
+                android:onClick="onCheckboxClicked"/>
             <CheckBox
+                android:id="@+id/checkbox_mash"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Mashroom"/>
+                android:text="Mashroom"
+                android:onClick="onCheckboxClicked"/>
             <CheckBox
+                android:id="@+id/checkbox_oli"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Black Olives"/>
+                android:text="Black Olives"
+                android:onClick="onCheckboxClicked"/>
             <CheckBox
+                android:id="@+id/checkbox_pine"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Pineapple"/>
+                android:text="Pineapple"
+                android:onClick="onCheckboxClicked"/>
         </LinearLayout>
     </LinearLayout>
 
@@ -108,6 +127,7 @@
         android:text="" />
 
     <Button
+        android:id="@+id/btnOrder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="ORDER"

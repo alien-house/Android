@@ -4,12 +4,12 @@
     <item
         android:state_pressed="true"
         android:state_enabled="true"
-        android:drawable="@drawable/rounded_focused" />
+        android:drawable="@drawable/rounded_edittext_focused" />
     <item
         android:state_focused="true"
         android:state_enabled="true"
-        android:drawable="@drawable/rounded_focused" />
+        android:drawable="@drawable/rounded_edittext_focused" />
     <item
         android:state_enabled="true"
-        android:drawable="@drawable/rounded_edittext" />
+        android:drawable="@drawable/rounded_edittext_focused" />
 </selector>

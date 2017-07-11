@@ -9,6 +9,6 @@
     </style>
 
     <style name="textForButton">
-        <item name=""></item>
+        <item name="colorPrimary">@color/colorPrimary</item>
     </style>
 </resources>
