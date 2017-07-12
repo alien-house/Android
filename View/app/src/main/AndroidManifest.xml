@@ -14,6 +14,8 @@
         <activity android:name=".ScrollActivity">
         </activity>
         <activity android:name=".SimpleMenuActivity">
+        </activity>
+        <activity android:name=".ListMobileActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
