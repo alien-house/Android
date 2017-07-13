@@ -44,7 +44,6 @@ public class MobileArrayAdapter extends ArrayAdapter<String> {
             imageView.setImageResource(R.drawable.android_logo);
         }
         return rowView;
-
     }
 
 }

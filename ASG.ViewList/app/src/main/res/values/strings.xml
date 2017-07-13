@@ -1,0 +1,21 @@
+<resources>
+  <string name="app_name">ASG.ViewList</string>
+  <string-array name="lists_array">
+    <item>LINEAR LAYOUT</item>
+    <item>RELATIVE LAYOUT</item>
+    <item>TABLE LAYOUT</item>
+    <item>FRAME LAYOUT</item>
+    <item>LIST VIEW</item>
+    <item>GRID VIEW</item>
+    <item>RECYLCER VIEW</item>
+  </string-array>
+  <string-array name="page_contents1">
+    <item>LinearLayout is a view group that aligns all children in a single direction, vertically or horizontally. You can specify the layout direction with the android:orientation attribute.</item>
+    <item>a</item>
+    <item>a</item>
+    <item>a</item>
+    <item>a</item>
+    <item>a</item>
+    <item>a</item>
+  </string-array>
+</resources>

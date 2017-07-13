@@ -16,6 +16,10 @@
         <activity android:name=".SimpleMenuActivity">
         </activity>
         <activity android:name=".ListMobileActivity">
+        </activity>
+        <activity android:name=".GridViewActivity">
+        </activity>
+        <activity android:name=".GridViewTxtImgActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
