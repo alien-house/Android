@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent i = new Intent(MainActivity.this, PageActivity.class);
                 i.putExtra(EXTRA_INDEX, itemPosition);
                 startActivity(i);
+//                overridePendingTransition(0, 0);
                 //                i.putExtra(Intent.EXTRA_TEXT, txt.getText().toString());
                 //        String itemValue = (String)l.getItemAtPosition(position);
                 //        Toast.makeText(getApplicationContext(),

@@ -3,8 +3,12 @@ package com.example.shinji.asgviewlist;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.text.method.MovementMethod;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -13,35 +17,79 @@ import android.widget.TextView;
 
 public class PageActivity extends AppCompatActivity {
   private static String EXTRA_INDEX = "SUPER_INDEX";
+  private static String listText[];
+  private int currentNum;
+  private int maxNum;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.page_layout);
-    int[] s = getIntent().getIntArrayExtra(EXTRA_INDEX);
-
-
+    currentNum = getIntent().getIntExtra(EXTRA_INDEX,0);
+    listText = getResources().getStringArray(R.array.page_contents1);
+    maxNum = listText.length - 1;
     System.out.println("========================");
-    if (s != null) {
-      System.out.println(s);
-    }else{
-      System.out.println("nullダヨーーーーーーー");
+    System.out.println(currentNum);
+    if (currentNum < 0) {
+      System.out.println("Error");
     }
+    TextView txt = (TextView) findViewById(R.id.txt);
+    MovementMethod movementmethod = LinkMovementMethod.getInstance();
+    txt.setMovementMethod(movementmethod);
 
-//        Log.d("de",s);
+    CharSequence spanned = Html.fromHtml(listText[currentNum]);
+    txt.setText(spanned);
 
-//    TextView txt = (TextView) findViewById(R.id.textView);
-//    txt.setText(s);
-//
-//    Button button = (Button) findViewById(R.id.button);
-//    button.setOnClickListener( new View.OnClickListener() {
-//
-//      @Override
-//      public void onClick(View v) {
-//        startActivity(new Intent(SecondActivity.this, MainActivity.class));
-//      }
-//    });
+    ImageView img = (ImageView) findViewById(R.id.img);
+    String imgname = "layout_img"+(currentNum + 1);
+    int id = getResources().getIdentifier(imgname, "drawable", getPackageName());
+    img.setImageResource(id);
+
+    Button btn_pre = (Button) findViewById(R.id.btn_pre);
+    btn_pre.setOnClickListener( new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        transitionToPage(-1);
+      }
+    });
+
+    Button btn_next = (Button) findViewById(R.id.btn_next);
+    btn_next.setOnClickListener( new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        transitionToPage(1);
+      }
+    });
+
   }
+//  @Override
+//  public void finish() {
+//    super.finish();
+//
+//    overridePendingTransition(0, 0);
+//  }
 
+  public void transitionToPage(int num){
+    Intent i = null;
+    switch (num){
+      case 1:
+        if(currentNum >= maxNum){
+          i = new Intent(PageActivity.this, MainActivity.class);
+        }else{
+          i = new Intent(PageActivity.this, PageActivity.class);
+          i.putExtra(EXTRA_INDEX, currentNum+(num));
+        }
+        break;
+      case -1:
+        if(currentNum <= 0){
+          i = new Intent(PageActivity.this, MainActivity.class);
+        }else{
+          i = new Intent(PageActivity.this, PageActivity.class);
+          i.putExtra(EXTRA_INDEX, currentNum+(num));
+        }
+        break;
+    }
+    startActivity(i);
+  }
 
 }

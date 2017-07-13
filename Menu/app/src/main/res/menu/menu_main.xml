@@ -9,10 +9,16 @@
       app:showAsAction="never"/>
 
   <item android:id="@+id/search"
+        android:orderInCategory="200"
         android:icon="@drawable/icon_search"
-        android:title="search"/>
+        android:title="search"
+        app:showAsAction="ifRoom">
+  </item>
 
   <item android:id="@+id/help"
-        android:title="help" />
+        android:orderInCategory="300"
+        android:title="help"
+        app:showAsAction="ifRoom">
+  </item>
 
 </menu>
