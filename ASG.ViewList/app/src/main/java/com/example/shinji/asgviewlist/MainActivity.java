@@ -27,11 +27,6 @@ public class MainActivity extends AppCompatActivity {
                 i.putExtra(EXTRA_INDEX, itemPosition);
                 startActivity(i);
 //                overridePendingTransition(0, 0);
-                //                i.putExtra(Intent.EXTRA_TEXT, txt.getText().toString());
-                //        String itemValue = (String)l.getItemAtPosition(position);
-                //        Toast.makeText(getApplicationContext(),
-                //                "Position :"+ itemPosition + " ListItem : "+ itemValue,
-                //                Toast.LENGTH_LONG).show();
             }
 
         });

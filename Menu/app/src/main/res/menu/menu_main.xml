@@ -11,14 +11,39 @@
   <item android:id="@+id/search"
         android:orderInCategory="200"
         android:icon="@drawable/icon_search"
-        android:title="search"
-        app:showAsAction="ifRoom">
+        android:title="search">
   </item>
 
-  <item android:id="@+id/help"
-        android:orderInCategory="300"
-        android:title="help"
-        app:showAsAction="ifRoom">
-  </item>
+  <group android:id="@+id/group_help">
+    <item
+        android:title="group_help"
+        android:enabled="false"
+        android:checkable="false"
+        />
+    <item android:id="@+id/help"
+          android:orderInCategory="300"
+          android:title="help">
+    </item>
+    <item android:id="@+id/help2"
+          android:orderInCategory="300"
+          android:title="help2">
+    </item>
+  </group>
+
+  <group android:id="@+id/group_delete">
+    <item
+        android:title="group_delete"
+        android:enabled="false"
+        android:checkable="false"
+        />
+    <item android:id="@+id/delete1"
+          android:orderInCategory="300"
+          android:title="delete1">
+    </item>
+    <item android:id="@+id/delete2"
+          android:orderInCategory="300"
+          android:title="delete2">
+    </item>
+  </group>
 
 </menu>

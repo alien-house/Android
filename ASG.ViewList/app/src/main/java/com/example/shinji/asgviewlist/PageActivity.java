@@ -26,8 +26,9 @@ public class PageActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.page_layout);
     currentNum = getIntent().getIntExtra(EXTRA_INDEX,0);
-    listText = getResources().getStringArray(R.array.page_contents1);
+    listText = getResources().getStringArray(R.array.lists_array);
     maxNum = listText.length - 1;
+    setTitle(listText[currentNum]);
     System.out.println("========================");
     System.out.println(currentNum);
     if (currentNum < 0) {
@@ -37,7 +38,11 @@ public class PageActivity extends AppCompatActivity {
     MovementMethod movementmethod = LinkMovementMethod.getInstance();
     txt.setMovementMethod(movementmethod);
 
-    CharSequence spanned = Html.fromHtml(listText[currentNum]);
+    String txtname = "page_contents"+currentNum;
+    System.out.println(txtname);
+    int resId = getResources().getIdentifier(txtname, "string", getPackageName());
+    String txtRes = getResources().getString(resId);
+    CharSequence spanned = Html.fromHtml(txtRes);
     txt.setText(spanned);
 
     ImageView img = (ImageView) findViewById(R.id.img);

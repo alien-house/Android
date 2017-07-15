@@ -9,13 +9,25 @@
     <item>GRID VIEW</item>
     <item>RECYLCER VIEW</item>
   </string-array>
-  <string-array name="page_contents1">
-    <item>LinearLayout is a <a href="http://somesite.com/">view</a> group that aligns all children in a single direction, vertically or horizontally. You can specify the layout direction with the android:orientation attribute.</item>
-    <item>This is Relatetive layput </item>
-    <item>This is table laypout</item>
-    <item>This frame laput</item>
-    <item>This is list view</item>
-    <item>This his frid </item>
-    <item>THissis Rcycer view</item>
-  </string-array>
+  <string name="page_contents0">
+    ^_ ^ LinearLayout &lt;a href="http://www.google.com">Google&lt;/a> is a \<a href="http://somesite.com/">view\</a> group that aligns all children in a single direction, vertically or horizontally. You can specify the layout direction with the android:orientation attribute.
+  </string>
+  <string name="page_contents1">
+    This is Relatetive layput
+  </string>
+  <string name="page_contents2">
+    This is table laypout
+  </string>
+  <string name="page_contents3">
+    This frame laput
+  </string>
+  <string name="page_contents4">
+    This is list view
+  </string>
+  <string name="page_contents5">
+    This his frid
+  </string>
+  <string name="page_contents6">
+    THissis Rcycer view
+  </string>
 </resources>
