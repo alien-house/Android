@@ -20,12 +20,15 @@
         <activity android:name=".GridViewActivity">
         </activity>
         <activity android:name=".GridViewTxtImgActivity">
+        </activity>
+        <activity android:name=".RecycleMainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>
