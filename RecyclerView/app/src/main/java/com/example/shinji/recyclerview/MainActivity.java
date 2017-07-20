@@ -10,8 +10,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements GreenAdapter.ListItemClickListener{
     private static final int NUM_LIST_ITEMS = 100;
     GreenAdapter mAdapter;
     RecyclerView mNumbersList;
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mNumbersList.setLayoutManager(layoutManager);
         mNumbersList.setHasFixedSize(true);
-        mAdapter = new GreenAdapter(NUM_LIST_ITEMS);
+        mAdapter = new GreenAdapter(NUM_LIST_ITEMS, this);
         mNumbersList.setAdapter(mAdapter);
     }
 
@@ -53,11 +54,16 @@ public class MainActivity extends AppCompatActivity {
         if(id == R.id.action_settings){
             return true;
         }else if(id == R.id.action_refresh){
-            mAdapter = new GreenAdapter(NUM_LIST_ITEMS);
+            mAdapter = new GreenAdapter(NUM_LIST_ITEMS, this);
             // recycler view object
             mNumbersList.setAdapter(mAdapter);
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onListItemClick(int index) {
+        Toast.makeText(this, "Item # " + index + "is clicked", Toast.LENGTH_SHORT).show();
     }
 }

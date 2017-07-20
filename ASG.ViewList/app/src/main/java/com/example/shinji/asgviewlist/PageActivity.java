@@ -7,6 +7,7 @@ import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.text.method.MovementMethod;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -34,16 +35,23 @@ public class PageActivity extends AppCompatActivity {
     if (currentNum < 0) {
       System.out.println("Error");
     }
-    TextView txt = (TextView) findViewById(R.id.txt);
-    MovementMethod movementmethod = LinkMovementMethod.getInstance();
-    txt.setMovementMethod(movementmethod);
+
+//    TextView txt = (TextView) findViewById(R.id.txt);
+//    MovementMethod movementmethod = LinkMovementMethod.getInstance();
+//    txt.setMovementMethod(movementmethod);
 
     String txtname = "page_contents"+currentNum;
-    System.out.println(txtname);
     int resId = getResources().getIdentifier(txtname, "string", getPackageName());
     String txtRes = getResources().getString(resId);
-    CharSequence spanned = Html.fromHtml(txtRes);
-    txt.setText(spanned);
+
+//    CharSequence spanned = Html.fromHtml(txtRes);
+//    txt.setText(spanned);
+
+
+    String text = "<html><body style=\"text-align:justify;font-size:18px;color:#555;\"> %s </body></Html>";
+    WebView txtWebView = (WebView) findViewById(R.id.WebView);
+    txtWebView.loadData(String.format(text, txtRes), "text/html", "utf-8");
+
 
     ImageView img = (ImageView) findViewById(R.id.img);
     String imgname = "layout_img"+(currentNum + 1);
@@ -74,6 +82,7 @@ public class PageActivity extends AppCompatActivity {
 //    overridePendingTransition(0, 0);
 //  }
 
+    // pagnation
   public void transitionToPage(int num){
     Intent i = null;
     switch (num){
