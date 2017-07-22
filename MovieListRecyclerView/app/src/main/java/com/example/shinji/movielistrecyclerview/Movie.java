@@ -7,6 +7,8 @@ import android.os.Parcelable;
  * Created by shinji on 2017/07/18.
  */
 
+//1. Declare a privte boolean variable
+
 public class Movie implements Parcelable {
     private String title = "";
     private String category = "";
@@ -17,6 +19,8 @@ public class Movie implements Parcelable {
     private String director = "";
     private String cast = "";
     private String describe = "";
+    private boolean isSelected;
+
 
     Movie(
             String title,
@@ -38,6 +42,7 @@ public class Movie implements Parcelable {
         this.director = director;
         this.cast = cast;
         this.describe = describe;
+        this.isSelected = false;
     }
 
     protected Movie(Parcel in) {
@@ -74,7 +79,12 @@ public class Movie implements Parcelable {
     public int getTime(){
         return this.time;
     }
-
+    public void setSelected(boolean selected){
+        this.isSelected = selected;
+    }
+    public boolean isSelected(){
+        return this.isSelected;
+    }
 
     @Override
     public int describeContents() {

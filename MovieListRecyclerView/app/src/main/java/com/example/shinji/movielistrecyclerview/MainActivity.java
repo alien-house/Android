@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static android.content.Intent.EXTRA_INDEX;
 
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     MovieAdapter mAdapter;
     RecyclerView rvList;
     ArrayList<Movie> movieList = new ArrayList<Movie>();
+//    private List<Movie> movieList = new ArrayList<>();
     private int NUM_LIST_ITEMS = 0;
     private static String EXTRA_DATA = "EXTRA_DATA";
 
@@ -51,50 +53,87 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         rvList.setAdapter(mAdapter);
 
 
-        // Btn:All Clear
-        Button btnAllClear = (Button)findViewById(R.id.btnAllClear);
-        btnAllClear.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mAdapter.setAllCheckBoxOff();
-            }
-        });
-
-        // Btn:All Select
-        Button btnAllSelect = (Button)findViewById(R.id.btnAllSelect);
-        btnAllSelect.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mAdapter.setAllCheckBoxOn();
-            }
-        });
-
-        // Btn:All Delete
-        Button btnAllDelete = (Button)findViewById(R.id.btnDelete);
-        btnAllDelete.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mAdapter.removeItem();
-
-            }
-        });
-
-
-//        btnAllClear.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+//        // Btn:All Clear
+//        Button btnAllClear = (Button)findViewById(R.id.btnAllClear);
+//        btnAllClear.setOnClickListener( new View.OnClickListener() {
 //            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-//                int itemPosition = position;
-//                Intent i = new Intent(MainActivity.this, PageActivity.class);
-//                i.putExtra(EXTRA_INDEX, itemPosition);
-//                startActivity(i);
-////                overridePendingTransition(0, 0);
+//            public void onClick(View v) {
+//                mAdapter.setAllCheckBoxOff();
 //            }
+//        });
 //
+//        // Btn:All Select
+//        Button btnAllSelect = (Button)findViewById(R.id.btnAllSelect);
+//        btnAllSelect.setOnClickListener( new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mAdapter.setAllCheckBoxOn();
+//            }
+//        });
+//
+//        // Btn:All Delete
+//        Button btnAllDelete = (Button)findViewById(R.id.btnDelete);
+//        btnAllDelete.setOnClickListener( new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mAdapter.removeItem();
+//
+//            }
 //        });
 
+    }
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        System.out.println("------------onSaveInstanceState---------------");
+        outState.putParcelableArrayList("LIST_INSTANCE_STATE", movieList);
+//        outState.putParcelable("LIST_INSTANCE_STATE", movieList.onSaveInstanceState());
+//        outState.putString("STRING",textView.getText().toString() );
+    }
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if(savedInstanceState!=null) {
+            System.out.println("=============onRestoreInstanceState---------------");
+            ArrayList<Movie> movieList2 = savedInstanceState.getParcelableArrayList("LIST_INSTANCE_STATE");
+            System.out.println("movieList2:"+movieList2.size());
+            movieList = movieList2;
+            mAdapter.notifyDataSetChanged();
+        }
 
+    }
 
+    public void selectAll(View view){
+        System.out.println("^^_^^^^^^^^^^^^");
+//        mAdapter.setAllCheckBoxOn();
+        for(Movie m : movieList){
+            m.setSelected(true);
+            mAdapter.notifyDataSetChanged();
+        }
+    }
 
+    public void clearAll(View view){
+        for(Movie m : movieList){
+            m.setSelected(false);
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public void deleteMovie(View view){
+//        System.out.println("@@@@:"+movieList.size());
+        for(int i = 0; i < movieList.size(); i++){
+            System.out.print("@@@@@@@@@:"+i);
+            System.out.println(":"+movieList.get(i).isSelected());
+            if(movieList.get(i).isSelected()){
+                movieList.remove(i);
+            }
+        }
+        mAdapter.notifyDataSetChanged();
+    }
+
+    public void deleteAllMovie(View view) {
+        movieList.clear();
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override

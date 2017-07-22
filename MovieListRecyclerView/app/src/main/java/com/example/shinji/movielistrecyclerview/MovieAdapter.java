@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by shinji on 2017/07/18.
@@ -20,7 +21,8 @@ import java.util.ArrayList;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.TextViewHolder> {
     private int mNumberItems;
-    private ArrayList<Movie> movieList = new ArrayList<Movie>();
+//    private ArrayList<Movie> movieList = new ArrayList<Movie>();
+    private List<Movie> movieList;
     private static int viewHolderCount;
     private ArrayList<TextViewHolder> nhList = new ArrayList<TextViewHolder>();
     final private ListItemClickListener onClickListner;
@@ -30,7 +32,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.TextViewHold
         void onListItemClick(int index);
     }
 
-    MovieAdapter( ArrayList<Movie> movieList, ListItemClickListener listener){
+    MovieAdapter(List<Movie> movieList, ListItemClickListener listener){
         this.mNumberItems = movieList.size();
         this.movieList = movieList;
         this.viewHolderCount = 0;
@@ -52,14 +54,24 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.TextViewHold
     }
 
     @Override
-    public void onBindViewHolder(TextViewHolder holder, int position) {
+    //表示されているリサイクルビューがアップデート時に呼ばれる。
+    public void onBindViewHolder(TextViewHolder holder, final int position) {
         System.out.println("------------onBindViewHolder---------------");
+        Movie movie = movieList.get(position);
+        holder.chkBox.setChecked(movieList.get(position).isSelected());
+
         holder.bind(position);
 //        public void onRemove(){
 //            movieList.remove(position);
 //            notifyItemRemoved(position);
 ////            notifyItemRangeChanged(position, contents2.size());
 //        };
+        holder.chkBox.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                movieList.get(position).setSelected(true);
+            }
+        });
         setAnimation(holder.itemView, position);
 //        slide(holder.itemView, position);
     }
@@ -72,40 +84,39 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.TextViewHold
 
     @Override
     public int getItemCount() {
-        return mNumberItems;
+        return this.movieList.size();
     }
 
     public void setAllCheckBoxOn(){
         int i = 0;
         for (TextViewHolder tvh : nhList) {
-            tvh.checkBoxOn();
-            blink(tvh.itemView, i);
+            tvh.chkBox.setChecked(true);
             i++;
         }
     }
-    public void setAllCheckBoxOff(){
-        int i = 0;
-        for (TextViewHolder tvh : nhList) {
-            tvh.checkBoxOff();
-            setFadeAnimation(tvh.itemView);
-            i++;
-        }
-    }
-    public void removeItem(){
-        for(int i = 0; i < nhList.size(); i++){
-
-            if(nhList.get(i).getCheckState()){
-                nhList.remove(i);
-                movieList.remove(i);
-                notifyItemRemoved(i);
-                this.mNumberItems--;
-//                tvh.
-//                yourdatalist.remove(position);
-//                notifyItemRemoved(position);
-//                notifyItemRangeChanged(position,getItemCount());
-            }
-        }
-    }
+//    public void setAllCheckBoxOff(){
+//        int i = 0;
+//        for (TextViewHolder tvh : nhList) {
+//            tvh.checkBoxOff();
+//            setFadeAnimation(tvh.itemView);
+//            i++;
+//        }
+//    }
+//    public void removeItem(){
+//        for(int i = 0; i < nhList.size(); i++){
+//
+//            if(nhList.get(i).getCheckState()){
+//                nhList.remove(i);
+//                movieList.remove(i);
+//                notifyItemRemoved(i);
+//                this.mNumberItems--;
+////                tvh.
+////                yourdatalist.remove(position);
+////                notifyItemRemoved(position);
+////                notifyItemRangeChanged(position,getItemCount());
+//            }
+//        }
+//    }
 
     private void setAnimation(View viewToAnimate, int position){
         Context context = viewToAnimate.getContext();
@@ -178,7 +189,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.TextViewHold
         }
 
         public void bind(int listIndex){
-
             tvTitle.setText(movieList.get(listIndex).getTitle());
             tvCategory.setText(movieList.get(listIndex).getCategory());
             tvYear.setText(String.valueOf(movieList.get(listIndex).getYear()));
