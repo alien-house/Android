@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     public void deleteMovie(View view){
 //        System.out.println("@@@@:"+movieList.size());
-        for(int i = 0; i < movieList.size(); i++){
+        for(int i = movieList.size() - 1; i >= 0; i--){
             System.out.print("@@@@@@@@@:"+i);
             System.out.println(":"+movieList.get(i).isSelected());
             if(movieList.get(i).isSelected()){
