@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     MovieAdapter mAdapter;
     RecyclerView rvList;
     ArrayList<Movie> movieList = new ArrayList<Movie>();
-//    private List<Movie> movieList = new ArrayList<>();
+    private List booList = new ArrayList<>();
     private int NUM_LIST_ITEMS = 0;
     private static String EXTRA_DATA = "EXTRA_DATA";
 
@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -44,68 +43,50 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                         .setAction("Action", null).show();
             }
         });
-        createMovieList();
+
         rvList = (RecyclerView) findViewById(R.id.rv_movie);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         rvList.setLayoutManager(layoutManager);
         rvList.setHasFixedSize(true);
+
+        if(savedInstanceState != null) {
+            System.out.println("=============onCreate---------------");
+            movieList = savedInstanceState.getParcelableArrayList("LIST_INSTANCE_STATE");
+        }else{
+            createMovieList();
+        }
+
         mAdapter = new MovieAdapter(movieList, this);
         rvList.setAdapter(mAdapter);
-
-
-//        // Btn:All Clear
-//        Button btnAllClear = (Button)findViewById(R.id.btnAllClear);
-//        btnAllClear.setOnClickListener( new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mAdapter.setAllCheckBoxOff();
-//            }
-//        });
-//
-//        // Btn:All Select
-//        Button btnAllSelect = (Button)findViewById(R.id.btnAllSelect);
-//        btnAllSelect.setOnClickListener( new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mAdapter.setAllCheckBoxOn();
-//            }
-//        });
-//
-//        // Btn:All Delete
-//        Button btnAllDelete = (Button)findViewById(R.id.btnDelete);
-//        btnAllDelete.setOnClickListener( new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mAdapter.removeItem();
-//
-//            }
-//        });
 
     }
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
         System.out.println("------------onSaveInstanceState---------------");
         outState.putParcelableArrayList("LIST_INSTANCE_STATE", movieList);
-//        outState.putParcelable("LIST_INSTANCE_STATE", movieList.onSaveInstanceState());
-//        outState.putString("STRING",textView.getText().toString() );
+        super.onSaveInstanceState(outState);
     }
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        if(savedInstanceState!=null) {
-            System.out.println("=============onRestoreInstanceState---------------");
-            ArrayList<Movie> movieList2 = savedInstanceState.getParcelableArrayList("LIST_INSTANCE_STATE");
-            System.out.println("movieList2:"+movieList2.size());
-            movieList = movieList2;
-            mAdapter.notifyDataSetChanged();
-        }
-
-    }
+//    @Override
+//    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+//        super.onRestoreInstanceState(savedInstanceState);
+//        if(savedInstanceState!=null) {
+//            System.out.println("=============onRestoreInstanceState---------------");
+//            movieList = savedInstanceState.getParcelableArrayList("LIST_INSTANCE_STATE");
+//            System.out.println("movieList:"+movieList.size());
+//            for(Movie m : movieList){
+//                System.out.println(m.isSelected());
+//                m.setSelected(true);
+//            }
+////            mAdapter.setAllCheckBoxOn();
+////            movieList = movieList2;
+//
+//            mAdapter.notifyDataSetChanged();
+//        }
+//
+//    }
 
     public void selectAll(View view){
         System.out.println("^^_^^^^^^^^^^^^");
-//        mAdapter.setAllCheckBoxOn();
         for(Movie m : movieList){
             m.setSelected(true);
             mAdapter.notifyDataSetChanged();
@@ -120,10 +101,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     }
 
     public void deleteMovie(View view){
-//        System.out.println("@@@@:"+movieList.size());
         for(int i = movieList.size() - 1; i >= 0; i--){
-            System.out.print("@@@@@@@@@:"+i);
-            System.out.println(":"+movieList.get(i).isSelected());
             if(movieList.get(i).isSelected()){
                 movieList.remove(i);
             }

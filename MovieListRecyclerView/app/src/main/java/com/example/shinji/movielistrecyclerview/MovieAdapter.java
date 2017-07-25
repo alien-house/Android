@@ -25,9 +25,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.TextViewHold
     private List<Movie> movieList;
     private static int viewHolderCount;
     private ArrayList<TextViewHolder> nhList = new ArrayList<TextViewHolder>();
-    final private ListItemClickListener onClickListner;
     private int lastPosition = -1;
 
+    final private ListItemClickListener onClickListner;
     public interface ListItemClickListener{
         void onListItemClick(int index);
     }
@@ -48,7 +48,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.TextViewHold
         int bg  = ColorUtils.getViewHolderBackgroundColorFromInstance(context,viewHolderCount);
         view.setBackgroundColor(bg);
         nhList.add(nh);
-        System.out.println("***nh***:"+nh);
         viewHolderCount++;
         return nh;
     }
@@ -59,20 +58,18 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.TextViewHold
         System.out.println("------------onBindViewHolder---------------");
         Movie movie = movieList.get(position);
         holder.chkBox.setChecked(movieList.get(position).isSelected());
-
-        holder.bind(position);
-//        public void onRemove(){
-//            movieList.remove(position);
-//            notifyItemRemoved(position);
-////            notifyItemRangeChanged(position, contents2.size());
-//        };
+//        holder.bind(position);
+        holder.tvTitle.setText(movie.getTitle());
+        holder.tvCategory.setText(movie.getCategory());
+        holder.tvYear.setText(String.valueOf(movie.getYear()));
+        holder.imgView.setImageResource(movie.getImgID());
         holder.chkBox.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
                 movieList.get(position).setSelected(true);
             }
         });
-        setAnimation(holder.itemView, position);
+//        setFadeAnimation(holder.itemView);
 //        slide(holder.itemView, position);
     }
 
@@ -83,17 +80,22 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.TextViewHold
     }
 
     @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+    }
+
+    @Override
     public int getItemCount() {
         return this.movieList.size();
     }
 
-    public void setAllCheckBoxOn(){
-        int i = 0;
-        for (TextViewHolder tvh : nhList) {
-            tvh.chkBox.setChecked(true);
-            i++;
-        }
-    }
+//    public void setAllCheckBoxOn(){
+//        int i = 0;
+//        for (TextViewHolder tvh : nhList) {
+//            tvh.chkBox.setChecked(true);
+//            i++;
+//        }
+//    }
 //    public void setAllCheckBoxOff(){
 //        int i = 0;
 //        for (TextViewHolder tvh : nhList) {
@@ -176,6 +178,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.TextViewHold
         TextView tvYear;
         CheckBox chkBox;
         ImageView imgView;
+        Boolean myCheck;
 //        View itemView;
         TextViewHolder(View itemView){
             super(itemView);
@@ -189,20 +192,20 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.TextViewHold
         }
 
         public void bind(int listIndex){
-            tvTitle.setText(movieList.get(listIndex).getTitle());
-            tvCategory.setText(movieList.get(listIndex).getCategory());
-            tvYear.setText(String.valueOf(movieList.get(listIndex).getYear()));
-            imgView.setImageResource(movieList.get(listIndex).getImgID());
+//            tvTitle.setText(movieList.get(listIndex).getTitle());
+//            tvCategory.setText(movieList.get(listIndex).getCategory());
+//            tvYear.setText(String.valueOf(movieList.get(listIndex).getYear()));
+//            imgView.setImageResource(movieList.get(listIndex).getImgID());
 //            tvTitle.setText("e");
         }
 
-        public void checkBoxOn(){
-            chkBox.setChecked(true);
-        }
-
-        public void checkBoxOff(){
-            chkBox.setChecked(false);
-        }
+//        public void checkBoxOn(){
+//            chkBox.setChecked(true);
+//        }
+//
+//        public void checkBoxOff(){
+//            chkBox.setChecked(false);
+//        }
 
         public boolean getCheckState(){
             return chkBox.isChecked();
