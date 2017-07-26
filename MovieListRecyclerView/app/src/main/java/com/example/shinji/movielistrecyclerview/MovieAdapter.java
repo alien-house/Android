@@ -69,7 +69,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.TextViewHold
                 movieList.get(position).setSelected(true);
             }
         });
-//        setFadeAnimation(holder.itemView);
+        setFadeAnimation(holder.itemView);
 //        slide(holder.itemView, position);
     }
 

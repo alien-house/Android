@@ -1,10 +1,13 @@
 package com.example.shinji.asgrecyclerview;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -43,12 +46,21 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         holder.chkBox.setChecked(recipeList.get(position).isSelected());
         holder.tvName.setText(recipe.getName());
         holder.tvDesc.setText(recipe.getDesc());
+        holder.tvImgview.setImageResource(recipe.getImgUrl());
+//        holder.tvImgview.setImageState();
         holder.chkBox.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
                 recipeList.get(position).setSelected(true);
             }
         });
+        setAnimation(holder.itemView, position);
+    }
+
+    private void setAnimation(View viewToAnimate, int position){
+        Context context = viewToAnimate.getContext();
+        Animation animation = AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left);
+        viewToAnimate.startAnimation(animation);
     }
 
     @Override
@@ -62,20 +74,22 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     }
 
     /*
-      NumberViewHolder Class
+      RecipeViewHolder Class
      */
-
     class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,View.OnLongClickListener{
         TextView tvName;
         TextView tvDesc;
+        ImageView tvImgview;
         CheckBox chkBox;
         Boolean myCheck;
         RecipeViewHolder(View itemView){
             super(itemView);
             tvName = (TextView) itemView.findViewById(R.id.recipe_item_title);
             tvDesc = (TextView) itemView.findViewById(R.id.recipe_item_desc);
+            tvImgview = (ImageView) itemView.findViewById(R.id.recipe_item_img);
             chkBox = (CheckBox) itemView.findViewById(R.id.recipe_item_chkbox);
             itemView.setOnClickListener((View.OnClickListener) this);
+            itemView.setOnLongClickListener((View.OnLongClickListener) this);
         }
 
         @Override

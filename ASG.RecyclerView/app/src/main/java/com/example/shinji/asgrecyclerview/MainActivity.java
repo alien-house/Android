@@ -87,6 +87,17 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Lis
     @Override
     public void onListItemLongClick(int index) {
         System.out.println("Hello again!!!!!!!!!!!!!"+index);
+        int itemPosition = index;
+        Recipe recipe_tmp = recipeList.get(itemPosition);
+        Recipe obj = null;
+        try {
+            obj = (Recipe) recipe_tmp.clone();
+            recipeList.add(itemPosition+1,obj);
+            mAdapter.notifyDataSetChanged();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     @Override
@@ -115,19 +126,28 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Lis
         recipeList.add(
                 new Recipe(
                         "Chiken Salada",
-                        "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.")
+                        "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
+                        getImgID("img01")
+                )
         );
         recipeList.add(
                 new Recipe(
                         "Colokke",
-                        "jagajaga imo imo o isihi na n decency.")
+                        "jagajaga imo imo o isihi na n decency.",
+                        getImgID("img02")
+                )
         );
         recipeList.add(
                 new Recipe(
                         "Tomato Salada",
-                        "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.")
+                        "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
+                        getImgID("img03"))
         );
+    }
 
+    public int getImgID(String str){
+        int ID = getResources().getIdentifier(str, "drawable", getPackageName());
+        return ID;
     }
 
 }

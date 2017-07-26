@@ -7,13 +7,15 @@ import android.os.Parcelable;
  * Created by shinji on 2017/07/24.
  */
 
-public class Recipe implements Parcelable {
+public class Recipe implements Parcelable, Cloneable {
     private String name = "";
     private String description = "";
+    private int imgUrl = 0;
     private boolean checkSelecte;
-    Recipe(String name, String description){
+    Recipe(String name, String description, int imgUrl){
         this.name = name;
         this.description = description;
+        this.imgUrl = imgUrl;
         this.checkSelecte = false;
     }
 
@@ -40,6 +42,9 @@ public class Recipe implements Parcelable {
     public String getDesc(){
         return this.description;
     }
+    public int getImgUrl(){
+        return this.imgUrl;
+    }
     public void setSelected(boolean selected){
         this.checkSelecte = selected;
     }
@@ -56,5 +61,13 @@ public class Recipe implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(name);
         parcel.writeString(description);
+    }
+    @Override
+    public Recipe clone() throws CloneNotSupportedException {
+        Recipe obj = (Recipe) super.clone();
+        obj.name = name;
+        obj.description = description;
+        obj.checkSelecte = false;
+        return obj;
     }
 }
