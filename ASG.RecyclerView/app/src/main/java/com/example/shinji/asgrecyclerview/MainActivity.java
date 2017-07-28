@@ -1,5 +1,7 @@
 package com.example.shinji.asgrecyclerview;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -82,6 +84,15 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Lis
     @Override
     public void onListItemClick(int index) {
         System.out.println("norma....l:"+index);
+        Intent i = new Intent(MainActivity.this, PageActivity.class);
+        Recipe recipe_tmp = recipeList.get(index);
+        i.putExtra("RECIPEDATA", recipe_tmp);
+        startActivity(i);
+
+        //
+//        Uri uri = Uri.parse("https://www.example.com");
+//        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+//        startActivity(intent);
 
     }
     @Override
@@ -127,21 +138,53 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Lis
                 new Recipe(
                         "Chiken Salada",
                         "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
-                        getImgID("img01")
+                        getImgID("img01"),
+                        "http://allrecipes.com/"
                 )
         );
         recipeList.add(
                 new Recipe(
                         "Colokke",
                         "jagajaga imo imo o isihi na n decency.",
-                        getImgID("img02")
+                        getImgID("img02"),
+                        "http://allrecipes.com/recipe/222111/healthier-brown-sugar-meatloaf/?internalSource=popular&referringContentType=home%20page&clickId=cardslot%2024"
                 )
         );
         recipeList.add(
                 new Recipe(
                         "Tomato Salada",
                         "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
-                        getImgID("img03"))
+                        getImgID("img03"),
+                        "http://allrecipes.com/recipe/233762/chipotle-beef-tostadas/?internalSource=previously%20viewed&referringContentType=home%20page&clickId=cardslot%2042"
+                )
+        );
+        recipeList.add(
+                new Recipe(
+                        "minesuterone",
+                        "Two imprisoned  through acts of common decency.",
+                        getImgID("img04"),
+                        "http://allrecipes.com/recipe/233762/chipotle-beef-tostadas/?internalSource=previously%20viewed&referringContentType=home%20page&clickId=cardslot%2042")
+        );
+        recipeList.add(
+                new Recipe(
+                        "koresutete-na",
+                        "Two imprisoned  through acts of common decency.",
+                        getImgID("img05"),
+                        "http://allrecipes.com/recipe/233762/chipotle-beef-tostadas/?internalSource=previously%20viewed&referringContentType=home%20page&clickId=cardslot%2042")
+        );
+        recipeList.add(
+                new Recipe(
+                        "koreiminaiwa",
+                        "Two imprisoned  through acts of common decency.",
+                        getImgID("img06"),
+                        "http://allrecipes.com/recipe/233762/chipotle-beef-tostadas/?internalSource=previously%20viewed&referringContentType=home%20page&clickId=cardslot%2042")
+        );
+        recipeList.add(
+                new Recipe(
+                        "ashitanoimagoro",
+                        "through acts of common decency Two imprisoned  .",
+                        getImgID("img07"),
+                        "http://allrecipes.com/recipe/233762/chipotle-beef-tostadas/?internalSource=previously%20viewed&referringContentType=home%20page&clickId=cardslot%2042")
         );
     }
 

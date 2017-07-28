@@ -8,8 +8,14 @@
       android:layout_height="wrap_content"
       android:text="This is landscape mode fragment"/>
   <Button
+      android:id="@+id/btn1"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="Click here"/>
+      android:text="btn1"/>
+  <Button
+      android:id="@+id/btn2"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="btn2"/>
 
 </LinearLayout>

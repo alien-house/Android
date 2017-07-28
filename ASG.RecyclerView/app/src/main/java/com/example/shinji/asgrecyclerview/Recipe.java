@@ -11,17 +11,20 @@ public class Recipe implements Parcelable, Cloneable {
     private String name = "";
     private String description = "";
     private int imgUrl = 0;
+    private String siteUrl = "";
     private boolean checkSelecte;
-    Recipe(String name, String description, int imgUrl){
+    Recipe(String name, String description, int imgUrl, String siteUrl){
         this.name = name;
         this.description = description;
         this.imgUrl = imgUrl;
+        this.siteUrl = siteUrl;
         this.checkSelecte = false;
     }
 
     protected Recipe(Parcel in) {
         name = in.readString();
         description = in.readString();
+        siteUrl = in.readString();
     }
 
     public static final Creator<Recipe> CREATOR = new Creator<Recipe>() {
@@ -42,9 +45,8 @@ public class Recipe implements Parcelable, Cloneable {
     public String getDesc(){
         return this.description;
     }
-    public int getImgUrl(){
-        return this.imgUrl;
-    }
+    public int getImgUrl(){ return this.imgUrl;}
+    public String getSiteUrl(){ return this.siteUrl;}
     public void setSelected(boolean selected){
         this.checkSelecte = selected;
     }
@@ -61,6 +63,7 @@ public class Recipe implements Parcelable, Cloneable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(name);
         parcel.writeString(description);
+        parcel.writeString(siteUrl);
     }
     @Override
     public Recipe clone() throws CloneNotSupportedException {
