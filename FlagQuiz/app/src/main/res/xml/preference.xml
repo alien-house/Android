@@ -11,14 +11,16 @@
       android:title="Number of Choices"
       android:summary="Display 2, 4, 6 or 8 guess buttons"
       android:key="numberType"
-      android:defaultValue="1"
-      android:entries="@array/numberListArray"
-      android:entryValues="@array/numberListValues" />
+      android:defaultValue="@array/pref_numberOfChoices"
+      android:entries="@array/guesses_list"
+      android:entryValues="@array/numberListValues"
+      />
   <MultiSelectListPreference
       android:title="Regions"
       android:summary="Regions to include in the quiz"
       android:key="regionsType"
-      android:defaultValue="@array/regionsListValues_defaults"
-      android:entries="@array/regionsListArray"
-      android:entryValues="@array/regionsListValues" />
+      android:entries="@array/regions_list"
+      android:entryValues="@array/regions_list_for_settings"
+      android:defaultValue="@array/pref_regionsToInclude"
+      />
 </PreferenceScreen>
