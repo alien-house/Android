@@ -27,7 +27,7 @@ import java.util.Set;
  * Created by shinji on 2017/07/31.
  */
 
-public class MainActivityFragment extends Fragment implements View.OnClickListener {
+public class MainActivityFragment extends Fragment {
     private final int FLAGS_IN_QUIZ = 10;
     //TODO 11) Create a list for quiz
     private List<String> fileNameList;
@@ -43,6 +43,7 @@ public class MainActivityFragment extends Fragment implements View.OnClickListen
     private SecureRandom random; // used to randomize the quiz
     private String correctAnswer; // number of correct guesses
     private int guessRows; // number of rows displaying guess Buttons
+    private int count = 1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -63,10 +64,6 @@ public class MainActivityFragment extends Fragment implements View.OnClickListen
         guessLinearLayouts[2] = (LinearLayout)view.findViewById(R.id.row3LinearLayout);
         guessLinearLayouts[3] = (LinearLayout)view.findViewById(R.id.row4LinearLayout);
         answerTextView = (TextView) view.findViewById(R.id.answerTextView);
-
-        // set questionNumberTextView's text
-        // Question %1$d of %2$d
-        questionNumberTextView.setText(getString(R.string.question,1,FLAGS_IN_QUIZ));
 
         return view;
     }
@@ -125,12 +122,16 @@ public class MainActivityFragment extends Fragment implements View.OnClickListen
 
     // TODO 13) フラグ画像を読む
     private void loadtheflag() {
-         loadNextFlag(); // 最初のフラグ
+
+        // set questionNumberTextView's text
+        // Question %1$d of %2$d
+        questionNumberTextView.setText(getString(R.string.question, count, FLAGS_IN_QUIZ));
+
         // 次のフラグ名を取得、それをリストから削除
         String nextImage = quizCountriesList.remove(0);
         correctAnswer = nextImage; // 正解を更新
 
-        // answerTextView.setText(""); // テキストビューを綺麗に
+         answerTextView.setText(""); // テキストビューを綺麗に
         //国の名前をゲット、フラグから
         String region = nextImage.substring(0, nextImage.indexOf('-'));
         AssetManager assets = getActivity().getAssets();
@@ -145,6 +146,7 @@ public class MainActivityFragment extends Fragment implements View.OnClickListen
         }
         //名前を混ぜる
         Collections.shuffle(fileNameList);
+
         //正解をfileNameListの最後に入れる
         int correct = fileNameList.indexOf(correctAnswer);
         fileNameList.add(fileNameList.remove(correct));
@@ -155,6 +157,7 @@ public class MainActivityFragment extends Fragment implements View.OnClickListen
                 // 設定による数を可能不可能に
                 Button newGuessButton = (Button) guessLinearLayouts[row].getChildAt(column);
                 newGuessButton.setEnabled(true);
+                newGuessButton.setOnClickListener(guessButtonListener);
                 // 国名の取得、newGuessButtonのテキストをセット
                 String filename = fileNameList.get((row * 2) + column);
                 newGuessButton.setText(getCountryName(filename));
@@ -167,21 +170,58 @@ public class MainActivityFragment extends Fragment implements View.OnClickListen
         LinearLayout randomRow = guessLinearLayouts[row]; // ローのゲット
         String countryName = getCountryName(correctAnswer);
         ((Button) randomRow.getChildAt(column)).setText(countryName);
+
+        //PLACE THIS CODE IN ONCREATEVIEW()
+        //TODO 15) Add the listeneer for all buttons
+        // configure listeners for the guess Buttons
     }
 
-    private void loadNextFlag(){
 
+    private void loadNextFlag(){
+        Log.e("kore","next=================");
+        loadtheflag();
+    }
+
+    private View.OnClickListener guessButtonListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Button guessButton = ((Button) v);
+            String guess = ((Button) v).getText().toString();
+            String answer = getCountryName(correctAnswer);
+
+            //if the guess is correct
+            // display correct answer in green text
+            if(guess.equals(answer)){
+                count++;
+                answerTextView.setText(answer + "!");
+                //set the text in green Color
+                disableAllButtons();
+
+                loadNextFlag(); // 次のフラグ
+            }else{
+//                  flagImageView.startAnimation(shakeAnimation); // play shake
+
+                // display "Incorrect!" in red
+                answerTextView.setText(R.string.incorrect_answer);
+                //set the text in red Color
+                guessButton.setEnabled(false); // disable incorrect answer
+            }
+
+        }
+    };
+
+    // utility method that disables all answer Buttons
+    public void disableAllButtons(){
+        for(int row = 0; row < guessRows; row++){
+            LinearLayout guessRow = guessLinearLayouts[row];
+            for(int i = 0; i < guessRow.getChildCount(); i++){
+                guessRow.getChildAt(i).setEnabled(false);
+            }
+        }
     }
 
     // parses the country flag file name and returns the country name
     private String getCountryName(String name) {
         return name.substring(name.indexOf('-') + 1).replace('_', ' ');
-    }
-
-
-    @Override
-    public void onClick(View view) {
-
-        Log.e("d","===================");
     }
 }
