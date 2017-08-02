@@ -30,8 +30,8 @@ import java.util.Set;
 public class MainActivityFragment extends Fragment implements View.OnClickListener {
     private final int FLAGS_IN_QUIZ = 10;
     //TODO 11) Create a list for quiz
-     private List<String> fileNameList;
-     private List<String> quizCountriesList;
+    private List<String> fileNameList;
+    private List<String> quizCountriesList;
     private Set<String> regionsSet;
 
     //TODO 5) CREATE a reference variable for all GUI componnets
@@ -66,7 +66,7 @@ public class MainActivityFragment extends Fragment implements View.OnClickListen
 
         // set questionNumberTextView's text
         // Question %1$d of %2$d
-//        questionNumberTextView.setText(getString(R.string.question,1,FLAGS_IN_QUIZ));
+        questionNumberTextView.setText(getString(R.string.question,1,FLAGS_IN_QUIZ));
 
         return view;
     }
@@ -76,8 +76,8 @@ public class MainActivityFragment extends Fragment implements View.OnClickListen
     public void updateGuessRows(SharedPreferences sharedPreferences) {
         // get the number of guess buttons that should be displayed
         String choices = sharedPreferences.getString(MainActivity.CHOICES, null);
-        guessRows = Integer.parseInt(choices) / 2;
 
+        guessRows = Integer.parseInt(choices) / 2;
         // hide all quess button LinearLayouts
         for (LinearLayout layout : guessLinearLayouts)
             layout.setVisibility(View.GONE);

@@ -6,15 +6,15 @@
     <item>6</item>
     <item>8</item>
   </string-array>
+
   <string-array name="numberListValues">
-    <item>1</item>
     <item>2</item>
-    <item>3</item>
     <item>4</item>
+    <item>6</item>
+    <item>8</item>
   </string-array>
-  <string-array name="pref_numberOfChoices">
-    <item>2</item>
-  </string-array>
+
+
 
   <string-array name="regions_list">
     <item>Africa</item>
@@ -24,6 +24,7 @@
     <item>Oceania</item>
     <item>South America</item>
   </string-array>
+
   <string-array name="regions_list_for_settings">
     <item>Africa</item>
     <item>Asia</item>
@@ -32,8 +33,5 @@
     <item>Oceania</item>
     <item>South_America</item>
   </string-array>
-  <string-array name="pref_regionsToInclude">
-    <item>2</item>
-    <item>3</item>
-  </string-array>
+
 </resources>

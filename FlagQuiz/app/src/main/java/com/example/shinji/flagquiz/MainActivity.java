@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //set defaultValues! これでデフォルトをセットできる
+        PreferenceManager.setDefaultValues(this, R.xml.preference, false);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -57,14 +59,14 @@ public class MainActivity extends AppCompatActivity {
         //// TODO 2) クイズフラグメントインスタンスを作る
         MainActivityFragment quizFragment = (MainActivityFragment) getSupportFragmentManager().findFragmentById(R.id.quizFragment);
 
-//        //TODO 3) 選択数について：ユーザー選択オプションをアップデートする
-//        quizFragment.updateGuessRows(PreferenceManager.getDefaultSharedPreferences(this));
-//
-//        //TODO 4) 出題国について：ユーザー選択オプションをアップデートする
-//        quizFragment.updateRegions(PreferenceManager.getDefaultSharedPreferences(this));
-//
-//        //TODO 10) クイズをスタートする
-//        quizFragment.startQuiz();
+        //TODO 3) 選択数について：ユーザー選択オプションをアップデートする
+        quizFragment.updateGuessRows(PreferenceManager.getDefaultSharedPreferences(this));
+
+        //TODO 4) 出題国について：ユーザー選択オプションをアップデートする
+        quizFragment.updateRegions(PreferenceManager.getDefaultSharedPreferences(this));
+
+        //TODO 10) クイズをスタートする
+        quizFragment.startQuiz();
     }
 
     @Override
