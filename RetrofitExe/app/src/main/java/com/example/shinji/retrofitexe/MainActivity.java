@@ -26,22 +26,33 @@ public class MainActivity extends AppCompatActivity{
         //QiitaApiの使用
         Retrofit retrofit = new Retrofit.Builder()
 //                .baseUrl("http://10.86.148.94:8080")
-                .baseUrl("http://api.indeed.com")
+                .baseUrl("http://api.indeed.com/api/v2/")
+//                .baseUrl("https://qiita.com")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         QiitaApiService qiitaApiservice = retrofit.create(QiitaApiService.class);
-        Call<List<QiitaGsonResponse>> call = qiitaApiservice.getData("2612264898312897","json",2,"web");
+        Call<List<QiitaGsonResponse>> call = qiitaApiservice.getData(
+//                "1","20", "android"
+                "2612264898312897","json",2,"web","vancouver"
+                ,"1.2.3.4","Mozilla/%2F4.0(Firefox)"
+        );
         try {
             call.enqueue(new Callback<List<QiitaGsonResponse>>() {
                 @Override
                 public void onResponse(Call<List<QiitaGsonResponse>> call, Response<List<QiitaGsonResponse>> response) {
-                    List results = new ArrayList();
-                    results = response.body().get(0).getResults();
                     Log.d("Qiita","====================");
-                    for(Object item : results){
-                        Log.d("Qiita:", (String) item);
-                    }
+                    System.out.println(response);
+//                    String title = response.body().get(0).getTitle();
+//                    Log.d("Qiita",title);
+//                    List results = new ArrayList();
+
+//                    Log.e("response",response);
+//                    int totalResults = response.body().get(0).getTotalResults();
+//                    Log.e("totalResults",String.valueOf(totalResults) );
+//                    for(Object item : results){
+//                        Log.d("Qiita:", (String) item);
+//                    }
 //                    Log.d("Qiita",results);
                 }
                 @Override

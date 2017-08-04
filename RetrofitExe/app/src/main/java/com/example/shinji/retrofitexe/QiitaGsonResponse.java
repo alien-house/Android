@@ -34,23 +34,26 @@ public class QiitaGsonResponse {
     @SerializedName("id")
     @Expose
     private String id;
-    @SerializedName("private")
+
+    @SerializedName("totalResults")
     @Expose
-    private Boolean _private;
-    @SerializedName("results")
-    @Expose
-    private List<Object> results = new ArrayList<Object>();
+    private int totalResults;
+
+    @SerializedName("tags")
     @Expose
     private List<Tag> tags = new ArrayList<Tag>();
+
     @SerializedName("title")
     @Expose
     private String title;
+
     @SerializedName("updated_at")
     @Expose
     private String updatedAt;
     @SerializedName("url")
     @Expose
     private String url;
+
     /**
      *
      * @return
@@ -144,28 +147,28 @@ public class QiitaGsonResponse {
     /**
      *
      * @return
-     * The _private
+     * The totalResults
      */
-    public Boolean getPrivate() {
-        return _private;
+    public int getTotalResults() {
+        return totalResults;
     }
 
     /**
      *
-     * @param _private
-     * The private
+     * @param totalResults
+     * The totalResults
      */
-    public void setPrivate(Boolean _private) {
-        this._private = _private;
+    public void setTotalResults(int totalResults) {
+        this.totalResults = totalResults;
     }
 
     /**
      *
      * @return
-     * The results
+     * The tags
      */
-    public List getResults() {
-        return results;
+    public List<Tag> getTags() {
+        return tags;
     }
 
     /**
@@ -173,8 +176,8 @@ public class QiitaGsonResponse {
      * @param tags
      * The tags
      */
-    public void setResults(ArrayList tags) {
-        this.results = results;
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 
     /**
@@ -230,6 +233,5 @@ public class QiitaGsonResponse {
     public void setUrl(String url) {
         this.url = url;
     }
-
 
 }

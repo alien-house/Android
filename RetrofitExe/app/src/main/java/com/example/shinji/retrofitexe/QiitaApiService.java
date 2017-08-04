@@ -12,10 +12,22 @@ import retrofit2.http.Query;
 
 public interface QiitaApiService {
 //    @GET("/ciccc/android/moviedata.json")
-    @GET("/ads/apisearch")
+//    @GET("/ads/apisearch")
+    @GET("items")
     Call<List<QiitaGsonResponse>> getData(
+//            @Query ("page") String page,
+//            @Query ("per_page") String per_page,
+//            @Query ("query") String query
+
             @Query ("publisher") String publisher,
             @Query ("format") String format,
             @Query ("v") int v,
-            @Query ("q") String query);
+            @Query ("q") String query,
+            @Query ("l") String location
+            ,@Query ("userip") String userip
+            ,@Query ("useragent") String useragent
+    );
+
+
+
 }
