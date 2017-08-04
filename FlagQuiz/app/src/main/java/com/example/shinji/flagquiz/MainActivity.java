@@ -17,11 +17,12 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FuncInterface {
 
     // TODO 1) 設定データのキーを設定する
     public static final String CHOICES = "pref_numberOfChoices";
     public static final String REGIONS = "pref_regionsToInclude";
+    public MainActivityFragment quizFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,5 +92,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onReturnFnc() {
+        quizFragment = (MainActivityFragment) getSupportFragmentManager().findFragmentById(R.id.quizFragment);
+        quizFragment.startQuiz();
     }
 }

@@ -1,15 +1,23 @@
 package com.example.shinji.flagquiz;
 
+import android.app.*;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
+import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.app.DialogFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -22,12 +30,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+//import java.util.logging.Handler;
 
 /**
  * Created by shinji on 2017/07/31.
  */
 
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends Fragment{
     private final int FLAGS_IN_QUIZ = 10;
     //TODO 11) Create a list for quiz
     private List<String> fileNameList;
@@ -44,6 +53,9 @@ public class MainActivityFragment extends Fragment {
     private String correctAnswer; // number of correct guesses
     private int guessRows; // number of rows displaying guess Buttons
     private int count = 1;
+    public int countGuess = 0;
+    private Handler handle;
+    private Animation shakeAnimation;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -65,6 +77,11 @@ public class MainActivityFragment extends Fragment {
         guessLinearLayouts[3] = (LinearLayout)view.findViewById(R.id.row4LinearLayout);
         answerTextView = (TextView) view.findViewById(R.id.answerTextView);
 
+        // intialize the animation reference variable
+        shakeAnimation = AnimationUtils.loadAnimation(getActivity(), R.anim.incorrect_shake);
+        shakeAnimation.setRepeatCount(2);
+
+        handle = new Handler();
         return view;
     }
 
@@ -92,6 +109,9 @@ public class MainActivityFragment extends Fragment {
 
     // TODO 12 ) クイズの設定と、次のクイズの準備
     public void startQuiz() {
+        //for restart
+        count = 1;
+        countGuess = 0;
         int i = 0;
         AssetManager assets = getActivity().getAssets();
         try {
@@ -131,7 +151,7 @@ public class MainActivityFragment extends Fragment {
         String nextImage = quizCountriesList.remove(0);
         correctAnswer = nextImage; // 正解を更新
 
-         answerTextView.setText(""); // テキストビューを綺麗に
+        answerTextView.setText(""); // テキストビューを綺麗に
         //国の名前をゲット、フラグから
         String region = nextImage.substring(0, nextImage.indexOf('-'));
         AssetManager assets = getActivity().getAssets();
@@ -192,17 +212,40 @@ public class MainActivityFragment extends Fragment {
             //if the guess is correct
             // display correct answer in green text
             if(guess.equals(answer)){
-                count++;
                 answerTextView.setText(answer + "!");
                 //set the text in green Color
+                answerTextView.setTextColor(getResources().getColor(R.color.correct_answer));
                 disableAllButtons();
 
-                loadNextFlag(); // 次のフラグ
-            }else{
-//                  flagImageView.startAnimation(shakeAnimation); // play shake
+                //dialog end of continue?
+                if(count < 2){
 
+                    handle.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadNextFlag(); // 次のフラグ
+                        }
+                    }, 1000);
+
+                }else{
+                    // finished!bye
+                    ResultDialogAlert dialog = new ResultDialogAlert();
+                    Bundle args = new Bundle();
+                    args.putInt("countGuessInt",countGuess); //引数
+                    args.putInt("count",count); //引数
+                    dialog.setArguments(args);
+                    dialog.show(getActivity().getFragmentManager(), "Alert");
+                }
+
+                count++;
+            }else{
+                countGuess++;
+                Log.e("countGuess",String.valueOf(countGuess));
+//                Animation hyperspaceJump = AnimationUtils.loadAnimation(getActivity(), R.anim.incorrect_shake);
+                flagImageView.startAnimation(shakeAnimation);
                 // display "Incorrect!" in red
                 answerTextView.setText(R.string.incorrect_answer);
+                answerTextView.setTextColor(getResources().getColor(R.color.incorrect_answer));
                 //set the text in red Color
                 guessButton.setEnabled(false); // disable incorrect answer
             }
@@ -224,4 +267,5 @@ public class MainActivityFragment extends Fragment {
     private String getCountryName(String name) {
         return name.substring(name.indexOf('-') + 1).replace('_', ' ');
     }
+
 }
