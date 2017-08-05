@@ -114,10 +114,16 @@ public class MainActivityFragment extends Fragment{
         countGuess = 0;
         int i = 0;
         AssetManager assets = getActivity().getAssets();
+
+//        if(regionsSet.size() == 0) {
+//            regionsSet.add("North_America");
+//        }
+
         try {
             //　国籍のループ
             for (String region : regionsSet) {
                 // 全てのフラグのループ
+                Log.e("IN FLAG regionQUIZ : ", region);
                 String[] paths = assets.list(region);
                 for (String path : paths)
                     fileNameList.add(path.replace(".png", ""));

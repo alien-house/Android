@@ -4,8 +4,10 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -18,6 +20,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements FuncInterface {
 
@@ -35,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements FuncInterface {
         setSupportActionBar(toolbar);
         //set defaultValues! これでデフォルトをセットできる
         PreferenceManager.setDefaultValues(this, R.xml.preference, false);
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(preferenceChangeListener);
 
         int ScreenSize = getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK;
@@ -83,6 +90,34 @@ public class MainActivity extends AppCompatActivity implements FuncInterface {
         //TODO 10) クイズをスタートする
         quizFragment.startQuiz();
     }
+
+    private OnSharedPreferenceChangeListener preferenceChangeListener =
+            new OnSharedPreferenceChangeListener() {
+                @Override
+                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+                    MainActivityFragment quizFragment =
+                            (MainActivityFragment) getSupportFragmentManager().findFragmentById(R.id.quizFragment);
+                    if(s.equals(CHOICES)){
+                        quizFragment.updateGuessRows(sharedPreferences);
+                        quizFragment.startQuiz();
+                    }else if(s.equals(REGIONS)){
+                        Log.e("REGIONS:::::","@@");
+                        Set<String> regionsSet = sharedPreferences.getStringSet(REGIONS,null);
+                        System.out.println(regionsSet.size());
+
+                        if(regionsSet.size() == 0){
+                            regionsSet.add("South_America");
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putStringSet(REGIONS, regionsSet);
+                            editor.apply();
+                            Toast.makeText(getApplicationContext(),"Select at least one Resion",Toast.LENGTH_SHORT).show();
+                        }
+                        quizFragment.updateRegions(sharedPreferences);
+                        quizFragment.startQuiz();
+                    }
+                    Toast.makeText(getApplicationContext(),"The quiz is reset",Toast.LENGTH_SHORT).show();
+                }
+            };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
