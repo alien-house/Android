@@ -43,39 +43,42 @@ public class ResultActivity extends AppCompatActivity {
     private final String URL_API = "?publisher=2612264898312897&latlong=1&co=ca&chnl=&userip=1.2.3.4&useragent=Mozilla/%2F4.0(Firefox)&v=2&format=json";
     private String url;
     private int _totalItemCount = 0;
+    private int resultTotalItem = 0;
+    private JobAdapter myAdapter;
+    private ListView listView;
+    private boolean listenerLock = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
 //        Intent i = getIntent();
-//
 //        String search_loc = i.getStringExtra("SEARCH_LOC");
 //        if (search_loc != null) {// 定義されている
 //            Log.e("search_word::", search_loc);
 //        } else {//まだ定義されていない
 //        }
 //        String search_word = i.getStringExtra("SEARCH_WORD");
-//
-//
 //        if((search_loc.length() > 0) && (search_word.length() > 0)){
 //            makeJsonArrayRequest(search_loc, search_word);
 //        }
         mQueue = Volley.newRequestQueue(this);
-//        String url_base = "http://api.indeed.com/ads/apisearch";
-//        String url_api = "?publisher=2612264898312897&latlong=1&co=ca&chnl=&userip=1.2.3.4&useragent=Mozilla/%2F4.0(Firefox)&v=2&format=json";
+        myAdapter = new JobAdapter(ResultActivity.this);
+//        ArrayAdapter a = new ArrayAdapter<String>(this,R.layout.result_list, listText);
+        listView = (ListView)findViewById(R.id.view_list);
 //        String url_location = "&l=" + search_loc;
 //        String url_query = "&q=" + search_word;
         String url_location = "&l=" + "Vancouver";
-        String url_query = "&q=" + "Front end developer";
+        String url_query = "&q=" + "ios front";
         url = URL_BASE + URL_API + url_location + url_query;
-        makeJsonArrayRequest(url);
+        makeJsonArrayRequest(url, true);
     }
 
     /**
-     * Method to make json array request where response starts with [
+     * Method to make json array request where response starts
      */
-    private void makeJsonArrayRequest(String url) {
+    private void makeJsonArrayRequest(String url, final boolean begin) {
+        Log.d("makeJsonArrayRequest::","何回通る？"+begin);
 
         JsonObjectRequest jsonObjectReq = new JsonObjectRequest(
                 Request.Method.GET, url,
@@ -87,8 +90,18 @@ public class ResultActivity extends AppCompatActivity {
                         try {
                             Log.d(LOG_TAG, "Value: " + response.getString("query"));
                             Log.d(LOG_TAG, "results: " + response.getJSONArray("results"));
-                            JSONArray itemArray = response.getJSONArray("results");
-                            parseData(itemArray);
+                            // if no result
+                            if(response.getInt("totalResults") == 0){
+                                String txt = "No results were found for \" " + response.getString("query") + "\"";
+                                Toast.makeText(getApplicationContext(), txt, Toast.LENGTH_SHORT).show();
+                            }else{
+                                resultTotalItem = response.getInt("totalResults");
+                                JSONArray itemArray = response.getJSONArray("results");
+                                makeDataToListview(itemArray);
+                                if(begin){
+                                    settingListView();
+                                }
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -102,47 +115,39 @@ public class ResultActivity extends AppCompatActivity {
                     }
                 }
         );
-
         mQueue.add(jsonObjectReq);
     }
 
-    public void parseData(JSONArray itemArray){
+    public void makeDataToListview(JSONArray itemArray){
         try {
             for (int i = 0 ; i < itemArray.length(); i++) {
                 JSONObject obj = itemArray.getJSONObject(i);
                 Log.d(LOG_TAG, obj.getString("company"));
-                //Job(String title, String url, String company, String description, String postedDate, String area){
-                joblist.add(new Job(
-                        obj.getString("jobtitle"),
-                        obj.getString("url"),
-                        obj.getString("company"),
-                        obj.getString("snippet"),
-                        obj.getString("formattedRelativeTime"),
-                        obj.getString("formattedLocation")
-                ));
+                addList(obj);
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-//        ArrayAdapter a = new ArrayAdapter<String>(this,R.layout.result_list, listText);
-        ListView listView = (ListView)findViewById(R.id.view_list);
+        listenerLock = false;
 
-        JobAdapter myAdapter = new JobAdapter(ResultActivity.this);
+//        if(_totalItemCount >= 10){
+//            Log.e("restoreListPosition @_", String.valueOf(_totalItemCount));
+//            // 現在のスクリーン上端に表示されているインデックスを取得する
+//            int position = listView.getFirstVisiblePosition();
+//            int yOffset = 0;
+//            Log.e("restoreListPosition @_:", String.valueOf(listView.getChildCount()));
+//            if (listView.getChildCount() > 0) {
+//                yOffset = listView.getChildAt(0).getTop();
+//            }
+//            listView.setSelectionFromTop(position, yOffset);
+////            restoreListPosition(listView);
+//        }
+    }
+
+    /* 一度でいい処理 */
+    void settingListView() {
         myAdapter.setJobList(joblist);
         listView.setAdapter(myAdapter);
-        Log.e("parseData:", String.valueOf(_totalItemCount));
-        if(_totalItemCount >= 10){
-            Log.e("restoreListPosition @_", String.valueOf(_totalItemCount));
-            // 現在のスクリーン上端に表示されているインデックスを取得する
-            int position = listView.getFirstVisiblePosition();
-            int yOffset = 0;
-            Log.e("restoreListPosition @_:", String.valueOf(listView.getChildCount()));
-            if (listView.getChildCount() > 0) {
-                yOffset = listView.getChildAt(0).getTop();
-            }
-            listView.setSelectionFromTop(position, yOffset);
-//            restoreListPosition(listView);
-        }
 
         //リスト項目が選択された時のイベントを追加
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -164,43 +169,46 @@ public class ResultActivity extends AppCompatActivity {
             @Override
             public void onScrollStateChanged(AbsListView absListView, int i) {
             }
-
             @Override
             public void onScroll(AbsListView absListView,
                                  int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 if (totalItemCount != 0 && totalItemCount == firstVisibleItem + visibleItemCount) {
                     // 最後尾までスクロールしたので、何かデータ取得する処理
-                    Log.e("firstVisibleItem", String.valueOf(firstVisibleItem));
-                    Log.e("visibleItemCount", String.valueOf(visibleItemCount));
-                    Log.e("totalItemCount", String.valueOf(totalItemCount));
-                    _totalItemCount = totalItemCount;
-                    url += "&start=" + String.valueOf(totalItemCount + 1);
-                    makeJsonArrayRequest(url);
+                    if(!listenerLock){
+                        listenerLock = true;
+                        Log.e("firstVisibleItem", String.valueOf(firstVisibleItem));
+                        Log.e("visibleItemCount", String.valueOf(visibleItemCount));
+                        Log.e("totalItemCount", String.valueOf(totalItemCount));
+                        _totalItemCount = totalItemCount;
+                        if(resultTotalItem != totalItemCount){
+                            String new_url = url + "&start=" + String.valueOf(totalItemCount);
+                            Log.e("onScroll::", new_url);
+                            makeJsonArrayRequest(new_url, false);
+                        }
+                    }
                 }
             }
         });
-
-
     }
 
 
-    public void restoreListPosition(ListView listView) {
+
+    void restoreListPosition() {
         Log.e("restoreListPosition @_", String.valueOf(_totalItemCount));
         System.out.println(listView);
     }
-//    void makeFakeDate(){
-//        joblist.add( new Job("Web Developler", "http://google.com/", "koooo","korekorekore", "2days ago"));
-//        joblist.add( new Job("Front Developler", "http://rrrr.com/", "koooo","kiieure", "3days ago"));
-//        joblist.add( new Job("Back Developler", "http://dede.com/", "tste","eeee", "5days ago"));
-//    }
 
-//    void addList(){
-//        Food food = new Food();
-//        food.setName("りんご");
-//        food.setPrice(100);
-//        list.add(food);
-//        myAdapter.notifyDataSetChanged();
-//    }
+    void addList(JSONObject obj) throws JSONException {
+        joblist.add(new Job(
+                obj.getString("jobtitle"),
+                obj.getString("url"),
+                obj.getString("company"),
+                obj.getString("snippet"),
+                obj.getString("formattedRelativeTime"),
+                obj.getString("formattedLocation")
+        ));
+        myAdapter.notifyDataSetChanged();
+    }
 
 }
 
