@@ -64,7 +64,7 @@ public class JobAdapter extends BaseAdapter {
             holder = (ViewHolder) view.getTag();
         }
 
-        holder.job_title.setText(String.valueOf(jobList.get(i).getID()) + ":" + jobList.get(i).getTitle());
+        holder.job_title.setText(jobList.get(i).getTitle());
         holder.job_company.setText(jobList.get(i).getCompany());
         holder.job_area.setText(jobList.get(i).getArea());
         holder.job_posttime.setText(jobList.get(i).getPostedDate());

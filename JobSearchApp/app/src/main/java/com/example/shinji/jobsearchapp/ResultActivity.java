@@ -1,5 +1,6 @@
 package com.example.shinji.jobsearchapp;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,6 +15,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -36,6 +39,7 @@ import java.util.ArrayList;
  */
 
 public class ResultActivity extends AppCompatActivity {
+//    private ProgressBar spinner;
     private ArrayList<Job> joblist = new ArrayList();
     public static final String LOG_TAG = "volley_test";
     private RequestQueue mQueue;
@@ -47,31 +51,64 @@ public class ResultActivity extends AppCompatActivity {
     private JobAdapter myAdapter;
     private ListView listView;
     private boolean listenerLock = false;
+    private Button btnSearch;
+    private TextView txtSearchWord;
+    ProgressDialog progressDialog;
+    private String url_query;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
-//        Intent i = getIntent();
-//        String search_loc = i.getStringExtra("SEARCH_LOC");
-//        if (search_loc != null) {// 定義されている
-//            Log.e("search_word::", search_loc);
-//        } else {//まだ定義されていない
-//        }
-//        String search_word = i.getStringExtra("SEARCH_WORD");
-//        if((search_loc.length() > 0) && (search_word.length() > 0)){
-//            makeJsonArrayRequest(search_loc, search_word);
-//        }
-        mQueue = Volley.newRequestQueue(this);
-        myAdapter = new JobAdapter(ResultActivity.this);
-//        ArrayAdapter a = new ArrayAdapter<String>(this,R.layout.result_list, listText);
-        listView = (ListView)findViewById(R.id.view_list);
-//        String url_location = "&l=" + search_loc;
-//        String url_query = "&q=" + search_word;
-        String url_location = "&l=" + "Vancouver";
-        String url_query = "&q=" + "ios front";
-        url = URL_BASE + URL_API + url_location + url_query;
-        makeJsonArrayRequest(url, true);
+        txtSearchWord = (TextView) findViewById(R.id.searchWord);
+        txtSearchWord.setNextFocusDownId(R.id.btnSearch);
+        btnSearch = (Button) findViewById(R.id.btnSearch);
+//        spinner = (ProgressBar)findViewById(R.id.progressBar1);
+//        spinner.setVisibility(View.VISIBLE);
+
+//        ProgressDialog.show(Context context, CharSequence title, CharSequence message);
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Loading");
+        progressDialog.setMessage("....");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
+
+        Intent i = getIntent();
+        String search_loc = i.getStringExtra("SEARCH_LOC");
+        if (search_loc != null) {
+            Log.e("search_word::", search_loc);
+        }
+        String search_word = i.getStringExtra("SEARCH_WORD");
+        if((search_loc.length() > 0) && (search_word.length() > 0)){
+            mQueue = Volley.newRequestQueue(this);
+            myAdapter = new JobAdapter(ResultActivity.this);
+            listView = (ListView)findViewById(R.id.view_list);
+            String url_location = "&l=" + search_loc;
+            url_query = "&q=" + search_word;
+            url = URL_BASE + URL_API + url_location + url_query;
+            txtSearchWord.setText(search_word);
+            makeJsonArrayRequest(url, true);
+        }
+
+        btnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(txtSearchWord.getText().toString().matches("")){
+                    Toast.makeText(getApplicationContext(), "You did not enter any words", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                progressDialog.show();
+                joblist.clear();
+                String url_location = "&l=" + "Vancouver";
+                url_query = "&q=" + txtSearchWord.getText().toString();
+                url = URL_BASE + URL_API + url_location + url_query;
+                Log.e("onScroll::", url);
+                makeJsonArrayRequest(url, true);
+                myAdapter.notifyDataSetChanged();
+            }
+        });
+
     }
 
     /**
@@ -88,13 +125,16 @@ public class ResultActivity extends AppCompatActivity {
                         Log.d("onResponse::","====================");
                         Log.d(LOG_TAG, response.toString());
                         try {
+                            progressDialog.dismiss();
                             Log.d(LOG_TAG, "Value: " + response.getString("query"));
                             Log.d(LOG_TAG, "results: " + response.getJSONArray("results"));
                             // if no result
                             if(response.getInt("totalResults") == 0){
+                                txtSearchWord.setText("");
                                 String txt = "No results were found for \" " + response.getString("query") + "\"";
                                 Toast.makeText(getApplicationContext(), txt, Toast.LENGTH_SHORT).show();
                             }else{
+                                setTitle("Results:" + response.getInt("totalResults"));
                                 resultTotalItem = response.getInt("totalResults");
                                 JSONArray itemArray = response.getJSONArray("results");
                                 makeDataToListview(itemArray);
@@ -112,6 +152,7 @@ public class ResultActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
                         Log.d("error::","~~~~~~~~~~~~~~~~~~~~~~");
                         Log.d(LOG_TAG, error.toString());
+                        progressDialog.dismiss();
                     }
                 }
         );
@@ -183,6 +224,7 @@ public class ResultActivity extends AppCompatActivity {
                         if(resultTotalItem != totalItemCount){
                             String new_url = url + "&start=" + String.valueOf(totalItemCount);
                             Log.e("onScroll::", new_url);
+                            progressDialog.show();
                             makeJsonArrayRequest(new_url, false);
                         }
                     }
