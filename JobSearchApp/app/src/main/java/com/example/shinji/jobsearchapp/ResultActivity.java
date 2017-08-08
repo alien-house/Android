@@ -189,10 +189,12 @@ public class ResultActivity extends AppCompatActivity {
     void settingListView() {
         myAdapter.setJobList(joblist);
         listView.setAdapter(myAdapter);
+        Log.e("settingListView", "settingListView======");
 
         //リスト項目が選択された時のイベントを追加
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.e("setOnItemClickListener", String.valueOf(position));
 //                String msg = position + "番目のアイテムがクリックされました";
 //                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
 //                Intent i = new Intent(ResultActivity.this, DetailActivity.class);

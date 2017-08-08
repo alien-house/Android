@@ -42,6 +42,8 @@
         android:text="\@area"
         android:textColor="#AAAAAA"
         android:inputType="text"
+        android:focusableInTouchMode="false"
+        android:focusable="false"
         android:textSize="10sp"/>
   </LinearLayout>
 
