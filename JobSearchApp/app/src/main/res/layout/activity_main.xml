@@ -15,7 +15,8 @@
                android:layout_gravity="center"
                android:scaleType="centerInside"
                android:src="@drawable/top_image"
-               android:layout_marginBottom="20dp"
+               android:layout_marginBottom="10dp"
+               android:layout_marginTop="5dp"
         />
         <EditText
             android:id="@+id/searchLocation"

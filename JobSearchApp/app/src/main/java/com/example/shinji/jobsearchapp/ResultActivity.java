@@ -115,7 +115,6 @@ public class ResultActivity extends AppCompatActivity {
      * Method to make json array request where response starts
      */
     private void makeJsonArrayRequest(String url, final boolean begin) {
-        Log.d("makeJsonArrayRequest::","何回通る？"+begin);
 
         JsonObjectRequest jsonObjectReq = new JsonObjectRequest(
                 Request.Method.GET, url,

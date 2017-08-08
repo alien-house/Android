@@ -74,7 +74,7 @@ public class JobAdapter extends BaseAdapter {
 
 //        view.setOnClickListener(new AdapterView.OnItemClickListener() {
 //            public void onItemClick(AdapterView<?> parent, View views, int position, long id) {
-//                String msg = position + "番目のアイテムがクリックされました";
+//                String msg = position + "items";
 //                Log.e("Msg:::",msg);
 //
 //            }
