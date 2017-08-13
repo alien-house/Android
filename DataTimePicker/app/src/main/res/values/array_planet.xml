@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string-array name="planetnames">
+    <item>sun</item>
+    <item>mars</item>
+    <item>earth</item>
+    <item>venus</item>
+    <item>starne</item>
+    <item>neptune</item>
+    <item>pluto</item>
+  </string-array>
+  <string-array name="array2">
+    <item>data1</item>
+    <item>data2</item>
+    <item>data3</item>
+    <item>data4</item>
+    <item>data5</item>
+  </string-array>
+</resources>

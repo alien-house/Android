@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--https://developer.android.com/guide/topics/resources/animation-resource.html-->
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+  <alpha android:fromAlpha="0.5"
+      android:toAlpha="1.0">
+  </alpha>
+  <rotate android:fromDegrees="2.8"
+      android:toDegrees="0">
+  </rotate>
+</set>

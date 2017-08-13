@@ -1,0 +1,36 @@
+<resources>
+  <string name="app_name">ASG.ViewList</string>
+  <string-array name="lists_array">
+    <item>LINEAR LAYOUT</item>
+    <item>RELATIVE LAYOUT</item>
+    <item>TABLE LAYOUT</item>
+    <item>FRAME LAYOUT</item>
+    <item>LIST VIEW</item>
+    <item>GRID VIEW</item>
+    <item>RECYLCER VIEW</item>
+  </string-array>
+  <string name="page_contents0">
+    ^_ ^ LinearLayout &lt;a href="http://www.google.com">Google&lt;/a> is a \<a href="http://somesite.com/">view\</a> group that aligns all children in a single direction, vertically or horizontally. You can specify the layout direction with the android:orientation attribute.
+  </string>
+  <string name="page_contents1">
+    A Layout where the positions of the children can be described in relation to each other or to the parent.
+Note that you cannot have a circular dependency between the size of the RelativeLayout and the position of its children. For example, you cannot have a RelativeLayout whose height is set to WRAP_CONTENT and a child set to ALIGN_PARENT_BOTTOM.
+  </string>
+  <string name="page_contents2">
+    A layout that arranges its children into rows and columns. A TableLayout consists of a number of TableRow objects, each defining a row (actually, you can have other children, which will be explained below). TableLayout containers do not display border lines for their rows, columns, or cells. Each row has zero or more cells; each cell can hold one View object. The table has as many columns as the row with the most cells. A table can leave cells empty. Cells can span columns, as they can in HTML.
+  </string>
+  <string name="page_contents3">
+    FrameLayout is designed to block out an area on the screen to display a single item. Generally, FrameLayout should be used to hold a single child view, because it can be difficult to organize child views in a way that\'s scalable to different screen sizes without the children overlapping each other. You can, however, add multiple children to a FrameLayout and control their position within the FrameLayout by assigning gravity to each child, using the android:layout_gravity attribute.
+  </string>
+  <string name="page_contents4">
+    ListView is a view group that displays a list of scrollable items. The list items are automatically inserted to the list using an Adapter that pulls content from a source such as an array or database query and converts each item result into a view that\'s placed into the list.
+
+For an introduction to how you can dynamically insert views using an adapter, read Building Layouts with an Adapter.
+  </string>
+  <string name="page_contents5">
+    GridView is a ViewGroup that displays items in a two-dimensional, scrollable grid. The grid items are automatically inserted to the layout using a ListAdapter.For an introduction to how you can dynamically insert views using an adapter, read Building Layouts with an Adapter.
+  </string>
+  <string name="page_contents6">
+    Many apps need to display user-interface elements based on large data sets, or data that frequently changes. For example, a music app might need to display information about thousands of albums, but only a dozen of those albums might be on-screen at a time. If the app created UI widgets for each of those albums, the app would end up using a lot of memory and storage, potentially making the app slow and crash-prone. On the other hand, if the app created UI widgets each time a new album scrolled onto the screen and destroyed the widgets when it scrolled off, that would also cause the app to run slowly, since creating UI objects is a resource-intensive operation.
+  </string>
+</resources>
