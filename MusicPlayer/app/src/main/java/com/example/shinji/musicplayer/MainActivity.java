@@ -1,5 +1,6 @@
 package com.example.shinji.musicplayer;
 
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -39,7 +40,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.play:
                 if (play_reset) {
                     play_reset = false;
-                    player.setLooping(false);
+//                    player.setLooping(false);
+                    Intent i= new Intent(this, MusicService.class);
+                    startService(i);
                 }
                 playPause();
                 break;
