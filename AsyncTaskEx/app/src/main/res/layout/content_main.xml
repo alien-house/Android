@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="90dp"
+    android:orientation="vertical">
+  <ProgressBar
+      android:id="@+id/progresslistitems"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+      android:indeterminate="false"
+      android:max="100"
+      android:layout_margin="5dp"
+      android:visibility="gone"
+      />
+
+  <TextView
+      android:id="@+id/textviewprogress"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="update change"
+      android:layout_margin="5dp"
+      />
+
+  <ListView
+      android:id="@+id/listviewcities"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_margin="5dp">
+  </ListView>
+
+</LinearLayout>
