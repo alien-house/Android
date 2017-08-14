@@ -18,9 +18,10 @@
         <category android:name="android.intent.category.LAUNCHER"/>
       </intent-filter>
     </activity>
+    <service android:name=".MusicService"
+             android:enabled="true" />
+    <activity android:name=".Music">
+    </activity>
   </application>
-
-  <activity android:name=".Music">
-  </activity>
 
 </manifest>

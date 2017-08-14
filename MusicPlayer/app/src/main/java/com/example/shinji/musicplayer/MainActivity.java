@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
@@ -17,6 +18,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ImageButton playButton, stopButton, resetButton;
     boolean play_reset = true;
     private SeekBar seekbar;
+    Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,21 +36,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         resetButton.setOnClickListener(this);
     }
 
+
     @Override
     public void onClick(View v) {
+        Log.e("onClick","View");
         switch (v.getId()) {
             case R.id.play:
                 if (play_reset) {
                     play_reset = false;
+                    Intent intent = new Intent(this, MusicService.class);
+                    startService(intent);
 //                    player.setLooping(false);
-                    Intent i= new Intent(this, MusicService.class);
-                    startService(i);
                 }
                 playPause();
+                Log.e("onClick","kiteru");
                 break;
             case R.id.stop:
                 if (!play_reset) {
-                    player.stop();
+//                    player.stop();
+                    intent = new Intent(this, MusicService.class);
+                    stopService(intent);
                     playButton.setImageResource(R.drawable.buttonplay);
                     Toast.makeText(this, R.string.stopped, Toast.LENGTH_SHORT).show();
                     try {
@@ -86,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         player.release();
         play_reset = true;
     }
+
     // Toggle between the buttonplay and pause
     private void playPause() {
 // if the music is playing then pause the music playback
@@ -103,4 +111,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(this, R.string.isPlaying, Toast.LENGTH_SHORT).show();
         }
     }
+
 }
