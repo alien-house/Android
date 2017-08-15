@@ -46,6 +46,7 @@ public class JobAdapter extends BaseAdapter {
     public long getItemId(int i) {
         return jobList.get(i).getID();
     }
+
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         final ViewHolder holder;
