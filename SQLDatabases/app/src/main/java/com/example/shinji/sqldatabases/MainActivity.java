@@ -17,6 +17,10 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * this class to ac
+ * @author shinji
+ */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     DatabaseHandler dbHandler = new DatabaseHandler(this);
     Button btnAdd,btnUpdate,btnDelete;
@@ -28,6 +32,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     List<Integer> listID = new ArrayList<Integer>();
     List<String> listTitle = new ArrayList<String>();
     List<String> listAuthor = new ArrayList<String>();
+
+    private Integer selectedID; //selected item ID
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,10 +50,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         editAuthor = (EditText) findViewById(R.id.editAuthor);
         listViewBooks = (ListView) findViewById(R.id.listview);
         getAllItem(0, true);
+
         //click
         listViewBooks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.e("setOnItemClickListener", String.valueOf(position));
+                selectedID = booklist.get(position).getId();
                 String txtTitle = booklist.get(position).getTitle();
                 String txtAuthor = booklist.get(position).getAuthor();
                 editTitle.setText(txtTitle);
@@ -75,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -92,14 +99,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 int maxNum = bookAdapter.getCount();
                 System.out.println(maxNum);
                 getAllItem(maxNum, false);
-//                booklist = dbHandler.getAllBooks();
-//                for(int i = maxNum; i < booklist.size(); i++){
-//                    listID.add(i, booklist.get(i).getId());
-//                    listTitle.add(i, booklist.get(i).getTitle());
-//                    listAuthor.add(i, booklist.get(i).getAuthor());
-//                }
-//                bookAdapter.notifyDataSetChanged();
-
+                break;
+            case R.id.btnDelete:
                 break;
         }
         InputMethodManager inputMethodMgr = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);

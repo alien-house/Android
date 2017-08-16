@@ -12,6 +12,7 @@ import java.util.List;
 
 /**
  * Created by shinji on 2017/08/15.
+ *
  */
 
 public class BookAdapter extends BaseAdapter {
