@@ -69,10 +69,59 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-    public List<Book> getAllBooks(){
+    public int updateBook(Book book){
+        //1. Open datebase wtiteable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+        //2. create ContentValue (key&value pair)
+        ContentValues value = new ContentValues();
+        value.put(KEY_NAME, book.getTitle());
+        value.put(KEY_AUTHOR, book.getAuthor());
+        //3. updaing a row using db.update()
+        int result = db.update(TABLE_NAME, value, KEY_ID + " = ? ",
+                new String[]{String.valueOf(book.getId())});
+        db.close();
+        return result;
+    }
+
+    public int deleteBook(Book book){
+        //1. Open datebase wtiteable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+        //3. updaing a row using db.update()
+        int result = db.delete(TABLE_NAME, KEY_ID + " = ? ",
+                new String[]{String.valueOf(book.getId())});
+        db.close();
+        return result;
+    }
+
+
+    public Book readBook(int selectedID){
+        // open the database of the application context
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_ID   + " = " + selectedID;
+        // read the book with "id" from the database
+        // get book query
+        Cursor cursor = db.rawQuery(query,null);
+
+        // if results !=null, parse the first one
+        if (cursor != null)
+            cursor.moveToFirst();
+
+        Book book = new Book();
+        book.setId(Integer.parseInt(cursor.getString(0)));
+        book.setTitle(cursor.getString(1));
+        book.setAuthor(cursor.getString(2));
+
+        db.close();
+        return book;
+    }
+
+    public List<Book> getAllBooks(String sort){
         List<Book> books = new LinkedList<Book>();
         //9. Create a select query
         String query = "SELECT * FROM " + TABLE_NAME;
+        if(!sort.equals("")){
+            query += " ORDER BY "+ sort + " ASC";
+        }
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(query, null);
@@ -92,6 +141,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         return books;
     }
+
 
 }
 

@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     DatabaseHandler dbHandler = new DatabaseHandler(this);
-    Button btnAdd,btnUpdate,btnDelete;
+    Button btnAdd, btnUpdate, btnDelete, btnSortByTitle, btnSortByAuthor;
     EditText editTitle, editAuthor;
 
     private List<Book> booklist;
@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     List<String> listTitle = new ArrayList<String>();
     List<String> listAuthor = new ArrayList<String>();
 
-    private Integer selectedID; //selected item ID
+    private Integer selectedID, selectedListPosition; //selected item ID
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,32 +43,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnAdd = (Button) findViewById(R.id.btnAdd);
         btnUpdate = (Button) findViewById(R.id.btnUpdate);
         btnDelete = (Button) findViewById(R.id.btnDelete);
+        btnSortByTitle = (Button) findViewById(R.id.btnSortByTitle);
+        btnSortByAuthor = (Button) findViewById(R.id.btnSortByAuthor);
         btnAdd.setOnClickListener(this);
         btnUpdate.setOnClickListener(this);
         btnDelete.setOnClickListener(this);
+        btnSortByTitle.setOnClickListener(this);
+        btnSortByAuthor.setOnClickListener(this);
         editTitle = (EditText) findViewById(R.id.editTitle);
         editAuthor = (EditText) findViewById(R.id.editAuthor);
         listViewBooks = (ListView) findViewById(R.id.listview);
-        getAllItem(0, true);
+        getAllItem(0, true, "");
 
         //click
         listViewBooks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.e("setOnItemClickListener", String.valueOf(position));
+                selectedListPosition = position;
                 selectedID = booklist.get(position).getId();
-                String txtTitle = booklist.get(position).getTitle();
-                String txtAuthor = booklist.get(position).getAuthor();
-                editTitle.setText(txtTitle);
-                editAuthor.setText(txtAuthor);
+//                String txtTitle = booklist.get(position).getTitle();
+//                String txtAuthor = booklist.get(position).getAuthor();
+//                editTitle.setText(txtTitle);
+//                editAuthor.setText(txtAuthor);
+
+                Book b = null;
+                b = dbHandler.readBook(selectedID);
+                editTitle.setText(b.getTitle());
+                editAuthor.setText(b.getAuthor());
+//                Toast.makeText(getApplicationContext(), "BOOK READ SUCCESFULLY", Toast.LENGTH_LONG).show();
+                Log.e("setOnItemClickListenerp", String.valueOf(position));
+                Log.e("setOnItemClickListeners", String.valueOf(selectedID));
             }
         });
 
     }
 
-    public void getAllItem(int startNum, boolean isFirst){
+    public void getAllItem(int startNum, boolean isFirst, String sort){
 
+        if(!isFirst) {
+            listID.clear();
+            listTitle.clear();
+            listAuthor.clear();
+            booklist.clear();
+        }
         //8 read from database into list
-        booklist = dbHandler.getAllBooks();
+        booklist = dbHandler.getAllBooks(sort);
 
         for(int i = startNum; i < booklist.size(); i++){
             listID.add(i, booklist.get(i).getId());
@@ -92,15 +110,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }else{
                     dbHandler.addBook(new Book(editTitle.getText().toString(), editAuthor.getText().toString()));
                     Toast.makeText(this, "DATABASE CREATED SUCCESFULLUY", Toast.LENGTH_LONG).show();
+                    int maxNum = bookAdapter.getCount();
+                    getAllItem(maxNum, false, "");
                 }
                 break;
             case R.id.btnUpdate:
-                Toast.makeText(this, "UPDATED!", Toast.LENGTH_SHORT).show();
-                int maxNum = bookAdapter.getCount();
-                System.out.println(maxNum);
-                getAllItem(maxNum, false);
+                //for db
+                Book book = new Book();
+                book.setId(selectedID);
+                book.setTitle(editTitle.getText().toString());
+                book.setAuthor(editAuthor.getText().toString());
+                dbHandler.updateBook(book);
+                int rowAffected = dbHandler.updateBook(book);
+
+                //for view
+                listTitle.set(selectedListPosition, editTitle.getText().toString());
+                listAuthor.set(selectedListPosition, editAuthor.getText().toString());
+                bookAdapter.notifyDataSetChanged();
+                Toast.makeText(this, "ROWS " + rowAffected + " are updated ", Toast.LENGTH_SHORT).show();
+
                 break;
             case R.id.btnDelete:
+                Book bookDelete = new Book();
+                bookDelete.setId(selectedID);
+                bookDelete.setTitle(editTitle.getText().toString());
+                bookDelete.setAuthor(editAuthor.getText().toString());
+                int rowAffectedDelete = dbHandler.deleteBook(bookDelete);
+                Toast.makeText(this, "ROWS " + rowAffectedDelete + " are deleted ", Toast.LENGTH_SHORT).show();
+                listID.remove(selectedListPosition);
+                listTitle.remove(selectedListPosition);
+                listAuthor.remove(selectedListPosition);
+                bookAdapter.notifyDataSetChanged();
+                break;
+            case R.id.btnSortByTitle:
+//                Toast.makeText(this, "Click btnSortByTitle", Toast.LENGTH_LONG).show();
+                getAllItem(0, false, "title");
+                break;
+            case R.id.btnSortByAuthor:
+//                Toast.makeText(this, "Click btnSortByAuthor", Toast.LENGTH_LONG).show();
+                getAllItem(0, false, "author");
                 break;
         }
         InputMethodManager inputMethodMgr = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
