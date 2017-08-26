@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+//https://github.com/dwa012/CSCI4669-Fall14-Android/tree/master/Book%20Example%20Code/Android%20Studio/AddressBook/app/src/main
+
 public class MainActivity extends AppCompatActivity implements ContactsFragment.ContactFragmentInterface,
         AddEditFragment.AddEditFragmentInterface,
         DetailFragment.DetailFragmentInterface{
@@ -29,16 +31,36 @@ public class MainActivity extends AppCompatActivity implements ContactsFragment.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        contactsFragment = new ContactsFragment();
         //add the fragment into framelayout
         //use fragment transaction
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragmentContainer, contactsFragment);
-        fragmentTransaction.commit();
+
+        if (findViewById(R.id.fragmentContainer) != null) { // phone
+            contactsFragment = new ContactsFragment();
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.fragmentContainer, contactsFragment);
+            fragmentTransaction.commit();
+        }
+        else{
+//            contactsFragment = new ContactsFragment();
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            contactsFragment = (ContactsFragment) getSupportFragmentManager().findFragmentById(R.id.contactsFragment);
+            fragmentTransaction.replace(R.id.contactsFragment, contactsFragment);
+            fragmentTransaction.commit();
+        }
 
 //        displayAddEditFragment(R.id.fragmentContainer, null);
     }
 
+    @Override
+    protected void onResume(){
+        super.onResume();
+
+        // if contactListFragment is null, activity running on tablet,
+        // so get reference from FragmentManager
+        if (contactsFragment == null){
+            contactsFragment = (ContactsFragment) getSupportFragmentManager().findFragmentById(R.id.contactsFragment);
+        }
+    }
     //display fragment for adding a new or editing an exisiting
     //ViewID is layout id
     //contacturi is the path for contentprovider
@@ -58,18 +80,28 @@ public class MainActivity extends AppCompatActivity implements ContactsFragment.
 
     @Override
     public void onAddContact() {
-        displayAddEditFragment(R.id.fragmentContainer,null);
+
+        if (findViewById(R.id.fragmentContainer) != null)
+            displayAddEditFragment(R.id.fragmentContainer, null);
+        else
+            displayAddEditFragment(R.id.rightPaneContainer, null);
+
     }
 
     @Override
     public void onContactSelected(Uri uri) {
         DetailFragment detailFragment = new DetailFragment();
         //use FragmentTranscation
-        FragmentTransaction transaction =
-                getSupportFragmentManager()
-                        .beginTransaction();
-        transaction.replace(R.id.fragmentContainer,
-                detailFragment);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+        if (findViewById(R.id.fragmentContainer) != null) // phone
+            transaction.replace(R.id.fragmentContainer, detailFragment);
+        else // tablet
+        {
+            getFragmentManager().popBackStack(); // removes top of back stack
+            transaction.replace(R.id.rightPaneContainer, detailFragment);
+        }
+
         transaction.addToBackStack(null);
         transaction.commit();
 
@@ -89,12 +121,17 @@ public class MainActivity extends AppCompatActivity implements ContactsFragment.
 
     @Override
     public void onEditContact(Uri uri) {
-        displayAddEditFragment(R.id.fragmentContainer, uri);
+
+        if (findViewById(R.id.fragmentContainer) != null)
+            displayAddEditFragment(R.id.fragmentContainer, uri);
+        else
+            displayAddEditFragment(R.id.rightPaneContainer, null);
     }
 
     @Override
     public void onContactDeleted() {
 
+        getSupportFragmentManager().popBackStack();
 //        contactsFragment = new ContactsFragment();
 //        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 //        fragmentTransaction.replace(R.id.fragmentContainer, contactsFragment);

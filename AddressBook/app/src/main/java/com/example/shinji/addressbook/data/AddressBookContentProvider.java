@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.example.shinji.addressbook.R;
 
@@ -155,6 +156,8 @@ public class AddressBookContentProvider extends ContentProvider {
             case ONE_CONTACT :
                 // get from the uri the id of contact for delete
                 String id = uri.getLastPathSegment();
+                Log.e("uri::::",String.valueOf(uri));
+                Log.e("id::::",String.valueOf(id));
                 //delete()
                 // 1. Table name
                 // 2. Where Clause

@@ -18,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.example.shinji.addressbook.data.DatabaseDescription;
 
@@ -44,9 +45,11 @@ public class ContactsFragment extends Fragment implements LoaderManager.LoaderCa
 
         setHasOptionsMenu(true); // fragment has menu items to display
         // inflate GUI and get reference to the RecyclerView
-        View view = inflater.inflate(
-                R.layout.fragment_contacts, container, false
-        );
+        View view = inflater.inflate(R.layout.fragment_contacts, container, false);
+
+//        FrameLayout frameLayout = (FrameLayout) findViewById(R.id.toolbar);
+//        rightPaneContainer
+
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         //set layoutManager
         recyclerView.setLayoutManager(
@@ -85,6 +88,7 @@ public class ContactsFragment extends Fragment implements LoaderManager.LoaderCa
 
 
     @Override
+    //called once the fragment is associated with its activity.
     public void onAttach(Context context) {
         super.onAttach(context);
         contactFragmentInterface = (ContactFragmentInterface) context;
@@ -116,6 +120,7 @@ public class ContactsFragment extends Fragment implements LoaderManager.LoaderCa
         return c;
     }
 
+    //send data to adapter
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         contactAdapter.notifyChange(data);

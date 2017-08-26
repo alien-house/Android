@@ -32,6 +32,8 @@ import com.example.shinji.addressbook.data.DatabaseDescription;
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private int detailIndex = 0;
+
     //callback methods implemented by Mainactivity
     public interface DetailFragmentInterface{
         //method for edit and delete
@@ -77,8 +79,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         zipTextView = (TextView) view.findViewById(R.id.zipTextView);
         //get the bundle value for selected contact URI
         Bundle arg = getArguments();
-        contactUri = arg.getParcelable(
-                MainActivity.CONTACT_URI);
+        contactUri = arg.getParcelable(MainActivity.CONTACT_URI);
+        Log.d("Detailed arg " , arg.toString());
         Log.d("Detailed uri " , contactUri.toString());
 
         //Get the Loader to load the contact
@@ -113,38 +115,40 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         switch (item.getItemId()){
             case R.id.action_edit :
                 //it will take you to Mainactitiy
-                detailFragmentInterface.onEditContact(contactUri);
+                detailFragmentInterface.onEditContact(contactUri);// 遷移用
                 return true;
             case R.id.action_delete :
-                deleteContact();
+                deleteContact(contactUri);
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void deleteContact(){
+    public void deleteContact(final Uri uri){
 
         // use FragmentManager to display the confirmDelete DialogFragment
 
         new android.support.v7.app.AlertDialog.Builder(getContext())
-                .setTitle("title")
-                .setMessage("message")
+                .setTitle("delete")
+                .setMessage("Are you sure that you really want to delete?")
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // OK button pressed
+//                        System.out.println(uri);
+//                        Log.e("uri:",String.valueOf(uri));
                         String mSelectionClause = DatabaseDescription.Contact._ID + " LIKE ?";
-                        String[] mSelectionArgs = {"user"};
-                        Uri newContactUri = getActivity().getContentResolver().delete(
-                                DatabaseDescription.Contact.CONTENT_URI,
+                        String[] mSelectionArgs = {};
+                        int deleteContact = getActivity().getContentResolver().delete(
+                                uri,
                                 mSelectionClause,
                                 mSelectionArgs);
+                        System.out.println("deleteContact::"+deleteContact);
+                        detailFragmentInterface.onContactDeleted();
                     }
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
-
-
     }
 
     @Override
@@ -186,6 +190,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             zipTextView.setText(data.getString(zipIndex));
             Log.d("detail name I  ", String.valueOf(nameIndex));
             Log.d("detail name V ", data.getString(nameIndex));
+            detailIndex = nameIndex;
         }
 
     }

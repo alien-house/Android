@@ -7,11 +7,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,7 +52,7 @@ public class AddEditFragment extends Fragment implements LoaderManager.LoaderCal
     //check whether insert or update
     private boolean addingNewContact = true;
     //create a View for Fragment
-
+    private ViewGroup viewContainer;
 
     @Nullable
     @Override
@@ -64,6 +66,7 @@ public class AddEditFragment extends Fragment implements LoaderManager.LoaderCal
                 container,
                 false
         );
+        viewContainer = container;
         nameTextInput = (TextInputLayout) view.findViewById(R.id.nameTextInputLayout);
         phoneTextInput = (TextInputLayout) view.findViewById(R.id.phoneTextInputLayout);
         emailTextInput = (TextInputLayout) view.findViewById(R.id.emailTextInputLayout);
@@ -117,7 +120,15 @@ public class AddEditFragment extends Fragment implements LoaderManager.LoaderCal
             Uri newContactUri = getActivity().getContentResolver().insert(
                     DatabaseDescription.Contact.CONTENT_URI,
                     contentValues);
-            Toast.makeText(getActivity(), "Data insert Succesfully", Toast.LENGTH_SHORT).show();
+            Snackbar.make(viewContainer, "Hello", Snackbar.LENGTH_SHORT)
+                    .setAction("UNDO", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Log.d("Snackbar.onClick", "Data insert Succesfully");
+                        }
+                    })
+                    .show();
+//            Toast.makeText(getActivity(), "Data insert Succesfully", Toast.LENGTH_SHORT).show();
             // Change the Toast to SnackBar
             // SnackBar = notification feedback to the user
             //and you add actions to snackBar like undo, cancel, ok
@@ -134,6 +145,14 @@ public class AddEditFragment extends Fragment implements LoaderManager.LoaderCal
             //if sucess
             if(updatedRows > 0){
                 Toast.makeText(getContext(), R.string.contact_updated, Toast.LENGTH_SHORT).show();
+                Snackbar.make(viewContainer, "Hello", Snackbar.LENGTH_SHORT)
+                        .setAction("UNDO", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Log.d("Snackbar.onClick", "UNDO Clicked");
+                            }
+                        })
+                        .show();
                 addEditFragmentInterface.onAddEditComplete(contactUri);
                 //onAddEdit() implemented in MainActitiviy
             }
@@ -142,7 +161,6 @@ public class AddEditFragment extends Fragment implements LoaderManager.LoaderCal
                 Toast.makeText(getContext(), R.string.contact_not_added, Toast.LENGTH_SHORT).show();
             }
         }
-
     }
 
     @Override
