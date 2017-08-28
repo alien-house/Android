@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+  <!--<AutoCompleteTextView-->
+  <!--android:id="@+id/searchLocationAuto"-->
+  <!--android:layout_width="match_parent"-->
+  <!--android:layout_height="match_parent"-->
+  <!--/>-->
+  <!--<ImageView android:layout_width="60dp"-->
+             <!--android:layout_height="100dp"-->
+             <!--android:layout_gravity="center"-->
+             <!--android:scaleType="centerInside"-->
+             <!--android:src="@drawable/top_image"-->
+             <!--android:layout_marginBottom="10dp"-->
+             <!--android:layout_marginTop="5dp"-->
+      <!--/>-->
+  <EditText
+      android:id="@+id/searchLocation"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:hint="Location"
+      android:inputType="text"
+      />
+
+  <EditText
+      android:id="@+id/searchWord"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:inputType="text"
+      android:hint="ex) Finance Assistant, Cook, Developer"/>
+
+  <Button
+      android:id="@+id/btnSearch"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="search"/>
+
+</LinearLayout>
