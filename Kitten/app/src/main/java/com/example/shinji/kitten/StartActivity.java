@@ -49,6 +49,9 @@ public class StartActivity extends Activity implements View.OnClickListener{
             }
         };
 
+        // If login, go to tab contents
+/*
+*/
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             // User is signed in
@@ -60,7 +63,6 @@ public class StartActivity extends Activity implements View.OnClickListener{
             // No user is signed in
             System.out.println("^0^:No user is ");
         }
-
     }
 //
 //    public void signIn(String email, String password){

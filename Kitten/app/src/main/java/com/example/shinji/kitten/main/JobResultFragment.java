@@ -67,6 +67,14 @@ public class JobResultFragment extends Fragment {
         progressDialog.setMessage("....");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.show();
+        listView = view.findViewById(R.id.view_list);
+
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
         Bundle argument = getArguments();
         String search_loc = "";
@@ -81,7 +89,6 @@ public class JobResultFragment extends Fragment {
         if((search_loc.length() > 0) && (search_word.length() > 0)){
             mQueue = Volley.newRequestQueue(getActivity());
             myAdapter = new JobAdapter(getActivity());
-            listView = view.findViewById(R.id.view_list);
             String url_location = "&l=" + search_loc;
             url_query = "&q=" + search_word;
             url = URL_BASE + URL_API + url_location + url_query;
@@ -108,9 +115,7 @@ public class JobResultFragment extends Fragment {
             }
         });
 
-        return view;
     }
-
 
     /**
      * Method to make json array request where response starts
@@ -177,11 +182,10 @@ public class JobResultFragment extends Fragment {
     /* 一度でいい処理 */
     void settingListView() {
         myAdapter.setJobList(joblist);
-//        this.getFragmentManager()
         System.out.println(joblist);
         listView.setAdapter(myAdapter);
         Log.e("settingListView", "settingListView======");
-        myAdapter.notifyDataSetChanged();
+//        myAdapter.notifyDataSetChanged();
 
 //        //リスト項目が選択された時のイベントを追加
 //        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

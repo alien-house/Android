@@ -42,7 +42,9 @@ public class BaseActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        getSupportActionBar().show();
+//        if(getActionBar().isShowing()){
+//            getActionBar().hide();
+//        }
 
         setContentView(R.layout.main_base_activity);
         mSectionPageAdapter = new SectionPageAdapter(getSupportFragmentManager());

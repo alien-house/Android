@@ -1,5 +1,6 @@
 package com.example.shinji.kitten.login;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.shinji.kitten.BaseActivity;
 import com.example.shinji.kitten.R;
 import com.example.shinji.kitten.dashboard.SettingActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -34,6 +36,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText mEmailField;
     private EditText mPasswordField;
     private Button loginbtn;
+    private ProgressDialog pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +47,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mPasswordField = (EditText) findViewById(R.id.editTextPass);
         loginbtn = (Button) findViewById(R.id.btnLogin);
         loginbtn.setOnClickListener(this);
+
+        pd = new ProgressDialog(LoginActivity.this);
+        pd.setMessage("loading");
 
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -69,6 +75,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             return;
         }
 
+        pd.show();
         System.out.println("アッレレレ");
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -76,16 +83,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
 
-            Intent nextItent;
-            nextItent = new Intent(LoginActivity.this, SettingActivity.class);
-            startActivity(nextItent);
+                        Intent nextItent;
+                        nextItent = new Intent(LoginActivity.this, BaseActivity.class);
+                        startActivity(nextItent);
 
                         if (!task.isSuccessful()) {
                             Log.w(TAG, "signInWithEmail:failed", task.getException());
                             Toast.makeText(LoginActivity.this, "auth_failed",
                                     Toast.LENGTH_SHORT).show();
                         }
-
+                        pd.hide();
                     }
                 });
     }

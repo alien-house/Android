@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.shinji.kitten.BaseActivity;
 import com.example.shinji.kitten.R;
 import com.example.shinji.kitten.dashboard.SettingActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -33,7 +34,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private EditText mPasswordField;
     private EditText mUsernameField;
     private Button btnRegister;
-    ProgressDialog pd;
+    private ProgressDialog pd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,7 +79,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-
                             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                     .setDisplayName(username)
                                     .build();
@@ -89,7 +90,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                                 Log.d(TAG, "User profile updated.");
 
                                                 Intent nextItent;
-                                                nextItent = new Intent(RegisterActivity.this, SettingActivity.class);
+                                                nextItent = new Intent(RegisterActivity.this, BaseActivity.class);
                                                 startActivity(nextItent);
                                             }
                                         }

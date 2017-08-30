@@ -11,15 +11,12 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="user name"/>
-
     <EditText
-        android:layout_width="100dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editTextUser"/>
+        android:id="@+id/editTextUser"
+        android:hint="mail address"/>
+
   </LinearLayout>
 
   <LinearLayout
@@ -28,15 +25,12 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="pass "/>
-
     <EditText
-        android:layout_width="100dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editTextPass"/>
+        android:id="@+id/editTextPass"
+        android:inputType="textPassword"
+        android:hint="password"/>
   </LinearLayout>
 
   <Button

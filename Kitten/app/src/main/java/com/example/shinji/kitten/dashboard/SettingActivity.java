@@ -18,32 +18,32 @@ public class SettingActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private TextView texthello;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.dashboard_setting);
-        texthello = (TextView) findViewById(R.id.texthello);
-
-        mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
-            // User is signed in
-            System.out.println("^^:User is signed in~~~~");
-
-            if (user != null) {
-                String name = user.getDisplayName();
-                String email = user.getEmail();
-                System.out.println(name);
-                System.out.println(email);
-                if(name != null){
-                    texthello.setText("Hello! " + name);
-                }
-            }
-
-        } else {
-            // No user is signed in
-            System.out.println("^0^:No user is ");
-        }
-    }
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.dashboard_setting);
+////        texthello = (TextView) findViewById(R.id.texthello);
+//
+//        mAuth = FirebaseAuth.getInstance();
+//        FirebaseUser user = mAuth.getCurrentUser();
+//        if (user != null) {
+//            // User is signed in
+//            System.out.println("^^:User is signed in~~~~");
+//
+//            if (user != null) {
+//                String name = user.getDisplayName();
+//                String email = user.getEmail();
+//                System.out.println(name);
+//                System.out.println(email);
+////                if(name != null){
+////                    texthello.setText("Hello! " + name);
+////                }
+//            }
+//
+//        } else {
+//            // No user is signed in
+//            System.out.println("^0^:No user is ");
+//        }
+//    }
 
 }
