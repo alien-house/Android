@@ -29,6 +29,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.shinji.kitten.BaseActivity;
 import com.example.shinji.kitten.R;
+import com.example.shinji.kitten.dashboard.User;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.json.JSONArray;
@@ -86,6 +87,7 @@ public class JobResultFragment extends Fragment {
         listView = view.findViewById(R.id.view_list);
         slidingLayout = view.findViewById(R.id.sliding_layout);
         radioJobtypeGroup = view.findViewById(R.id.radioJobType);
+        setCountry();
 
         return view;
     }
@@ -353,7 +355,6 @@ public class JobResultFragment extends Fragment {
         String url_locationWithQuery = "&l=" + url_location;
         url_query = word;
         String url_queryWithQuery = "&q=" + url_query;
-        url_co = "&co=ca"; // now only canada!
         url = URL_BASE + URL_API + url_co + url_locationWithQuery + url_queryWithQuery;
         if(url_sort != null){
             String url_sortWithQuery = "&sort=" + url_sort;
@@ -363,6 +364,7 @@ public class JobResultFragment extends Fragment {
             String url_jtWithQuery = "&jt=" + JobTypeString;
             url = url + url_jtWithQuery;
         }
+        System.out.println(url);
         return url;
     }
     /**
@@ -375,6 +377,14 @@ public class JobResultFragment extends Fragment {
         String url_start = "&start=" + start;
         url = url + url_start;
         return url;
+    }
+
+    public void setCountry(){
+        if(User.USER_COUNTRY != null){
+            url_co = "&co=" + User.USER_COUNTRY;
+        }else{
+            url_co = "&co=us";
+        }
     }
 
 }

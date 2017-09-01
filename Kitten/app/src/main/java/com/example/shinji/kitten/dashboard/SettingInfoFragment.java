@@ -101,11 +101,11 @@ public class SettingInfoFragment extends Fragment {
                 userData = new User(
                         user.getUid(),
                         user.getDisplayName(),
-                        "rde",
+                        "",
                         user.getEmail(),
-                        "biowoireru",
-                        "vancouver",
-                        "url"
+                        "",
+                        "",
+                        ""
                 );
                 usersRef = database.getReference("users/" + userData.userID);
                 System.out.println(userData);

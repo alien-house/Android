@@ -6,6 +6,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,19 +16,26 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.shinji.kitten.BaseActivity;
 import com.example.shinji.kitten.R;
+import com.example.shinji.kitten.dashboard.User;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by shinji on 2017/08/28.
@@ -33,7 +43,7 @@ import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 
 public class JobSearchFragment extends Fragment {
     private Button btnSearch;
-    private TextView txtSearchLocation;
+    private EditText txtSearchLocation;
     private String searchLocation = "";
     private PlaceAutocompleteFragment autocompleteFragment;
     private MultiAutoCompleteTextView multiAutoCompleteTextView;
@@ -47,11 +57,10 @@ public class JobSearchFragment extends Fragment {
         View view = inflater.inflate(R.layout.main_job_search_fragment, container, false);
 
         btnSearch = view.findViewById(R.id.btnSearch);
+        txtSearchLocation = view.findViewById(R.id.searchLocation);
+//        btnAuto = view.findViewById(R.id.btnAuto);
 //        searchLocation = "van";
-
 //        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment) getChildFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
-
-
         multiAutoCompleteTextView = view.findViewById(R.id.searchWordMultiAuto);
         String[] devAutoArray = {"web designer","front end developer", "android developer"};
         acAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, devAutoArray);
@@ -63,40 +72,76 @@ public class JobSearchFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        autocompleteFragment  = (PlaceAutocompleteFragment)
-                getActivity().getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+//
+//        PlaceAutocompleteFragment test = new PlaceAutocompleteFragment();
+//
+//        FragmentManager fm = getFragmentManager();
+//        FragmentTransaction ft = fm.beginTransaction();
+//        ft.replace(R.id.place_autocomplete_liner, test).commit();
 
-//        //filter
-        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
-                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
-                .setCountry("CA")
-                .build();
-        autocompleteFragment.setFilter(typeFilter);
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
-            public void onPlaceSelected(Place place) {
-                // TODO:Get info about the selected place.
-                Log.i("onPlaceSelected", "Place: " + place.getName());
-                searchLocation = place.getName().toString();
-            }
+//        autocompleteFragment  = (PlaceAutocompleteFragment)
+//                getActivity().getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
+//        autocompleteFragment.setFilter(typeFilter);
+//        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+//            @Override
+//            public void onPlaceSelected(Place place) {
+//                // TODO:Get info about the selected place.
+//                Log.i("onPlaceSelected", "Place: " + place.getName());
+//                searchLocation = place.getName().toString();
+//            }
+//
+//            @Override
+//            public void onError(Status status) {
+//                // TODO:Handle the error.
+//                Log.i("onError", "An error occurred: " + status);
+//            }
+//        });
+
+        txtSearchLocation.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public void onError(Status status) {
-                // TODO:Handle the error.
-                Log.i("onError", "An error occurred: " + status);
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    showAutoCompPlace();
+                }
             }
         });
+
+        txtSearchLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showAutoCompPlace();
+            }
+        });
+
+//        btnAuto.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                try {
+//                    Intent intent =
+//                            new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
+//                                    .build(getActivity());
+//                    startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+//                } catch (GooglePlayServicesRepairableException e) {
+//                    // TODO:Handle the error.
+//                } catch (GooglePlayServicesNotAvailableException e) {
+//                    // TODO:Handle the error.
+//                }
+//            }
+//        });
+
 
         //multiAutoCompleteTextView
         multiAutoCompleteTextView.setAdapter(acAdapter);
         multiAutoCompleteTextView.setThreshold(1);
-        multiAutoCompleteTextView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
-        multiAutoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(getActivity(), "multiAutoCompleteTextView" + adapterView.getItemAtPosition(i), Toast.LENGTH_SHORT).show();
-            }
-        });
+//        multiAutoCompleteTextView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+        multiAutoCompleteTextView.setTokenizer(new SpaceTokenizer());
+//        multiAutoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                Toast.makeText(getActivity(), "multiAutoCompleteTextView:" + adapterView.getItemAtPosition(i), Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,7 +164,7 @@ public class JobSearchFragment extends Fragment {
 
                 JobResultFragment jobResultFragment = new JobResultFragment();
                 Bundle argument = new Bundle();
-                argument.putString(BaseActivity.SEARCH_LOC, searchLocation);
+                argument.putString(BaseActivity.SEARCH_LOC, txtSearchLocation.getText().toString());
                 argument.putString(BaseActivity.SEARCH_WORD, multiAutoCompleteTextView.getText().toString());
                 jobResultFragment.setArguments(argument);
                 FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
@@ -133,6 +178,24 @@ public class JobSearchFragment extends Fragment {
 
     }
 
+    public void showAutoCompPlace(){
+        try {
+            //filter
+            AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                    .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
+                    .setCountry(User.USER_COUNTRY)//* should be changed! later *_*
+                    .build();
+            Intent intent =
+                    new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
+                            .setFilter(typeFilter)
+                            .build(getActivity());
+            startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+        } catch (GooglePlayServicesRepairableException e) {
+            // TODO:Handle the error.
+        } catch (GooglePlayServicesNotAvailableException e) {
+            // TODO:Handle the error.
+        }
+    }
 
 //    @Override
 //    public void onResume() {
@@ -146,10 +209,75 @@ public class JobSearchFragment extends Fragment {
 ////        getFragmentManager().beginTransaction().remove(autocompleteFragment).commit();
 //    }
 
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        autocompleteFragment.onActivityResult(requestCode, resultCode, data);
-//    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlaceAutocomplete.getPlace(getActivity(), data);
+                Log.i("TAG", "Place: " + place.getName());
+                searchLocation = place.getName().toString();
+                txtSearchLocation.setText(searchLocation);
+            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                Status status = PlaceAutocomplete.getStatus(getActivity(), data);
+                // TODO:Handle the error.
+                Log.i("TAG", status.getStatusMessage());
+
+            }
+        }
+    }
+
+
+    public class SpaceTokenizer implements MultiAutoCompleteTextView.Tokenizer {
+
+        public int findTokenStart(CharSequence text, int cursor) {
+            int i = cursor;
+
+            while (i > 0 && text.charAt(i - 1) != ' ') {
+                i--;
+            }
+            while (i < cursor && text.charAt(i) == ' ') {
+                i++;
+            }
+
+            return i;
+        }
+
+        public int findTokenEnd(CharSequence text, int cursor) {
+            int i = cursor;
+            int len = text.length();
+
+            while (i < len) {
+                if (text.charAt(i) == ' ') {
+                    return i;
+                } else {
+                    i++;
+                }
+            }
+
+            return len;
+        }
+
+        public CharSequence terminateToken(CharSequence text) {
+            int i = text.length();
+
+            while (i > 0 && text.charAt(i - 1) == ' ') {
+                i--;
+            }
+
+            if (i > 0 && text.charAt(i - 1) == ' ') {
+                return text;
+            } else {
+                if (text instanceof Spanned) {
+                    SpannableString sp = new SpannableString(text + " ");
+                    TextUtils.copySpansFrom((Spanned) text, 0, text.length(),
+                            Object.class, sp, 0);
+                    return sp;
+                } else {
+                    return text + " ";
+                }
+            }
+        }
+    }
 
 }

@@ -11,6 +11,7 @@ import java.util.Map;
 
 public class User {
     public String userID,username,role,devStatus,email,bio,location,url = "";
+    public static String USER_COUNTRY;
     //,comapny,lindkedin,twitter,github,facebook,dribbble
 
     public User() {
