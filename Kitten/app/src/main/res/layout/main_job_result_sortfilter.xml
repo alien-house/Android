@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+  <TextView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center|top"
+      android:text="Sort and filter"
+      android:textSize="16sp" />
+
+  <Switch android:id="@+id/sort_switch"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="32dip"
+          android:checked="false"/>
+
+  <TextView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="Filter"/>
+  <RadioGroup
+      android:id="@+id/radioJobType"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content" >
+
+    <RadioButton
+        android:id="@+id/radioFulltime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Full-time" />
+    <RadioButton
+        android:id="@+id/radioParttime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Part-time" />
+    <RadioButton
+        android:id="@+id/radioContract"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Contract" />
+    <RadioButton
+        android:id="@+id/radioInternship"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Internship" />
+    <RadioButton
+        android:id="@+id/radioTemporary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Temporary" />
+    <RadioButton
+        android:id="@+id/radioNone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="None" />
+
+  </RadioGroup>
+
+  <Button
+      android:id="@+id/btnDate"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="sort by date button"/>
+</LinearLayout>

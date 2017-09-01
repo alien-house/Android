@@ -27,8 +27,27 @@ dependencies {
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support:design:26.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-//    compile 'com.google.firebase:firebase-core:10.2.6'
+//    compile 'com.google.android.gms:play-services-base:9.2.0'
+//    compile 'com.google.android.gms:play-services-maps:9.2.0'
+//    compile 'com.google.android.gms:play-services-gcm:9.2.0'
+//    compile 'com.google.android.gms:play-services-places:9.2.0'
 //    compile 'com.google.android.gms:play-services-location:9.2.0'
+//    compile ("com.google.android.gms:play-services-base:9.2.0") {
+//        force = true;
+//    }
+//    compile ("com.google.android.gms:play-services-maps:9.2.0") {
+//        force = true;
+//    }
+//    compile ("com.google.android.gms:play-services-gcm:9.2.0") {
+//        force = true;
+//    }
+//    compile ("com.google.android.gms:play-services-places:9.2.0") {
+//        force = true;
+//    }
+//    compile ("com.google.android.gms:play-services-location:9.2.0") {
+//        force = true;
+//    }
+    compile 'com.google.firebase:firebase-core:10.2.6'
     compile 'com.google.firebase:firebase-auth:10.2.6'
     compile 'com.google.firebase:firebase-database:10.2.6'
     compile 'com.google.firebase:firebase-storage:10.2.6'
@@ -37,6 +56,7 @@ dependencies {
     compile 'com.mcxiaoke.volley:library:1.0.19'
     compile 'com.isseiaoki:simplecropview:1.1.6'
     compile 'com.sothree.slidinguppanel:library:3.3.1'
+    compile 'com.google.android.gms:play-services:10.2.6'
 }
 
 apply plugin: 'com.google.gms.google-services'

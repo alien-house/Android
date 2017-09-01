@@ -22,9 +22,25 @@
         android:layout_height="wrap_content"
         android:text="search"/>
   </LinearLayout>
-  <ListView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/view_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-  </ListView>
+  <com.sothree.slidinguppanel.SlidingUpPanelLayout
+      xmlns:sothree="http://schemas.android.com/apk/res-auto"
+      android:id="@+id/sliding_layout"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:gravity="bottom"
+      sothree:umanoPanelHeight="68dp"
+      sothree:umanoShadowHeight="4dp">
+
+    <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/view_list"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+    </ListView>
+    <include
+        android:id="@+id/sortPanel"
+        layout="@layout/main_job_result_sortfilter"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        />
+  </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 </LinearLayout>

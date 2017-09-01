@@ -2,6 +2,7 @@ package com.example.shinji.kitten;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -24,13 +25,16 @@ import android.widget.TextView;
 
 import com.example.shinji.kitten.dashboard.SettingFragment;
 import com.example.shinji.kitten.main.JobFragment;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.places.Places;
 
 /**
  * Created by shinji on 2017/08/27.
  */
 //https://github.com/delaroy/MaterialTabs
 
-public class BaseActivity extends FragmentActivity {
+public class BaseActivity extends FragmentActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "MainActivity";
     private SectionPageAdapter mSectionPageAdapter;
@@ -38,6 +42,7 @@ public class BaseActivity extends FragmentActivity {
     TabLayout tabLayout;
     public static final String SEARCH_LOC = "SEARCH_LOC";
     public static final String SEARCH_WORD = "SEARCH_WORD";
+//    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +55,14 @@ public class BaseActivity extends FragmentActivity {
         mSectionPageAdapter = new SectionPageAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.containers);
         setupViewPager(mViewPager);
+
+//
+//        mGoogleApiClient = new GoogleApiClient
+//                .Builder(this)
+//                .addApi(Places.GEO_DATA_API)
+//                .addApi(Places.PLACE_DETECTION_API)
+//                .enableAutoManage(this, this)
+//                .build();
     }
 
     private void setupViewPager(ViewPager viewPager){
@@ -64,4 +77,8 @@ public class BaseActivity extends FragmentActivity {
     }
 
 
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
 }

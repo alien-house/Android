@@ -17,8 +17,16 @@
 
     <android.support.design.widget.TabLayout
         android:id="@+id/tabs"
+        app:tabTextAppearance="@style/MineCustomTabText"
+        android:layout_centerInParent="true"
+        app:tabIndicatorHeight="0dp"
+        app:tabPaddingBottom="-1dp"
+        app:tabPaddingEnd="-1dp"
+        app:tabPaddingStart="-1dp"
+        app:tabPaddingTop="-1dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        />
 
   </android.support.design.widget.AppBarLayout>
 

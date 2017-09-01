@@ -13,7 +13,11 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +29,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.shinji.kitten.BaseActivity;
 import com.example.shinji.kitten.R;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,8 +47,8 @@ public class JobResultFragment extends Fragment {
     public static final String LOG_TAG = "volley_test";
     private RequestQueue mQueue;
     private final String URL_BASE = "http://api.indeed.com/ads/apisearch";
-    private final String URL_API = "?publisher=2612264898312897&latlong=1&co=ca&chnl=&userip=1.2.3.4&useragent=Mozilla/%2F4.0(Firefox)&v=2&format=json";
-    private String url;
+    private final String URL_API = "?publisher=2612264898312897&latlong=1&userip=1.2.3.4&useragent=Mozilla/%2F4.0(Firefox)&v=2&format=json";
+    private String search_loc = "";
     private int _totalItemCount = 0;
     private int resultTotalItem = 0;
     private JobAdapter myAdapter;
@@ -52,7 +57,16 @@ public class JobResultFragment extends Fragment {
     private Button btnSearch;
     private TextView txtSearchWord;
     ProgressDialog progressDialog;
+    private String url_location;
     private String url_query;
+    private String url_co;
+    private String url_sort;
+    private SlidingUpPanelLayout slidingLayout;
+    private Button btnDate;
+    private Switch switchSort;
+    private RadioGroup radioJobtypeGroup;
+    private RadioButton radioJobtypeButton;
+    private String JobTypeString = "";
 
 
     @Nullable
@@ -61,23 +75,27 @@ public class JobResultFragment extends Fragment {
         View view = inflater.inflate(R.layout.main_job_result_fragment, container, false);
         txtSearchWord = view.findViewById(R.id.searchWord);
         txtSearchWord.setNextFocusDownId(R.id.btnSearch);
-        btnSearch = (Button) view.findViewById(R.id.btnSearch);
+        btnSearch = view.findViewById(R.id.btnSearch);
+        btnDate = view.findViewById(R.id.btnDate);
+        switchSort = view.findViewById(R.id.sort_switch);
         progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setTitle("Loading");
-        progressDialog.setMessage("....");
+//        progressDialog.setTitle("Loading");
+//        progressDialog.setMessage("....");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.show();
         listView = view.findViewById(R.id.view_list);
+        slidingLayout = view.findViewById(R.id.sliding_layout);
+        radioJobtypeGroup = view.findViewById(R.id.radioJobType);
 
         return view;
     }
+
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         Bundle argument = getArguments();
-        String search_loc = "";
         String search_word = "";
         System.out.println(argument);
         if(argument != null){
@@ -89,9 +107,8 @@ public class JobResultFragment extends Fragment {
         if((search_loc.length() > 0) && (search_word.length() > 0)){
             mQueue = Volley.newRequestQueue(getActivity());
             myAdapter = new JobAdapter(getActivity());
-            String url_location = "&l=" + search_loc;
-            url_query = "&q=" + search_word;
-            url = URL_BASE + URL_API + url_location + url_query;
+
+            String url = getJobSearchURL(search_loc,search_word);
             txtSearchWord.setText(search_word);
             makeJsonArrayRequest(url, true);
         }
@@ -106,12 +123,88 @@ public class JobResultFragment extends Fragment {
                 }
                 progressDialog.show();
                 joblist.clear();
-                String url_location = "&l=" + "Vancouver";
-                url_query = "&q=" + txtSearchWord.getText().toString();
-                url = URL_BASE + URL_API + url_location + url_query;
+                String url = getJobSearchURL(search_loc, txtSearchWord.getText().toString());
                 Log.e("onScroll::", url);
                 makeJsonArrayRequest(url, true);
                 myAdapter.notifyDataSetChanged();
+            }
+        });
+
+        //slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED); //to close
+        //slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED); //to open
+        slidingLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+//                Log.e("addPanelSlideListener",String.valueOf(slideOffset));
+            }
+
+            @Override
+            public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+
+//                Log.e("onPanelStateChanged",String.valueOf(previousState));
+            }
+        });
+
+        switchSort.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // do something, the isChecked will be
+                // true if the switch is in the On position
+                Log.e("setOnCedChange:", String.valueOf(isChecked));
+                progressDialog.show();
+                joblist.clear();
+                if(isChecked){
+                    url_sort = "date";
+                }else{
+                    url_sort = "";
+                }
+                String url = getJobSearchURL(search_loc, txtSearchWord.getText().toString());
+                makeJsonArrayRequest(url, false);
+            }
+        });
+
+        btnDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // get selected radio button from radioGroup
+//                int selectedId = radioJobtypeGroup.getCheckedRadioButtonId();
+////                View radioButton = radioJobtypeGroup.findViewById(selectedId);
+////                int idx = radioJobtypeGroup.indexOfChild(radioButton);
+////                radioJobtypeButton = (RadioButton) radioJobtypeGroup.getChildAt(idx);
+//
+//                Toast.makeText(getActivity(),
+//                        radioJobtypeButton.getText().toString(), Toast.LENGTH_SHORT).show();
+////
+
+                progressDialog.show();
+                joblist.clear();
+                String url = getJobSearchURL(search_loc, txtSearchWord.getText().toString());
+                makeJsonArrayRequest(url, false);
+                slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            }
+        });
+
+        radioJobtypeGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch(checkedId){
+                    case R.id.radioFulltime:
+                        JobTypeString = "fulltime";
+                        break;
+                    case R.id.radioParttime:
+                        JobTypeString = "parttime";
+                        break;
+                    case R.id.radioContract:
+                        JobTypeString = "contract";
+                        break;
+                    case R.id.radioInternship:
+                        JobTypeString = "internship";
+                        break;
+                    case R.id.radioTemporary:
+                        JobTypeString = "temporary";
+                        break;
+                    case R.id.radioNone:
+                        JobTypeString = "";
+                        break;
+                }
             }
         });
 
@@ -143,6 +236,7 @@ public class JobResultFragment extends Fragment {
                                 resultTotalItem = response.getInt("totalResults");
                                 JSONArray itemArray = response.getJSONArray("results");
                                 makeDataToListview(itemArray);
+                                myAdapter.notifyDataSetChanged();
 
                                 if(begin){
                                     settingListView();
@@ -187,44 +281,45 @@ public class JobResultFragment extends Fragment {
         Log.e("settingListView", "settingListView======");
 //        myAdapter.notifyDataSetChanged();
 
-//        //リスト項目が選択された時のイベントを追加
-//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Log.e("setOnItemClickListener", String.valueOf(position));
-//                Job job_tmp = joblist.get(position);
-//                Uri uri = Uri.parse(job_tmp.getUrl());
-//                Intent i = new Intent(Intent.ACTION_VIEW, uri);
-////                i.putExtra("JOB_DETAIL_URL", job_tmp.getUrl());
-//
-//                startActivity(i);
-//            }
-//        });
-//
-//        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(AbsListView absListView, int i) {
-//            }
-//            @Override
-//            public void onScroll(AbsListView absListView,
-//                                 int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-//                if (totalItemCount != 0 && totalItemCount == firstVisibleItem + visibleItemCount) {
-//                    // 最後尾までスクロールしたので、何かデータ取得する処理
-//                    if(!listenerLock){
-//                        listenerLock = true;
-//                        Log.e("firstVisibleItem", String.valueOf(firstVisibleItem));
-//                        Log.e("visibleItemCount", String.valueOf(visibleItemCount));
-//                        Log.e("totalItemCount", String.valueOf(totalItemCount));
-//                        _totalItemCount = totalItemCount;
-//                        if(resultTotalItem != totalItemCount){
+        //リスト項目が選択された時のイベントを追加
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.e("setOnItemClickListener", String.valueOf(position));
+                Job job_tmp = joblist.get(position);
+                Uri uri = Uri.parse(job_tmp.getUrl());
+                Intent i = new Intent(Intent.ACTION_VIEW, uri);
+//                i.putExtra("JOB_DETAIL_URL", job_tmp.getUrl());
+
+                startActivity(i);
+            }
+        });
+
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+            }
+            @Override
+            public void onScroll(AbsListView absListView,
+                                 int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if (totalItemCount != 0 && totalItemCount == firstVisibleItem + visibleItemCount) {
+                    // 最後尾までスクロールしたので、何かデータ取得する処理
+                    if(!listenerLock){
+                        listenerLock = true;
+                        Log.e("firstVisibleItem", String.valueOf(firstVisibleItem));
+                        Log.e("visibleItemCount", String.valueOf(visibleItemCount));
+                        Log.e("totalItemCount", String.valueOf(totalItemCount));
+                        _totalItemCount = totalItemCount;
+                        if(resultTotalItem != totalItemCount){
+                            String url = getJobSearchURL(url_location,url_query,String.valueOf(totalItemCount));
 //                            String new_url = url + "&start=" + String.valueOf(totalItemCount);
-//                            Log.e("onScroll::", new_url);
-//                            progressDialog.show();
-//                            makeJsonArrayRequest(new_url, false);
-//                        }
-//                    }
-//                }
-//            }
-//        });
+                            Log.e("onScroll::", url);
+                            progressDialog.show();
+                            makeJsonArrayRequest(url, false);
+                        }
+                    }
+                }
+            }
+        });
 
     }
 
@@ -247,5 +342,39 @@ public class JobResultFragment extends Fragment {
 
 
 
+    /**
+     * get the indeed url
+     * @param location city name (e.g:l=vancouver )
+     * @param word query you want to search (e.g:q=webdesigner )
+     */
+    public String getJobSearchURL(String location, String word){
+        String url = "";
+        url_location = location;
+        String url_locationWithQuery = "&l=" + url_location;
+        url_query = word;
+        String url_queryWithQuery = "&q=" + url_query;
+        url_co = "&co=ca"; // now only canada!
+        url = URL_BASE + URL_API + url_co + url_locationWithQuery + url_queryWithQuery;
+        if(url_sort != null){
+            String url_sortWithQuery = "&sort=" + url_sort;
+            url = url + url_sortWithQuery;
+        }
+        if(JobTypeString != null){
+            String url_jtWithQuery = "&jt=" + JobTypeString;
+            url = url + url_jtWithQuery;
+        }
+        return url;
+    }
+    /**
+     * overload
+     * ...
+     * @param start e.g start=10
+     */
+    public String getJobSearchURL(String location, String word, String start){
+        String url = getJobSearchURL(location, word);
+        String url_start = "&start=" + start;
+        url = url + url_start;
+        return url;
+    }
 
 }
