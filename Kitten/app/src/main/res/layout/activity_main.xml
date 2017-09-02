@@ -17,4 +17,10 @@
       android:layout_width="wrap_content"
       android:layout_height="match_parent"
       android:text="Register"/>
+
+  <Button
+      android:id="@+id/btnGithub"
+      android:layout_width="wrap_content"
+      android:layout_height="match_parent"
+      android:text="Github Register"/>
 </LinearLayout>

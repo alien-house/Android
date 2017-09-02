@@ -3,7 +3,9 @@ package com.example.shinji.kitten;
 import android.*;
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -33,6 +35,8 @@ import com.android.volley.toolbox.Volley;
 import com.example.shinji.kitten.dashboard.User;
 import com.example.shinji.kitten.login.LoginActivity;
 import com.example.shinji.kitten.login.RegisterActivity;
+import com.example.shinji.kitten.oauth.github.GithubApp;
+import com.example.shinji.kitten.util.Config;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.gson.Gson;
@@ -65,6 +69,8 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
     private final String TAG = "onAuthStateChanged";
     private Button btnLoginTo;
     private Button btnRegisterTo;
+    private Button btnGithub;
+    private GithubApp mApp;
 
 
     @Override
@@ -72,18 +78,10 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        // -----------------------------
-        System.out.println("==========geocoderisPresent==========");
-        System.out.println("==========geocoder==========");
-
-
-        // -----------------------------
-
-
         btnLoginTo = (Button) findViewById(R.id.btnLoginTo);
         btnLoginTo.setOnClickListener(this);
         btnRegisterTo = (Button) findViewById(R.id.btnRegisterTo);
+        btnGithub = (Button) findViewById(R.id.btnGithub);
         btnRegisterTo.setOnClickListener(this);
 
         mAuth = FirebaseAuth.getInstance();
@@ -109,17 +107,70 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
         if (user != null) {
             // User is signed in
             System.out.println("^^:User is signed in");
-            Intent nextItent;
-            nextItent = new Intent(StartActivity.this, BaseActivity.class);
-            startActivity(nextItent);
+//            Intent nextItent;
+//            nextItent = new Intent(StartActivity.this, BaseActivity.class);
+//            startActivity(nextItent);
         } else {
             // No user is signed in
             System.out.println("^0^:No user is ");
         }
 
+        Context context = StartActivity.this;
+        mApp = new GithubApp(context,
+                Config.GITHUB_ID,
+                Config.GITHUB_SECRET,
+                Config.CALLBACK_URL);
+
+        btnGithub.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                if (mApp.hasAccessToken()) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(
+                            StartActivity.this);
+                    builder.setMessage("Disconnect from GitHub?")
+                            .setCancelable(false)
+                            .setPositiveButton("Yes",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(
+                                                DialogInterface dialog, int id) {
+                                            mApp.resetAccessToken();
+                                        }
+                                    })
+                            .setNegativeButton("No",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(
+                                                DialogInterface dialog, int id) {
+                                            dialog.cancel();
+                                        }
+                                    });
+                    final AlertDialog alert = builder.create();
+                    alert.show();
+                } else {
+                    System.out.println("mAppgetauthorize: "+ "authorize");
+                    mApp.authorize();
+                }
+
+
+            }
+        });
+
+
         locationStart();
     }
 
+    GithubApp.OAuthAuthenticationListener listener = new GithubApp.OAuthAuthenticationListener() {
+
+        @Override
+        public void onSuccess() {
+            System.out.println("Connected: "+ mApp.getUserName());
+        }
+
+        @Override
+        public void onFail(String error) {
+            Toast.makeText(StartActivity.this, error, Toast.LENGTH_SHORT).show();
+        }
+    };
     // 結果の受け取り
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
