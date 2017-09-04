@@ -21,6 +21,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -80,8 +81,6 @@ public class JobResultFragment extends Fragment {
         btnDate = view.findViewById(R.id.btnDate);
         switchSort = view.findViewById(R.id.sort_switch);
 
-
-
         progressDialog = new ProgressDialog(getActivity());
 //        progressDialog.setTitle("Loading");
 //        progressDialog.setMessage("....");
@@ -121,7 +120,6 @@ public class JobResultFragment extends Fragment {
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 if(txtSearchWord.getText().toString().matches("")){
                     Toast.makeText(getActivity(), "You did not enter any words", Toast.LENGTH_SHORT).show();
                     return;
@@ -281,21 +279,52 @@ public class JobResultFragment extends Fragment {
     /* 一度でいい処理 */
     void settingListView() {
         myAdapter.setJobList(joblist);
-        System.out.println(joblist);
         listView.setAdapter(myAdapter);
         Log.e("settingListView", "settingListView======");
 //        myAdapter.notifyDataSetChanged();
 
         //リスト項目が選択された時のイベントを追加
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Job job_tmp = (Job)myAdapter.getItem(position);
                 Log.e("setOnItemClickListener", String.valueOf(position));
-                Job job_tmp = joblist.get(position);
-                Uri uri = Uri.parse(job_tmp.getUrl());
-                Intent i = new Intent(Intent.ACTION_VIEW, uri);
-//                i.putExtra("JOB_DETAIL_URL", job_tmp.getUrl());
-
-                startActivity(i);
+//
+//                switch (view.getId()) {
+//                    case R.id.animationView:
+//                        Toast.makeText(getActivity(), "tap!!", Toast.LENGTH_LONG).show();
+//                        LottieAnimationView animationView = view.findViewById(view.getId());
+////                        if(job_tmp.clickon) {
+////                            animationView.setProgress(0f);
+////                            job_tmp.clickon = false;
+////                        } else {
+////                            animationView.playAnimation();
+////                            job_tmp.clickon = true;
+////                        }
+////                            view.animationView.setProgress(0f);
+////                            holder.clickon = false;
+////                            Map<String, Object> postValues = job.toMap();
+////                            Map<String, Object> childUpdates = new HashMap<>();
+////                            childUpdates.put("/" + job.getJobkey() + "/", postValues);
+////                            favoriteRef.child(job.getJobkey()).removeValue();
+////                        } else {
+////                            holder.animationView.playAnimation();
+////                            holder.clickon = true;
+////                            Map<String, Object> postValues = job.toMap();
+////                            Map<String, Object> childUpdates = new HashMap<>();
+////                            childUpdates.put("/" + job.getJobkey() + "/", postValues);
+////                            favoriteRef.updateChildren(childUpdates);
+////                        }
+//                        break;
+//                    default:
+//                        Uri uri = Uri.parse(job_tmp.getUrl());
+//                        Intent i = new Intent(Intent.ACTION_VIEW, uri);
+////                i.putExtra("JOB_DETAIL_URL", job_tmp.getUrl());
+//
+//                        startActivity(i);
+//                        break;
+//
+//                }
             }
         });
 
@@ -334,7 +363,7 @@ public class JobResultFragment extends Fragment {
     }
 
     void addList(JSONObject obj) throws JSONException {
-        joblist.add(new Job(
+        Job newJob = new Job(
                 obj.getString("jobtitle"),
                 obj.getString("url"),
                 obj.getString("company"),
@@ -342,7 +371,8 @@ public class JobResultFragment extends Fragment {
                 obj.getString("formattedRelativeTime"),
                 obj.getString("formattedLocation"),
                 obj.getString("jobkey")
-        ));
+        );
+        joblist.add(newJob);
         myAdapter.notifyDataSetChanged();
     }
 

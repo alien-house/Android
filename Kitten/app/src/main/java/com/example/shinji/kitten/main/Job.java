@@ -18,6 +18,8 @@ public class Job {
     private String postedDate;
     private String area;
     private String jobkey;
+    private boolean isFav = false;
+
     Job(String title, String url, String company, String description, String postedDate, String area, String jobkey){
         this.id = hashCode();
         this.title = title;
@@ -27,6 +29,7 @@ public class Job {
         this.postedDate = postedDate;
         this.area = "@ " + area;
         this.jobkey = jobkey;
+        this.isFav = false;
     }
     public int getID(){
         return this.id;
@@ -48,6 +51,12 @@ public class Job {
         return this.area;
     }
     public String getJobkey(){ return this.jobkey; }
+    public void setFav(boolean selected){
+        this.isFav = selected;
+    }
+    public boolean isFavd(){
+        return this.isFav;
+    }
 
     @Exclude
     public Map<String, Object> toMap() {

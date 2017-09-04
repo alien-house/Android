@@ -1,11 +1,15 @@
 package com.example.shinji.kitten.main;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -21,6 +25,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import static com.example.shinji.kitten.R.id.parent;
 
 /**
  * Created by shinji on 2017/08/04.
@@ -59,30 +65,38 @@ public class JobAdapter extends BaseAdapter {
         return jobList.get(i);
     }
 
+//    @Override
+//    public boolean getItem(int i) {
+//        return jobList.get(i);
+//    }
+
     @Override
     public long getItemId(int i) {
         return jobList.get(i).getID();
     }
 
     @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
+    public View getView(final int i, View convertView, final ViewGroup viewGroup) {
+
         final ViewHolder holder;
-        final Job job = jobList.get(i);
-        if (view == null) {
-            view = layoutInflater.inflate(R.layout.main_job_result_list, viewGroup, false);
+        final Job tempJob = jobList.get(i);
+//        final Job job = jobList.get(i);
+        if (convertView == null) {
+            convertView = layoutInflater.inflate(R.layout.main_job_result_list, viewGroup, false);
             holder = new ViewHolder();
 
-            holder.job_title = (TextView) view.findViewById(R.id.job_title);
-            holder.job_company = (TextView) view.findViewById(R.id.job_company);
-            holder.job_area = (TextView) view.findViewById(R.id.job_area);
-            holder.job_description = (TextView) view.findViewById(R.id.job_description);
-            holder.job_posttime = (TextView) view.findViewById(R.id.job_posttime);
-            holder.animationView = (LottieAnimationView) view.findViewById(R.id.animationView);
-            view.setTag(holder);
-        } else {
-            holder = (ViewHolder) view.getTag();
-        }
+            Log.e("holder:", String.valueOf(holder));
+            holder.job_title = (TextView) convertView.findViewById(R.id.job_title);
+            holder.job_company = (TextView) convertView.findViewById(R.id.job_company);
+            holder.job_area = (TextView) convertView.findViewById(R.id.job_area);
+            holder.job_description = (TextView) convertView.findViewById(R.id.job_description);
+            holder.job_posttime = (TextView) convertView.findViewById(R.id.job_posttime);
+            holder.animationView = (LottieAnimationView) convertView.findViewById(R.id.animationView);
+            convertView.setTag(holder);
 
+        } else {
+            holder = (ViewHolder) convertView.getTag();
+        }
         holder.job_title.setText(jobList.get(i).getTitle());
         holder.job_company.setText(jobList.get(i).getCompany());
         holder.job_area.setText(jobList.get(i).getArea());
@@ -93,33 +107,66 @@ public class JobAdapter extends BaseAdapter {
         holder.animationView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(holder.clickon) {
-                    holder.animationView.setProgress(0f);
-                    holder.clickon = false;
-                    Map<String, Object> postValues = job.toMap();
-                    Map<String, Object> childUpdates = new HashMap<>();
-                    childUpdates.put("/" + job.getJobkey() + "/", postValues);
-                    favoriteRef.child(job.getJobkey()).removeValue();
+                Log.e("holderPosition:", String.valueOf(i));
+
+                if(jobList.get(i).isFavd()) {
+                    Log.e("getView", String.valueOf(tempJob.isFavd()));
+
+                    LottieAnimationView av = v.findViewById(R.id.animationView);
+                    jobList.get(i).setFav(false);
+                    av.setProgress(0f);
+                    //                    holder.clickon = false;
+                    //                    Map<String, Object> postValues = job.toMap();
+                    //                    Map<String, Object> childUpdates = new HashMap<>();
+                    //                    childUpdates.put("/" + job.getJobkey() + "/", postValues);
+                    //                    favoriteRef.child(job.getJobkey()).removeValue();
 
                 } else {
-                    holder.animationView.playAnimation();
-                    holder.clickon = true;
-                    Map<String, Object> postValues = job.toMap();
-                    Map<String, Object> childUpdates = new HashMap<>();
-                    childUpdates.put("/" + job.getJobkey() + "/", postValues);
-                    favoriteRef.updateChildren(childUpdates);
+                    Log.e("getView", String.valueOf(tempJob.isFavd()));
+                    LottieAnimationView av = v.findViewById(R.id.animationView);
+                    jobList.get(i).setFav(true);
+                    av.playAnimation();
+                    //                    holder.clickon = true;
+                    //                    Map<String, Object> postValues = job.toMap();
+                    //                    Map<String, Object> childUpdates = new HashMap<>();
+                    //                    childUpdates.put("/" + job.getJobkey() + "/", postValues);
+                    //                    favoriteRef.updateChildren(childUpdates);
 
                 }
             }
         });
-//        view.setOnClickListener(new AdapterView.OnItemClickListener() {
-//            public void onItemClick(AdapterView<?> parent, View views, int position, long id) {
-//                String msg = position + "items";
-//                Log.e("Msg:::",msg);
+//        holder.animationView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if(holder.clickon) {
+//                    holder.animationView.setProgress(0f);
+//                    holder.clickon = false;
+//                    Map<String, Object> postValues = job.toMap();
+//                    Map<String, Object> childUpdates = new HashMap<>();
+//                    childUpdates.put("/" + job.getJobkey() + "/", postValues);
+//                    favoriteRef.child(job.getJobkey()).removeValue();
 //
+//                } else {
+//                    holder.animationView.playAnimation();
+//                    holder.clickon = true;
+//                    Map<String, Object> postValues = job.toMap();
+//                    Map<String, Object> childUpdates = new HashMap<>();
+//                    childUpdates.put("/" + job.getJobkey() + "/", postValues);
+//                    favoriteRef.updateChildren(childUpdates);
+//
+//                }
 //            }
 //        });
-        return view;
+
+
+//        holder.animationView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                ((ListView) viewGroup).performItemClick(view, i, view.getId());
+//            }
+//        });
+
+        return convertView;
     }
 
     class ViewHolder {
@@ -128,7 +175,6 @@ public class JobAdapter extends BaseAdapter {
         TextView job_area;
         TextView job_description;
         TextView job_posttime;
-        boolean clickon = false;
         LottieAnimationView animationView;
     }
 }
