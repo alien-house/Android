@@ -136,5 +136,11 @@
       android:layout_height="wrap_content"
       android:text="UpDate"/>
 
+
+  <Button
+      android:id="@+id/btnSignOut"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="Sign Out"/>
 </LinearLayout>
   </ScrollView>

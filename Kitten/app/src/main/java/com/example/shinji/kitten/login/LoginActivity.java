@@ -49,53 +49,25 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         loginbtn.setOnClickListener(this);
 
         pd = new ProgressDialog(LoginActivity.this);
-        pd.setMessage("loading");
 
         mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-
-                } else {
-                    // User is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
-                }
-
-            }
-        };
+//        mAuthListener = new FirebaseAuth.AuthStateListener() {
+//            @Override
+//            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+//                FirebaseUser user = firebaseAuth.getCurrentUser();
+//                if (user != null) {
+//                    // User is signed in
+//                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+//
+//                } else {
+//                    // User is signed out
+//                    Log.d(TAG, "onAuthStateChanged:signed_out");
+//                }
+//
+//            }
+//        };
     }
 
-    public void signIn(String email, String password){
-
-        if (!validateForm()) {
-            return;
-        }
-
-        pd.show();
-        System.out.println("アッレレレ");
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
-
-                        Intent nextItent;
-                        nextItent = new Intent(LoginActivity.this, BaseActivity.class);
-                        startActivity(nextItent);
-
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithEmail:failed", task.getException());
-                            Toast.makeText(LoginActivity.this, "auth_failed",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                        pd.hide();
-                    }
-                });
-    }
 
     private boolean validateForm() {
         boolean valid = true;
@@ -136,18 +108,47 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 //            sendEmailVerification();
 //        }
     }
-    @Override
-    public void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
+
+    public void signIn(String email, String password){
+
+        if (!validateForm()) {
+            return;
+        }
+
+        pd.show();
+        System.out.println("アッレレレ");
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
+
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "signInWithEmail:failed", task.getException());
+                            Toast.makeText(LoginActivity.this, "auth_failed",
+                                    Toast.LENGTH_SHORT).show();
+                        }else{
+                            Intent nextItent;
+                            nextItent = new Intent(LoginActivity.this, BaseActivity.class);
+                            startActivity(nextItent);
+                        }
+                        pd.hide();
+                    }
+                });
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
-    }
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        mAuth.addAuthStateListener(mAuthListener);
+//    }
+//
+//    @Override
+//    public void onStop() {
+//        super.onStop();
+//        if (mAuthListener != null) {
+//            mAuth.removeAuthStateListener(mAuthListener);
+//        }
+//    }
 
 }

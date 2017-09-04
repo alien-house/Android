@@ -1,20 +1,18 @@
 package com.example.shinji.kitten;
 
-import android.*;
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Address;
+import android.graphics.Bitmap;
 import android.location.Criteria;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.net.Uri;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
@@ -22,8 +20,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
-import android.Manifest.permission;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -32,24 +32,49 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.shinji.kitten.dashboard.User;
+import com.example.shinji.kitten.util.FirebaseController;
+import com.example.shinji.kitten.util.GetImageTaskUpload;
+import com.example.shinji.kitten.util.User;
 import com.example.shinji.kitten.login.LoginActivity;
 import com.example.shinji.kitten.login.RegisterActivity;
-import com.example.shinji.kitten.oauth.github.GithubApp;
 import com.example.shinji.kitten.util.Config;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GithubAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
 
 /*
 1. check whether login or not
@@ -62,27 +87,66 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private DatabaseReference usersRef;
+    private FirebaseStorage storage = FirebaseStorage.getInstance();
+    private StorageReference storageRef;
 
+    private SecureRandom random = new SecureRandom();
     public static final String LOG_TAG = "volley_test";
     private RequestQueue mQueue;
     private LocationManager locationManager;
-    private final String TAG = "onAuthStateChanged";
+    private final String TAG = "StartActivity";
     private Button btnLoginTo;
     private Button btnRegisterTo;
     private Button btnGithub;
-    private GithubApp mApp;
+    private Button btnSignOut;
+    private WebView webView;
+    private FirebaseController firebaseController;
+//    private GithubApp mApp;
+    private ProgressDialog pd;
 
+//    private static final String REDIRECT_URL_CALLBACK = "melardev://git.oauth2token";
+    private static final String REDIRECT_URL_CALLBACK = "https://programming-473ea.firebaseapp.com/__/auth/handler";
+    public static String OAUTH_URL = "https://github.com/login/oauth/authorize";
+    public static String OAUTH_ACCESS_TOKEN_URL = "https://github.com/login/oauth/access_token";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+//        FirebaseAuth.getInstance().signOut();
+
+        pd = new ProgressDialog(this);
+        firebaseController = FirebaseController.getInstance();
+        storageRef = storage.getReference();
 
         btnLoginTo = (Button) findViewById(R.id.btnLoginTo);
         btnLoginTo.setOnClickListener(this);
         btnRegisterTo = (Button) findViewById(R.id.btnRegisterTo);
         btnGithub = (Button) findViewById(R.id.btnGithub);
+        btnSignOut = (Button) findViewById(R.id.btnSignOut);
         btnRegisterTo.setOnClickListener(this);
+
+        webView = findViewById(R.id.webview);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                Uri uri = Uri.parse(url);
+                if (uri.getQueryParameter("code") != null
+                        && uri.getScheme() != null
+                        && uri.getScheme().equalsIgnoreCase("https")) {
+
+                    String code = uri.getQueryParameter("code");
+                    String state = uri.getQueryParameter("state");
+                    sendPost(code, state);
+                    return true;
+                }
+                return super.shouldOverrideUrlLoading(view, url);
+            }
+        });
 
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -96,81 +160,183 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
                 }
-
             }
         };
 
         // If login, go to tab contents
 /*
 */
+
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
-            // User is signed in
-            System.out.println("^^:User is signed in");
-//            Intent nextItent;
-//            nextItent = new Intent(StartActivity.this, BaseActivity.class);
-//            startActivity(nextItent);
+
+            System.out.println("^^onCreate:User is signed in");
+            System.out.println(user.getPhotoUrl());
+            User userdata = firebaseController.getUserData(user);
+            if(userdata != null){
+                System.out.println("^^userdata:User aru");
+                gotoNextIntent();
+            }
         } else {
-            // No user is signed in
             System.out.println("^0^:No user is ");
         }
 
-        Context context = StartActivity.this;
-        mApp = new GithubApp(context,
-                Config.GITHUB_ID,
-                Config.GITHUB_SECRET,
-                Config.CALLBACK_URL);
+        //Called after the github server redirect us to REDIRECT_URL_CALLBACK
+        Uri uri = getIntent().getData();
+        if (uri != null && uri.toString().startsWith(REDIRECT_URL_CALLBACK)) {
+            String code = uri.getQueryParameter("code");
+            String state = uri.getQueryParameter("state");
+            if (code != null && state != null)
+                sendPost(code, state);
+        }
+
 
         btnGithub.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                if (mApp.hasAccessToken()) {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(
-                            StartActivity.this);
-                    builder.setMessage("Disconnect from GitHub?")
-                            .setCancelable(false)
-                            .setPositiveButton("Yes",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(
-                                                DialogInterface dialog, int id) {
-                                            mApp.resetAccessToken();
-                                        }
-                                    })
-                            .setNegativeButton("No",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(
-                                                DialogInterface dialog, int id) {
-                                            dialog.cancel();
-                                        }
-                                    });
-                    final AlertDialog alert = builder.create();
-                    alert.show();
-                } else {
-                    System.out.println("mAppgetauthorize: "+ "authorize");
-                    mApp.authorize();
-                }
+                pd.show();
+                // Github auth
+                HttpUrl httpUrl = new HttpUrl.Builder()
+                        .scheme("http")
+                        .host("github.com")
+                        .addPathSegment("login")
+                        .addPathSegment("oauth")
+                        .addPathSegment("authorize")
+                        .addQueryParameter("client_id", Config.GITHUB_ID)
+                        .addQueryParameter("redirect_uri", REDIRECT_URL_CALLBACK)
+                        .addQueryParameter("state", getRandomString())
+                        .addQueryParameter("scope", "user,user:email")
+                        .build();
+                Log.d(TAG, httpUrl.toString());
+//                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(httpUrl.toString()));
+//                startActivity(intent);
 
+                webView.loadUrl(httpUrl.toString());
 
             }
         });
 
 
+        btnSignOut.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                FirebaseAuth.getInstance().signOut();
+            }
+        });
+
         locationStart();
     }
 
-    GithubApp.OAuthAuthenticationListener listener = new GithubApp.OAuthAuthenticationListener() {
 
-        @Override
-        public void onSuccess() {
-            System.out.println("Connected: "+ mApp.getUserName());
-        }
 
-        @Override
-        public void onFail(String error) {
-            Toast.makeText(StartActivity.this, error, Toast.LENGTH_SHORT).show();
-        }
-    };
+    private void sendPost(String code, String state) {
+        //POST https://github.com/login/oauth/access_token
+        System.out.println("sendPostきtア？");
+        OkHttpClient okHttpClient = new OkHttpClient();
+        FormBody form = new FormBody.Builder()
+                .add("client_id", Config.GITHUB_ID)
+                .add("client_secret", Config.GITHUB_SECRET)
+                .add("code", code)
+                .add("redirect_uri", REDIRECT_URL_CALLBACK)
+                .add("state", state)
+                .build();
+        okhttp3.Request request = new okhttp3.Request.Builder()
+                .url("https://github.com/login/oauth/access_token")
+                .post(form)
+                .build();
+
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+                Toast.makeText(StartActivity.this, "onFailure: " + e.toString(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onResponse(Call call, okhttp3.Response response) throws IOException {
+                String responseBody = response.body().string();
+                String[] splitted = responseBody.split("=|&");
+                if (splitted[0].equalsIgnoreCase("access_token")) {
+                    Log.d(TAG, "onResponse:" + splitted[1]);
+                    signInWithToken(splitted[1]);
+                }else
+                    Toast.makeText(StartActivity.this, "splitted[0] =>" + splitted[0], Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void signInWithToken(String token) {
+        Log.d(TAG, "signInWithToken:" + token);
+        AuthCredential credential = GithubAuthProvider.getCredential(token);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
+
+                        if (!task.isSuccessful()) {
+                            task.getException().printStackTrace();
+                            Log.w(TAG, "signInWithCredential", task.getException());
+//                            Toast.makeText(StartActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                        }else{
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            User userData = firebaseController.getUserData(user);
+                            final String userIDRes = userData.userID;
+                            if(userData != null){
+                                Log.d(TAG, "isSuccessful:" + userData.userID);
+                                usersRef = database.getReference("users/" + userData.userID);
+                                firebaseController.writeUserToData(usersRef);
+
+                                // save images
+                                GetImageTaskUpload myTask = new GetImageTaskUpload();
+                                myTask.setOnCallBack(new GetImageTaskUpload.CallBackTask(){
+
+                                    @Override
+                                    public void CallBack(Bitmap bitmap) {
+                                        super.CallBack(bitmap);
+                                        // ※１
+                                        // resultにはdoInBackgroundの返り値が入ります。
+                                        // ここからAsyncTask処理後の処理を記述します。
+                                        Log.i("AsyncTaskCallback", "非同期処理が終了しました。");
+
+                                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                                        byte[] data = baos.toByteArray();
+
+
+                                        StorageReference userImagesRef = storageRef.child("images/" + userIDRes + "/profile.jpg");
+                                        UploadTask uploadTask = userImagesRef.putBytes(data);
+                                        uploadTask.addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception exception) {
+                                                // Handle unsuccessful uploads
+                                                System.out.println("onFailure:Handle unsuccessful uploads");
+                                            }
+                                        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                            @Override
+                                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                System.out.println("onSuccess:UploadTask");
+                                                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                                                @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                                            }
+                                        });
+
+                                    }
+
+                                });
+                                pd.hide();
+                                myTask.execute(userData.photourl);
+                                gotoNextIntent();
+                            }
+                        }
+                    }
+                });
+    }
+
+
+
     // 結果の受け取り
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -374,6 +540,16 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
         }
     }
 
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+
+    }
+
 
     public void makeDataToListview(JSONArray rootObject){
         System.out.println("=========makeDataToListview=========");
@@ -401,14 +577,13 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
 
     }
 
-
-    @Override
-    public void onProviderEnabled(String s) {
-
+    private void gotoNextIntent(){
+        Intent nextItent;
+        nextItent = new Intent(StartActivity.this, BaseActivity.class);
+        startActivity(nextItent);
     }
 
-    @Override
-    public void onProviderDisabled(String s) {
-
+    private String getRandomString() {
+        return new BigInteger(130, random).toString(32);
     }
 }

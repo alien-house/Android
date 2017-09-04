@@ -1,15 +1,7 @@
 package com.example.shinji.kitten.util;
 
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-import android.widget.Toast;
 
-import com.example.shinji.kitten.R;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -17,19 +9,19 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by shinji on 2017/09/01.
  */
 
-public class firebaseController {
+public class FirebaseController {
 
     private FirebaseAuth mAuth;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -38,31 +30,140 @@ public class firebaseController {
     private DatabaseReference usersRef;
     private DatabaseReference devStatusRef;
     private List<String> devStatusArray = new ArrayList<String>();
+    private User userData;
+    private ValueEventListener userListener;
+    private ValueEventListener devDataListener;
 
 
-    private static firebaseController firebaseController = new firebaseController( );
+    private static FirebaseController firebaseController = new FirebaseController( );
 
-    private firebaseController() {
-
+    private FirebaseController() {
     }
 
-    public static firebaseController getInstance( ) {
+    public static FirebaseController getInstance( ) {
         return firebaseController;
     }
-    protected static void getDataFromFirebase(){
-        //for devdata
-        firebaseController.devStatusRef = firebaseController.database.getReference("devStatus");
-        firebaseController.devStatusRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again whenever data at this location is updated.
-                String devStatusValue = dataSnapshot.getValue(String.class);
-                String[] array = {};
-                array = devStatusValue.split(",", 0);
-                firebaseController.devStatusArray = Arrays.asList(array);
-                Log.d("Value:", "Value is: " + devStatusValue);
 
-                //setting spinner
+
+    public static User getUserData(FirebaseUser user) {
+        if(firebaseController.userData == null){
+            firebaseController.setUserToData(user);
+        }
+        return firebaseController.userData;
+    }
+
+    public static void setUserToData(FirebaseUser user) {
+        if(firebaseController.userData == null){
+            if (user != null) {
+                System.out.println("^^setUserToData:User is signed in~~~~");
+                if (user != null) {
+                    firebaseController.userData = new User(
+                            user.getUid(),
+                            user.getDisplayName(),
+                            "",
+                            user.getEmail(),
+                            "",
+                            "",
+                            "",
+                            user.getPhotoUrl().toString()
+                    );
+                }
+            } else {
+                System.out.println("^0^:No user is");
+            }
+        }
+    }
+
+    public static void writeUserToData(DatabaseReference usersRef) {
+        Map<String, Object> postValues = firebaseController.userData.toMap();
+        usersRef.updateChildren(postValues, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (databaseError != null) {
+                    System.out.println("Data could not be saved " + databaseError.getMessage());
+                } else {
+                    System.out.println("Data saved successfully.");
+                }
+            }
+        });
+    }
+
+//    public static void writeFavDatabase(DatabaseReference usersFavRef){
+//
+//        userData.username = nameEdit.getText().toString();
+//        String key = usersRef.push().getKey();
+//        Map<String, Object> postValues = userData.toMap();
+//        usersFavRef.updateChildren(postValues, new DatabaseReference.CompletionListener() {
+//            @Override
+//            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+//                if (databaseError != null) {
+//                    System.out.println("Data could not be saved " + databaseError.getMessage());
+//                } else {
+//                    System.out.println("Data saved successfully.");
+//                }
+//                pd.hide();
+//            }
+//        });
+//    }
+
+    public static void getUserDataEventListener(DatabaseReference usersRef) {
+        if(firebaseController.userListener == null){
+            //変更があれば都度取得する
+    //        usersRef.addValueEventListener(new ValueEventListener() {
+            firebaseController.userListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    System.out.println("======onDataChange========");
+                    // This method is called once with the initial value and again whenever data at this location is updated.
+                    User usersValue = dataSnapshot.getValue(User.class);
+    //                String[] array = {};
+    //                array = devStatusValue.split(",", 0);
+    //                devStatusArray = Arrays.asList(array);
+                    System.out.println(usersValue);
+
+    //                if(!usersValue.devStatus.isEmpty()){
+    //                    userData.devStatus = usersValue.devStatus;
+    //                }
+    //                if(!usersValue.bio.isEmpty()){
+    //                    userData.bio = usersValue.bio;
+    //                    bioEdit.setText(userData.bio);
+    //                }
+                    firebaseController.userData.userID = usersValue.userID;
+                    firebaseController.userData.username = usersValue.username;
+                    firebaseController.userData.devStatus = usersValue.devStatus;
+                    firebaseController.userData.email = usersValue.email;
+                    firebaseController.userData.bio = usersValue.bio;
+                    firebaseController.userData.location = usersValue.location;
+                    firebaseController.userData.url = usersValue.url;
+    //                userData.role = usersValue.getProperty('devStatus');
+                    Log.d("usersValue:", "usersValue is: " + usersValue);
+                }
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    // Failed to read value
+                    Log.w("Value:", "Failed to read value.", error.toException());
+                }
+            };
+            usersRef.addValueEventListener(firebaseController.userListener);
+        }
+    }
+
+
+    public static void getDataBaseEventListener(DatabaseReference devStatusRef) {
+        if(firebaseController.devDataListener == null) {
+            //for devdata e.g) "devStatus"
+            firebaseController.devDataListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    // This method is called once with the initial value and again whenever data at this location is updated.
+                    String devStatusValue = dataSnapshot.getValue(String.class);
+                    String[] array = {};
+                    array = devStatusValue.split(",", 0);
+                    firebaseController.devStatusArray = Arrays.asList(array);
+                    Log.d("Value:", "Value is: " + devStatusValue);
+
+//                return dataSnapshot;
+                    //setting spinner
 //                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, devStatusArray);
 //                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 //                roleSpinner.setAdapter(adapter);
@@ -94,13 +195,16 @@ public class firebaseController {
 //                    }
 //                });
 
-            }
+                }
 
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w("Value:", "Failed to read value.", error.toException());
-            }
-        });
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    // Failed to read value
+                    Log.w("Value:", "Failed to read value.", error.toException());
+                }
+            };
+
+            devStatusRef.addListenerForSingleValueEvent(firebaseController.devDataListener);
+        }
     }
 }

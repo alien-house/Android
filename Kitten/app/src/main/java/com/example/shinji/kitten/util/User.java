@@ -1,4 +1,4 @@
-package com.example.shinji.kitten.dashboard;
+package com.example.shinji.kitten.util;
 
 import com.google.firebase.database.Exclude;
 
@@ -10,7 +10,7 @@ import java.util.Map;
  */
 
 public class User {
-    public String userID,username,role,devStatus,email,bio,location,url = "";
+    public String userID,username,role,devStatus,email,bio,location,url,photourl = "";
     public static String USER_COUNTRY;
     //,comapny,lindkedin,twitter,github,facebook,dribbble
 
@@ -18,7 +18,7 @@ public class User {
         // Default constructor required for calls to DataSnapshot.getValue(Post.class)
     }
 
-    public User(String userID, String username, String devStatus, String email, String bio, String location, String url) {
+    public User(String userID, String username, String devStatus, String email, String bio, String location, String url, String photourl) {
         this.userID = userID;
         this.username = username;
         this.devStatus = devStatus;
@@ -26,6 +26,7 @@ public class User {
         this.bio = bio;
         this.location = location;
         this.url = url;
+        this.photourl = photourl;
     }
 
     @Exclude

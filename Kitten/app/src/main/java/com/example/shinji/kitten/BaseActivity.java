@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.shinji.kitten.dashboard.SettingFragment;
+import com.example.shinji.kitten.favorite.FavoriteFragment;
 import com.example.shinji.kitten.main.JobFragment;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -68,12 +69,14 @@ public class BaseActivity extends FragmentActivity implements GoogleApiClient.On
     private void setupViewPager(ViewPager viewPager){
         SectionPageAdapter adapter = new SectionPageAdapter(getSupportFragmentManager());
         adapter.addFragment(new JobFragment(), "Job");
+        adapter.addFragment(new FavoriteFragment(), "Favorite");
         adapter.addFragment(new SettingFragment(), "Setting");
         viewPager.setAdapter(adapter);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
         tabLayout.getTabAt(0).setIcon(R.drawable.ic_business_center_24dp);
-        tabLayout.getTabAt(1).setIcon(R.drawable.ic_settings_24dp);
+        tabLayout.getTabAt(1).setIcon(R.drawable.ic_favorite_24dp);
+        tabLayout.getTabAt(2).setIcon(R.drawable.ic_settings_24dp);
     }
 
 

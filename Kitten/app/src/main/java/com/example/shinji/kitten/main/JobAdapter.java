@@ -9,8 +9,18 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.shinji.kitten.R;
+import com.example.shinji.kitten.util.FirebaseController;
+import com.example.shinji.kitten.util.User;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 /**
  * Created by shinji on 2017/08/04.
@@ -20,10 +30,19 @@ public class JobAdapter extends BaseAdapter {
     Context context;
     LayoutInflater layoutInflater = null;
     ArrayList<Job> jobList;
+    private FirebaseAuth mAuth;
+    private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private FirebaseController firebaseController;
+    private DatabaseReference favoriteRef;
+    private User userData;
 
     public JobAdapter(Context context) {
         this.context = context;
         this.layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = mAuth.getCurrentUser();
+        userData = firebaseController.getUserData(user);
+        favoriteRef = database.getReference("favorite/" + userData.userID);
     }
 
     public void setJobList(ArrayList<Job> jobList) {
@@ -48,7 +67,7 @@ public class JobAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         final ViewHolder holder;
-
+        final Job job = jobList.get(i);
         if (view == null) {
             view = layoutInflater.inflate(R.layout.main_job_result_list, viewGroup, false);
             holder = new ViewHolder();
@@ -58,6 +77,7 @@ public class JobAdapter extends BaseAdapter {
             holder.job_area = (TextView) view.findViewById(R.id.job_area);
             holder.job_description = (TextView) view.findViewById(R.id.job_description);
             holder.job_posttime = (TextView) view.findViewById(R.id.job_posttime);
+            holder.animationView = (LottieAnimationView) view.findViewById(R.id.animationView);
             view.setTag(holder);
         } else {
             holder = (ViewHolder) view.getTag();
@@ -70,7 +90,28 @@ public class JobAdapter extends BaseAdapter {
         /* ====================================================  */
         CharSequence source = Html.fromHtml(jobList.get(i).getDescription());
         holder.job_description.setText(source);
+        holder.animationView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(holder.clickon) {
+                    holder.animationView.setProgress(0f);
+                    holder.clickon = false;
+                    Map<String, Object> postValues = job.toMap();
+                    Map<String, Object> childUpdates = new HashMap<>();
+                    childUpdates.put("/" + job.getJobkey() + "/", postValues);
+                    favoriteRef.child(job.getJobkey()).removeValue();
 
+                } else {
+                    holder.animationView.playAnimation();
+                    holder.clickon = true;
+                    Map<String, Object> postValues = job.toMap();
+                    Map<String, Object> childUpdates = new HashMap<>();
+                    childUpdates.put("/" + job.getJobkey() + "/", postValues);
+                    favoriteRef.updateChildren(childUpdates);
+
+                }
+            }
+        });
 //        view.setOnClickListener(new AdapterView.OnItemClickListener() {
 //            public void onItemClick(AdapterView<?> parent, View views, int position, long id) {
 //                String msg = position + "items";
@@ -87,5 +128,7 @@ public class JobAdapter extends BaseAdapter {
         TextView job_area;
         TextView job_description;
         TextView job_posttime;
+        boolean clickon = false;
+        LottieAnimationView animationView;
     }
 }

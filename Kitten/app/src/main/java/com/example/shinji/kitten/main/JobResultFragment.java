@@ -29,7 +29,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.shinji.kitten.BaseActivity;
 import com.example.shinji.kitten.R;
-import com.example.shinji.kitten.dashboard.User;
+import com.example.shinji.kitten.util.User;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.json.JSONArray;
@@ -79,6 +79,9 @@ public class JobResultFragment extends Fragment {
         btnSearch = view.findViewById(R.id.btnSearch);
         btnDate = view.findViewById(R.id.btnDate);
         switchSort = view.findViewById(R.id.sort_switch);
+
+
+
         progressDialog = new ProgressDialog(getActivity());
 //        progressDialog.setTitle("Loading");
 //        progressDialog.setMessage("....");
@@ -337,7 +340,8 @@ public class JobResultFragment extends Fragment {
                 obj.getString("company"),
                 obj.getString("snippet"),
                 obj.getString("formattedRelativeTime"),
-                obj.getString("formattedLocation")
+                obj.getString("formattedLocation"),
+                obj.getString("jobkey")
         ));
         myAdapter.notifyDataSetChanged();
     }

@@ -5,7 +5,7 @@ android {
     buildToolsVersion '26.0.0'
     defaultConfig {
         applicationId "com.example.shinji.kitten"
-        minSdkVersion 21
+        minSdkVersion 25
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -17,6 +17,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility
+        targetCompatibility
+    }
 }
 
 dependencies {
@@ -27,26 +31,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support:design:26.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-//    compile 'com.google.android.gms:play-services-base:9.2.0'
-//    compile 'com.google.android.gms:play-services-maps:9.2.0'
-//    compile 'com.google.android.gms:play-services-gcm:9.2.0'
-//    compile 'com.google.android.gms:play-services-places:9.2.0'
-//    compile 'com.google.android.gms:play-services-location:9.2.0'
-//    compile ("com.google.android.gms:play-services-base:9.2.0") {
-//        force = true;
-//    }
-//    compile ("com.google.android.gms:play-services-maps:9.2.0") {
-//        force = true;
-//    }
-//    compile ("com.google.android.gms:play-services-gcm:9.2.0") {
-//        force = true;
-//    }
-//    compile ("com.google.android.gms:play-services-places:9.2.0") {
-//        force = true;
-//    }
-//    compile ("com.google.android.gms:play-services-location:9.2.0") {
-//        force = true;
-//    }
     compile 'com.google.firebase:firebase-core:10.2.6'
     compile 'com.google.firebase:firebase-auth:10.2.6'
     compile 'com.google.firebase:firebase-database:10.2.6'
@@ -57,6 +41,12 @@ dependencies {
     compile 'com.isseiaoki:simplecropview:1.1.6'
     compile 'com.sothree.slidinguppanel:library:3.3.1'
     compile 'com.google.android.gms:play-services:10.2.6'
+
+    compile 'com.squareup.okhttp3:okhttp:3.2.0'
+    compile 'com.airbnb.android:lottie:2.2.0'
+//    compile 'com.github.VictorAlbertos.RxSocialConnect-Android:core:1.0.1-2.x'
+//    compile 'com.github.VictorAlbertos.Jolyglot:gson:0.0.3'
+//    compile 'io.reactivex.rxjava2:rxjava:2.0.5'
 }
 
 apply plugin: 'com.google.gms.google-services'
