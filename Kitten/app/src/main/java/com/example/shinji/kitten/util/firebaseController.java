@@ -32,31 +32,35 @@ public class FirebaseController {
     private List<String> devStatusArray = new ArrayList<String>();
     private User userData;
     private ValueEventListener userListener;
-    private ValueEventListener devDataListener;
+    private ValueEventListener favDataListener;
 
-
-    private static FirebaseController firebaseController = new FirebaseController( );
+    private static FirebaseController firebaseController;
 
     private FirebaseController() {
+        firebaseController = null;
     }
 
-    public static FirebaseController getInstance( ) {
+    public static FirebaseController getInstance() {
+        if (firebaseController == null) {
+            firebaseController = new FirebaseController();
+        }
         return firebaseController;
     }
 
 
-    public static User getUserData(FirebaseUser user) {
+    public static User getUserData() {
+        System.out.println("^getUserData"+firebaseController.userData);
+            FirebaseUser userFirebase = FirebaseAuth.getInstance().getCurrentUser();
+            firebaseController.setUserToData(userFirebase);
         if(firebaseController.userData == null){
-            firebaseController.setUserToData(user);
         }
         return firebaseController.userData;
     }
 
     public static void setUserToData(FirebaseUser user) {
-        if(firebaseController.userData == null){
+        System.out.println("^^setUserToData:FirebaseUser");
             if (user != null) {
                 System.out.println("^^setUserToData:User is signed in~~~~");
-                if (user != null) {
                     firebaseController.userData = new User(
                             user.getUid(),
                             user.getDisplayName(),
@@ -67,10 +71,8 @@ public class FirebaseController {
                             "",
                             user.getPhotoUrl().toString()
                     );
-                }
-            } else {
-                System.out.println("^0^:No user is");
             }
+        if(firebaseController.userData == null){
         }
     }
 
@@ -121,13 +123,6 @@ public class FirebaseController {
     //                devStatusArray = Arrays.asList(array);
                     System.out.println(usersValue);
 
-    //                if(!usersValue.devStatus.isEmpty()){
-    //                    userData.devStatus = usersValue.devStatus;
-    //                }
-    //                if(!usersValue.bio.isEmpty()){
-    //                    userData.bio = usersValue.bio;
-    //                    bioEdit.setText(userData.bio);
-    //                }
                     firebaseController.userData.userID = usersValue.userID;
                     firebaseController.userData.username = usersValue.username;
                     firebaseController.userData.devStatus = usersValue.devStatus;
@@ -149,10 +144,10 @@ public class FirebaseController {
     }
 
 
-    public static void getDataBaseEventListener(DatabaseReference devStatusRef) {
-        if(firebaseController.devDataListener == null) {
+    public static void getFavDataEventListener(DatabaseReference favRef) {
+        if(firebaseController.favDataListener == null) {
             //for devdata e.g) "devStatus"
-            firebaseController.devDataListener = new ValueEventListener() {
+            firebaseController.favDataListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     // This method is called once with the initial value and again whenever data at this location is updated.
@@ -161,39 +156,6 @@ public class FirebaseController {
                     array = devStatusValue.split(",", 0);
                     firebaseController.devStatusArray = Arrays.asList(array);
                     Log.d("Value:", "Value is: " + devStatusValue);
-
-//                return dataSnapshot;
-                    //setting spinner
-//                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, devStatusArray);
-//                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//                roleSpinner.setAdapter(adapter);
-//                // リスナーを登録
-//                roleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//                    //　アイテムが選択された時
-//                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                        Spinner spinner = (Spinner) parent;
-//                        String item = (String) spinner.getSelectedItem();
-//
-//                        if (item.equals("Android")) {
-//    //                    textView.setText("Android");
-//                            Toast.makeText(getActivity(), "Android", Toast.LENGTH_SHORT).show();
-//                        } else if (item.equals("Apple")) {
-//    //                    textView.setText("Apple");
-//                            Toast.makeText(getActivity(), "Apple", Toast.LENGTH_SHORT).show();
-//                        } else if (item.equals("Windows")) {
-//    //                    textView.setText("Windows");
-//                            Toast.makeText(getActivity(), "Windows", Toast.LENGTH_SHORT).show();
-//                        } else {
-//    //                    textView.setText("Spinner");
-//                            Toast.makeText(getActivity(), "Spinner", Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//
-//                    //　アイテムが選択されなかった
-//                    public void onNothingSelected(AdapterView<?> parent) {
-//                        //
-//                    }
-//                });
 
                 }
 
@@ -204,7 +166,7 @@ public class FirebaseController {
                 }
             };
 
-            devStatusRef.addListenerForSingleValueEvent(firebaseController.devDataListener);
+            favRef.addValueEventListener(firebaseController.favDataListener);
         }
     }
 }

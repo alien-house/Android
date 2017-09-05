@@ -169,10 +169,8 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
 
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
-
             System.out.println("^^onCreate:User is signed in");
-            System.out.println(user.getPhotoUrl());
-            User userdata = firebaseController.getUserData(user);
+            User userdata = firebaseController.getUserData();
             if(userdata != null){
                 System.out.println("^^userdata:User aru");
                 gotoNextIntent();
@@ -282,7 +280,7 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
 //                            Toast.makeText(StartActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                         }else{
                             FirebaseUser user = mAuth.getCurrentUser();
-                            User userData = firebaseController.getUserData(user);
+                            User userData = firebaseController.getUserData();
                             final String userIDRes = userData.userID;
                             if(userData != null){
                                 Log.d(TAG, "isSuccessful:" + userData.userID);
@@ -542,12 +540,9 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
 
     @Override
     public void onProviderEnabled(String s) {
-
     }
-
     @Override
     public void onProviderDisabled(String s) {
-
     }
 
 

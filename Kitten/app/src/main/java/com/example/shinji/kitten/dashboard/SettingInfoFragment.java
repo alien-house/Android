@@ -89,23 +89,17 @@ public class SettingInfoFragment extends Fragment {
         pd.setMessage("saving");
         firebaseController = FirebaseController.getInstance();
 
-//        Toast.makeText(getActivity(), "TEST BTN CLICK2", Toast.LENGTH_SHORT).show();
-//        btnTEST = (Button) view.findViewById(R.id.btnTEST1);
-//        btnTEST.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View view) {
-//                Toast.makeText(getActivity(), "TEST BTN CLICK1", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
-        userData = firebaseController.getUserData(user);
+
+        firebaseController = FirebaseController.getInstance();
+        userData = firebaseController.getUserData();
         if(userData != null){
-            System.out.println("^^userdataSettingInfoFragment:User aru");
+            System.out.println("SettingInfoFragment:User aru" + userData.username);
             changeUI();
         }
 
+        System.out.println("SettingInfoFragment userData@@:" + userData.username);
 
         return view;
     }
@@ -123,8 +117,6 @@ public class SettingInfoFragment extends Fragment {
         userImagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                // Got the download URL for 'users/me/profile.png'
-                System.out.println("userImagesRef :: ");
                 System.out.println(uri);
                 if(uri != null){
                     GetImageTask myTask = new GetImageTask(profileImg);
@@ -135,12 +127,9 @@ public class SettingInfoFragment extends Fragment {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
                 System.out.println("userImagesRef :: onFailure");
             }
         });
-
-
 
         System.out.println("======DatabaseReference========");
         usersRef = database.getReference("users/" + userData.userID);
@@ -148,8 +137,6 @@ public class SettingInfoFragment extends Fragment {
 
         //for devdata
         DatabaseReference devStatusRef = database.getReference("devStatus");
-
-//        firebaseController.getDataBaseEventListener(devStatusRef);
 
         //just once
         devStatusRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -250,4 +237,22 @@ public class SettingInfoFragment extends Fragment {
                 });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("SettingInfoFragment", "onResume ーーーーーーーー");
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d("SettingInfoFragment", "onStop settingがonStop終わりましたヨーーーーーーーー");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("SettingInfoFragment", "onDestroy settingが終わりましたヨーーーーーーーー");
+    }
 }

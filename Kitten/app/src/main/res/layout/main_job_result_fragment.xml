@@ -31,11 +31,16 @@
       sothree:umanoPanelHeight="68dp"
       sothree:umanoShadowHeight="4dp">
 
-    <ListView xmlns:android="http://schemas.android.com/apk/res/android"
-              android:id="@+id/view_list"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content">
-    </ListView>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/view_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </android.support.v7.widget.RecyclerView>
+    <!--<ListView xmlns:android="http://schemas.android.com/apk/res/android"-->
+              <!--android:id="@+id/view_list"-->
+              <!--android:layout_width="match_parent"-->
+              <!--android:layout_height="wrap_content">-->
+    <!--</ListView>-->
     <include
         android:id="@+id/sortPanel"
         layout="@layout/main_job_result_sortfilter"

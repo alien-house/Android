@@ -6,17 +6,21 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,7 +34,13 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.shinji.kitten.BaseActivity;
 import com.example.shinji.kitten.R;
+import com.example.shinji.kitten.util.FirebaseController;
 import com.example.shinji.kitten.util.User;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.json.JSONArray;
@@ -38,14 +48,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
 
 /**
  * Created by shinji on 2017/08/28.
  */
 
-public class JobResultFragment extends Fragment {
+public class JobResultFragment extends Fragment implements JobRecyclerAdapter.ListItemClickListener {
 
-    private ArrayList<Job> joblist = new ArrayList();
+    private ArrayList<Job> joblist = new ArrayList<Job>();
     public static final String LOG_TAG = "volley_test";
     private RequestQueue mQueue;
     private final String URL_BASE = "http://api.indeed.com/ads/apisearch";
@@ -53,8 +65,9 @@ public class JobResultFragment extends Fragment {
     private String search_loc = "";
     private int _totalItemCount = 0;
     private int resultTotalItem = 0;
-    private JobAdapter myAdapter;
+    private JobRecyclerAdapter myAdapter;
     private ListView listView;
+    private RecyclerView listViewRecycle;
     private boolean listenerLock = false;
     private Button btnSearch;
     private TextView txtSearchWord;
@@ -69,6 +82,9 @@ public class JobResultFragment extends Fragment {
     private RadioGroup radioJobtypeGroup;
     private RadioButton radioJobtypeButton;
     private String JobTypeString = "";
+    private DatabaseReference favoriteRef;
+    private FirebaseController firebaseController;
+    private User userData;
 
 
     @Nullable
@@ -86,9 +102,19 @@ public class JobResultFragment extends Fragment {
 //        progressDialog.setMessage("....");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.show();
-        listView = view.findViewById(R.id.view_list);
+//        listView = view.findViewById(R.id.view_list);
+        /**/
+        listViewRecycle = view.findViewById(R.id.view_list);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        listViewRecycle.setLayoutManager(layoutManager);
+        listViewRecycle.setHasFixedSize(true);
+        /**/
         slidingLayout = view.findViewById(R.id.sliding_layout);
         radioJobtypeGroup = view.findViewById(R.id.radioJobType);
+
+        firebaseController = firebaseController.getInstance();
+        userData = firebaseController.getUserData();
+        favoriteRef = FirebaseDatabase.getInstance().getReference("favorite/" + userData.userID);
         setCountry();
 
         return view;
@@ -110,7 +136,7 @@ public class JobResultFragment extends Fragment {
         Log.e("onCreateView::", search_word);
         if((search_loc.length() > 0) && (search_word.length() > 0)){
             mQueue = Volley.newRequestQueue(getActivity());
-            myAdapter = new JobAdapter(getActivity());
+            myAdapter = new JobRecyclerAdapter(joblist, this);
 
             String url = getJobSearchURL(search_loc,search_word);
             txtSearchWord.setText(search_word);
@@ -143,7 +169,6 @@ public class JobResultFragment extends Fragment {
 
             @Override
             public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
-
 //                Log.e("onPanelStateChanged",String.valueOf(previousState));
             }
         });
@@ -235,6 +260,8 @@ public class JobResultFragment extends Fragment {
                                 String txt = "No results were found for \" " + response.getString("query") + "\"";
                                 Toast.makeText(getActivity(), txt, Toast.LENGTH_SHORT).show();
                             }else{
+                                Toast.makeText(getActivity(), String.valueOf(response.getInt("totalResults")), Toast.LENGTH_SHORT).show();
+
 //                                getActivity().setTitle("Results:" + response.getInt("totalResults"));
                                 resultTotalItem = response.getInt("totalResults");
                                 JSONArray itemArray = response.getJSONArray("results");
@@ -278,63 +305,68 @@ public class JobResultFragment extends Fragment {
 
     /* 一度でいい処理 */
     void settingListView() {
-        myAdapter.setJobList(joblist);
-        listView.setAdapter(myAdapter);
+//        myAdapter.setJobList(joblist);
+//        listView.setAdapter(myAdapter);
+        listViewRecycle.setAdapter(myAdapter);
         Log.e("settingListView", "settingListView======");
 //        myAdapter.notifyDataSetChanged();
 
         //リスト項目が選択された時のイベントを追加
+//
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                Job job_tmp = (Job)myAdapter.getItem(position);
+//                Log.e("setOnItemClickListener", String.valueOf(position));
+////
+////                switch (view.getId()) {
+////                    case R.id.animationView:
+////                        Toast.makeText(getActivity(), "tap!!", Toast.LENGTH_LONG).show();
+////                        LottieAnimationView animationView = view.findViewById(view.getId());
+//////                        if(job_tmp.clickon) {
+//////                            animationView.setProgress(0f);
+//////                            job_tmp.clickon = false;
+//////                        } else {
+//////                            animationView.playAnimation();
+//////                            job_tmp.clickon = true;
+//////                        }
+//////                            view.animationView.setProgress(0f);
+//////                            holder.clickon = false;
+//////                            Map<String, Object> postValues = job.toMap();
+//////                            Map<String, Object> childUpdates = new HashMap<>();
+//////                            childUpdates.put("/" + job.getJobkey() + "/", postValues);
+//////                            favoriteRef.child(job.getJobkey()).removeValue();
+//////                        } else {
+//////                            holder.animationView.playAnimation();
+//////                            holder.clickon = true;
+//////                            Map<String, Object> postValues = job.toMap();
+//////                            Map<String, Object> childUpdates = new HashMap<>();
+//////                            childUpdates.put("/" + job.getJobkey() + "/", postValues);
+//////                            favoriteRef.updateChildren(childUpdates);
+//////                        }
+////                        break;
+////                    default:
+////                        Uri uri = Uri.parse(job_tmp.getUrl());
+////                        Intent i = new Intent(Intent.ACTION_VIEW, uri);
+//////                i.putExtra("JOB_DETAIL_URL", job_tmp.getUrl());
+////
+////                        startActivity(i);
+////                        break;
+////
+////                }
+//            }
+//        });
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Job job_tmp = (Job)myAdapter.getItem(position);
-                Log.e("setOnItemClickListener", String.valueOf(position));
-//
-//                switch (view.getId()) {
-//                    case R.id.animationView:
-//                        Toast.makeText(getActivity(), "tap!!", Toast.LENGTH_LONG).show();
-//                        LottieAnimationView animationView = view.findViewById(view.getId());
-////                        if(job_tmp.clickon) {
-////                            animationView.setProgress(0f);
-////                            job_tmp.clickon = false;
-////                        } else {
-////                            animationView.playAnimation();
-////                            job_tmp.clickon = true;
-////                        }
-////                            view.animationView.setProgress(0f);
-////                            holder.clickon = false;
-////                            Map<String, Object> postValues = job.toMap();
-////                            Map<String, Object> childUpdates = new HashMap<>();
-////                            childUpdates.put("/" + job.getJobkey() + "/", postValues);
-////                            favoriteRef.child(job.getJobkey()).removeValue();
-////                        } else {
-////                            holder.animationView.playAnimation();
-////                            holder.clickon = true;
-////                            Map<String, Object> postValues = job.toMap();
-////                            Map<String, Object> childUpdates = new HashMap<>();
-////                            childUpdates.put("/" + job.getJobkey() + "/", postValues);
-////                            favoriteRef.updateChildren(childUpdates);
-////                        }
-//                        break;
-//                    default:
-//                        Uri uri = Uri.parse(job_tmp.getUrl());
-//                        Intent i = new Intent(Intent.ACTION_VIEW, uri);
-////                i.putExtra("JOB_DETAIL_URL", job_tmp.getUrl());
-//
-//                        startActivity(i);
-//                        break;
-//
-//                }
-            }
-        });
+        listViewRecycle.addOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
 
-        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView absListView, int i) {
-            }
-            @Override
-            public void onScroll(AbsListView absListView,
-                                 int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+                int totalItemCount = recyclerView.getAdapter().getItemCount(); //合計のアイテム数
+                int visibleItemCount = recyclerView.getChildCount(); // RecyclerViewに表示されてるアイテム数
+                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) layoutManager;
+                int firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
+
                 if (totalItemCount != 0 && totalItemCount == firstVisibleItem + visibleItemCount) {
                     // 最後尾までスクロールしたので、何かデータ取得する処理
                     if(!listenerLock){
@@ -352,8 +384,36 @@ public class JobResultFragment extends Fragment {
                         }
                     }
                 }
+
             }
         });
+
+//        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(AbsListView absListView, int i) {
+//            }
+//            @Override
+//            public void onScroll(AbsListView absListView,
+//                                 int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+//                if (totalItemCount != 0 && totalItemCount == firstVisibleItem + visibleItemCount) {
+//                    // 最後尾までスクロールしたので、何かデータ取得する処理
+//                    if(!listenerLock){
+//                        listenerLock = true;
+//                        Log.e("firstVisibleItem", String.valueOf(firstVisibleItem));
+//                        Log.e("visibleItemCount", String.valueOf(visibleItemCount));
+//                        Log.e("totalItemCount", String.valueOf(totalItemCount));
+//                        _totalItemCount = totalItemCount;
+//                        if(resultTotalItem != totalItemCount){
+//                            String url = getJobSearchURL(url_location,url_query,String.valueOf(totalItemCount));
+////                            String new_url = url + "&start=" + String.valueOf(totalItemCount);
+//                            Log.e("onScroll::", url);
+//                            progressDialog.show();
+//                            makeJsonArrayRequest(url, false);
+//                        }
+//                    }
+//                }
+//            }
+//        });
 
     }
 
@@ -363,7 +423,8 @@ public class JobResultFragment extends Fragment {
     }
 
     void addList(JSONObject obj) throws JSONException {
-        Job newJob = new Job(
+
+        final Job newJob = new Job(
                 obj.getString("jobtitle"),
                 obj.getString("url"),
                 obj.getString("company"),
@@ -372,11 +433,40 @@ public class JobResultFragment extends Fragment {
                 obj.getString("formattedLocation"),
                 obj.getString("jobkey")
         );
-        joblist.add(newJob);
-        myAdapter.notifyDataSetChanged();
+
+        favoriteRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                    if(postSnapshot.getKey().matches(newJob.getJobkey())){
+                        newJob.setFav(true);
+                        Log.d("favoriteRefあったよ:", postSnapshot.getKey());
+                    }
+                }
+                joblist.add(newJob);
+                myAdapter.notifyDataSetChanged();
+            }
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w("Value:", "Failed to read value.", error.toException());
+            }
+        });
+
     }
 
 
+    @Override
+    public void onListItemClick(int index) {
+        Job job_tmp = joblist.get(index);
+//        Job job_tmp = (Job)myAdapter.getItemId(index)
+        Uri uri = Uri.parse(job_tmp.getUrl());
+        Intent i = new Intent(Intent.ACTION_VIEW, uri);
+//                i.putExtra("JOB_DETAIL_URL", job_tmp.getUrl());
+
+        startActivity(i);
+        Log.e("onListItemClick", String.valueOf(index));
+    }
 
     /**
      * get the indeed url

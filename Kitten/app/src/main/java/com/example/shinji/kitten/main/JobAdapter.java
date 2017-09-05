@@ -1,20 +1,15 @@
 package com.example.shinji.kitten.main;
 
-import android.content.ClipData;
 import android.content.Context;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.shinji.kitten.R;
@@ -22,11 +17,8 @@ import com.example.shinji.kitten.util.FirebaseController;
 import com.example.shinji.kitten.util.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import static com.example.shinji.kitten.R.id.parent;
 
 /**
  * Created by shinji on 2017/08/04.
@@ -47,7 +39,7 @@ public class JobAdapter extends BaseAdapter {
         this.layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
-        userData = firebaseController.getUserData(user);
+        userData = firebaseController.getUserData();
         favoriteRef = database.getReference("favorite/" + userData.userID);
     }
 
@@ -82,7 +74,7 @@ public class JobAdapter extends BaseAdapter {
         final Job tempJob = jobList.get(i);
 //        final Job job = jobList.get(i);
         if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.main_job_result_list, viewGroup, false);
+            convertView = layoutInflater.inflate(R.layout.main_job_result_list_item, viewGroup, false);
             holder = new ViewHolder();
 
             Log.e("holder:", String.valueOf(holder));

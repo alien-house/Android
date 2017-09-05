@@ -75,7 +75,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:scaleType="centerCrop">
-      <com.airbnb.lottie.LottieAnimationView
+      <com.example.shinji.kitten.util.HeartAnimation
           android:id="@+id/animationView"
           android:layout_width="190dp"
           android:layout_height="190dp"

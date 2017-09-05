@@ -52,8 +52,6 @@ public class JobSearchFragment extends Fragment {
 
         btnSearch = view.findViewById(R.id.btnSearch);
         txtSearchLocation = view.findViewById(R.id.searchLocation);
-//        btnAuto = view.findViewById(R.id.btnAuto);
-//        searchLocation = "van";
 //        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment) getChildFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
         multiAutoCompleteTextView = view.findViewById(R.id.searchWordMultiAuto);
         String[] devAutoArray = {"web designer","front end developer", "android developer"};
@@ -141,7 +139,7 @@ public class JobSearchFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-                if(searchLocation.matches("")){
+                if(txtSearchLocation.getText().toString().matches("")){
                     Toast.makeText(getActivity(), "You did not enter a location", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -174,7 +172,6 @@ public class JobSearchFragment extends Fragment {
 
     public void showAutoCompPlace(){
         try {
-            //filter
             AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
                     .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
                     .setCountry(User.USER_COUNTRY)//* should be changed! later *_*
@@ -220,6 +217,8 @@ public class JobSearchFragment extends Fragment {
             }
         }
     }
+
+
 
 
     public class SpaceTokenizer implements MultiAutoCompleteTextView.Tokenizer {

@@ -1,4 +1,4 @@
-package com.example.shinji.kitten.main;
+package com.example.shinji.kitten.favorite;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.shinji.kitten.R;
+import com.example.shinji.kitten.main.Job;
 import com.example.shinji.kitten.util.FirebaseController;
 import com.example.shinji.kitten.util.HeartAnimation;
 import com.example.shinji.kitten.util.User;
@@ -27,7 +28,7 @@ import java.util.Map;
  * Created by shinji on 2017/09/04.
  */
 
-public class JobRecyclerAdapter extends RecyclerView.Adapter<JobRecyclerAdapter.JobHolder> {
+public class FavoriteRecyclerAdapter extends RecyclerView.Adapter<FavoriteRecyclerAdapter.JobHolder> {
     private int mNumberItems;
     private List<Job> jobList;
     private ArrayList<JobHolder> JobHolderList = new ArrayList<JobHolder>();
@@ -43,24 +44,22 @@ public class JobRecyclerAdapter extends RecyclerView.Adapter<JobRecyclerAdapter.
         void onListItemClick(int index);
     }
 
-    public JobRecyclerAdapter(List<Job> jobList, ListItemClickListener onClickListner) {
+    public FavoriteRecyclerAdapter(List<Job> jobList, ListItemClickListener onClickListner) {
         this.mNumberItems = jobList.size();
         this.jobList = jobList;
         this.viewHolderCount = 0;
         this.onClickListner = onClickListner;
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
-
-        firebaseController = firebaseController.getInstance();
+        firebaseController.getInstance();
         userData = firebaseController.getUserData();
-        System.out.println("JobRecyclerAdapter:" + userData.username);
         favoriteRef = database.getReference("favorite/" + userData.userID);
     }
     @Override
     public JobHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.main_job_result_list_item, parent, false);//this time, only textview
+        View view = inflater.inflate(R.layout.favorite_list_item, parent, false);//this time, only textview
         JobHolder nh = new JobHolder(view);
         JobHolderList.add(nh);
         viewHolderCount++;
@@ -75,35 +74,8 @@ public class JobRecyclerAdapter extends RecyclerView.Adapter<JobRecyclerAdapter.
         holder.job_title.setText(job.getTitle());
         holder.job_company.setText(job.getCompany());
         holder.job_area.setText(job.getArea());
-        holder.job_posttime.setText(job.getPostedDate());
         CharSequence source = Html.fromHtml(job.getDescription());
         holder.job_description.setText(source);
-        if(job.isFavd()){
-            holder.animationView.setProgress(1f);
-        }
-        holder.animationView.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-//                holder.animationView.setOn();
-                if(jobList.get(position).isFavd()) {
-                    holder.animationView.setProgress(0f);
-                    jobList.get(position).setFav(false);
-                    Map<String, Object> postValues = job.toMap();
-                    Map<String, Object> childUpdates = new HashMap<>();
-                    childUpdates.put("/" + job.getJobkey() + "/", postValues);
-                    favoriteRef.child(job.getJobkey()).removeValue();
-                    Log.e("animationView:", String.valueOf(jobList.get(position).isFavd()));
-                }else{
-                    holder.animationView.playAnimation();
-                    jobList.get(position).setFav(true);
-                    Map<String, Object> postValues = job.toMap();
-                    Map<String, Object> childUpdates = new HashMap<>();
-                    childUpdates.put("/" + job.getJobkey() + "/", postValues);
-                    favoriteRef.updateChildren(childUpdates);
-                    Log.e("animationView:", String.valueOf(jobList.get(position).isFavd()));
-                }
-            }
-        });
     }
 
     @Override
@@ -122,7 +94,6 @@ public class JobRecyclerAdapter extends RecyclerView.Adapter<JobRecyclerAdapter.
         TextView job_company;
         TextView job_area;
         TextView job_description;
-        TextView job_posttime;
         HeartAnimation animationView;
 
         public JobHolder(View itemView) {
@@ -131,8 +102,6 @@ public class JobRecyclerAdapter extends RecyclerView.Adapter<JobRecyclerAdapter.
             job_company = (TextView) itemView.findViewById(R.id.job_company);
             job_area = (TextView) itemView.findViewById(R.id.job_area);
             job_description = (TextView) itemView.findViewById(R.id.job_description);
-            job_posttime = (TextView) itemView.findViewById(R.id.job_posttime);
-            animationView = (HeartAnimation) itemView.findViewById(R.id.animationView);
             itemView.setOnClickListener((View.OnClickListener) this);
         }
 

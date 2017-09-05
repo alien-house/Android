@@ -20,7 +20,7 @@ public class Job {
     private String jobkey;
     private boolean isFav = false;
 
-    Job(String title, String url, String company, String description, String postedDate, String area, String jobkey){
+    public Job(String title, String url, String company, String description, String postedDate, String area, String jobkey){
         this.id = hashCode();
         this.title = title;
         this.url = url;
