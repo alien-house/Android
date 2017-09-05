@@ -55,7 +55,7 @@ import java.util.Map;
  * Created by shinji on 2017/08/28.
  */
 
-public class JobResultFragment extends Fragment implements JobRecyclerAdapter.ListItemClickListener {
+public class JobResultFragment extends Fragment implements JobRecyclerAdapter.ListItemClickListener,AdapterView.OnItemClickListener {
 
     private ArrayList<Job> joblist = new ArrayList<Job>();
     public static final String LOG_TAG = "volley_test";
@@ -457,15 +457,25 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
 
 
     @Override
-    public void onListItemClick(int index) {
-        Job job_tmp = joblist.get(index);
-//        Job job_tmp = (Job)myAdapter.getItemId(index)
-        Uri uri = Uri.parse(job_tmp.getUrl());
-        Intent i = new Intent(Intent.ACTION_VIEW, uri);
-//                i.putExtra("JOB_DETAIL_URL", job_tmp.getUrl());
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        switch (view.getId()) {
+            case R.id.animationView:
+                Toast.makeText(getActivity(), "tap!!", Toast.LENGTH_LONG).show();
+                break;
+        }
+    }
 
-        startActivity(i);
-        Log.e("onListItemClick", String.valueOf(index));
+    @Override
+    public void onListItemClick(int index) {
+//        Job job_tmp = joblist.get(index);
+////        Job job_tmp = (Job)myAdapter.getItemId(index)
+//        Uri uri = Uri.parse(job_tmp.getUrl());
+//        Intent i = new Intent(Intent.ACTION_VIEW, uri);
+////                i.putExtra("JOB_DETAIL_URL", job_tmp.getUrl());
+//
+//        startActivity(i);
+//        Log.e("onListItemClick", String.valueOf(index));
+
     }
 
     /**
@@ -510,5 +520,4 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
             url_co = "&co=us";
         }
     }
-
 }

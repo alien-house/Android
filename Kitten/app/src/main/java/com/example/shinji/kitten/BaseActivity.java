@@ -55,6 +55,7 @@ public class BaseActivity extends FragmentActivity implements GoogleApiClient.On
         setContentView(R.layout.main_base_activity);
         mSectionPageAdapter = new SectionPageAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.containers);
+        mViewPager.setOffscreenPageLimit(3);
         setupViewPager(mViewPager);
 
 //
