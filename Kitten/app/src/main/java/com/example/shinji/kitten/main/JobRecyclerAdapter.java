@@ -1,12 +1,14 @@
 package com.example.shinji.kitten.main;
 
 import android.content.Context;
+import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -83,9 +85,10 @@ public class JobRecyclerAdapter extends RecyclerView.Adapter<JobRecyclerAdapter.
         holder.job_posttime.setText(job.getPostedDate());
         CharSequence source = Html.fromHtml(job.getDescription());
         holder.job_description.setText(source);
-        if(job.isFavd()){
-            holder.animationView.setProgress(1f);
-        }
+        holder.job_chk.setChecked(job.isFavd());
+//        if(job.isFavd()){
+//            holder.animationView.setProgress(1f);
+//        }
 //        holder.animationView.setOnClickListener(new View.OnClickListener(){
 //            @Override
 //            public void onClick(View view) {
@@ -136,7 +139,8 @@ public class JobRecyclerAdapter extends RecyclerView.Adapter<JobRecyclerAdapter.
         TextView job_area;
         TextView job_description;
         TextView job_posttime;
-        HeartAnimation animationView;
+//        HeartAnimation animationView;
+        CheckBox job_chk;
 
         public JobHolder(View itemView) {
             super(itemView);
@@ -145,9 +149,12 @@ public class JobRecyclerAdapter extends RecyclerView.Adapter<JobRecyclerAdapter.
             job_area = (TextView) itemView.findViewById(R.id.job_area);
             job_description = (TextView) itemView.findViewById(R.id.job_description);
             job_posttime = (TextView) itemView.findViewById(R.id.job_posttime);
-            animationView = (HeartAnimation) itemView.findViewById(R.id.animationView);
+//            animationView = (HeartAnimation) itemView.findViewById(R.id.animationView);
+            job_chk = itemView.findViewById(R.id.jobCheckBox);
             itemView.setOnClickListener((View.OnClickListener) this);
-            animationView.setOnClickListener(this);
+//            animationView.setOnClickListener(this);
+//            job_chk.setOnCheckedChangeListener(null);
+            job_chk.setOnClickListener(this);
         }
 
         @Override
@@ -155,26 +162,27 @@ public class JobRecyclerAdapter extends RecyclerView.Adapter<JobRecyclerAdapter.
             int position = getAdapterPosition();
             onClickListner.onListItemClick(position);
 
-            if (view.getId() == animationView.getId()){
+            if (view.getId() == job_chk.getId()){
+
                 if(jobList.get(position).isFavd()) {
-                    animationView.setProgress(0f);
+//                    animationView.setProgress(0f);
                     jobList.get(position).setFav(false);
-                    Log.e("position " , " off - " + position);
-//                    Map<String, Object> postValues = jobList.get(position).toMap();
-//                    Map<String, Object> childUpdates = new HashMap<>();
-//                    childUpdates.put("/" + jobList.get(position).getJobkey() + "/", postValues);
-//                    favoriteRef.child(jobList.get(position).getJobkey()).removeValue();
-                    Log.e("animationView:", String.valueOf(jobList.get(position).isFavd()));
+//                    Log.e("position " , " off - " + position);
+////                    Map<String, Object> postValues = jobList.get(position).toMap();
+////                    Map<String, Object> childUpdates = new HashMap<>();
+////                    childUpdates.put("/" + jobList.get(position).getJobkey() + "/", postValues);
+////                    favoriteRef.child(jobList.get(position).getJobkey()).removeValue();
+//                    Log.e("animationView:", String.valueOf(jobList.get(position).isFavd()));
                 }else{
-                    animationView.setProgress(1f);
-//                    animationView.playAnimation();
+//                    animationView.setProgress(1f);
+////                    animationView.playAnimation();
                     jobList.get(position).setFav(true);
-                    Log.e("position " , " on - " + position);
-//                    Map<String, Object> postValues = job.toMap();
-//                    Map<String, Object> childUpdates = new HashMap<>();
-//                    childUpdates.put("/" + job.getJobkey() + "/", postValues);
-//                    favoriteRef.updateChildren(childUpdates);
-                    Log.e("animationView:", String.valueOf(jobList.get(position).isFavd()));
+//                    Log.e("position " , " on - " + position);
+////                    Map<String, Object> postValues = job.toMap();
+////                    Map<String, Object> childUpdates = new HashMap<>();
+////                    childUpdates.put("/" + job.getJobkey() + "/", postValues);
+////                    favoriteRef.updateChildren(childUpdates);
+//                    Log.e("animationView:", String.valueOf(jobList.get(position).isFavd()));
                 }
                 Toast.makeText(view.getContext(), "ITEM PRESSED = " + String.valueOf(getAdapterPosition()), Toast.LENGTH_SHORT).show();
             } else {

@@ -458,11 +458,11 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        switch (view.getId()) {
-            case R.id.animationView:
-                Toast.makeText(getActivity(), "tap!!", Toast.LENGTH_LONG).show();
-                break;
-        }
+//        switch (view.getId()) {
+//            case R.id.animationView:
+//                Toast.makeText(getActivity(), "tap!!", Toast.LENGTH_LONG).show();
+//                break;
+//        }
     }
 
     @Override

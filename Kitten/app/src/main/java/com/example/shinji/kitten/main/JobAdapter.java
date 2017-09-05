@@ -83,7 +83,7 @@ public class JobAdapter extends BaseAdapter {
             holder.job_area = (TextView) convertView.findViewById(R.id.job_area);
             holder.job_description = (TextView) convertView.findViewById(R.id.job_description);
             holder.job_posttime = (TextView) convertView.findViewById(R.id.job_posttime);
-            holder.animationView = (LottieAnimationView) convertView.findViewById(R.id.animationView);
+//            holder.animationView = (LottieAnimationView) convertView.findViewById(R.id.animationView);
             convertView.setTag(holder);
 
         } else {
@@ -96,37 +96,37 @@ public class JobAdapter extends BaseAdapter {
         /* ====================================================  */
         CharSequence source = Html.fromHtml(jobList.get(i).getDescription());
         holder.job_description.setText(source);
-        holder.animationView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.e("holderPosition:", String.valueOf(i));
-
-                if(jobList.get(i).isFavd()) {
-                    Log.e("getView", String.valueOf(tempJob.isFavd()));
-
-                    LottieAnimationView av = v.findViewById(R.id.animationView);
-                    jobList.get(i).setFav(false);
-                    av.setProgress(0f);
-                    //                    holder.clickon = false;
-                    //                    Map<String, Object> postValues = job.toMap();
-                    //                    Map<String, Object> childUpdates = new HashMap<>();
-                    //                    childUpdates.put("/" + job.getJobkey() + "/", postValues);
-                    //                    favoriteRef.child(job.getJobkey()).removeValue();
-
-                } else {
-                    Log.e("getView", String.valueOf(tempJob.isFavd()));
-                    LottieAnimationView av = v.findViewById(R.id.animationView);
-                    jobList.get(i).setFav(true);
-                    av.playAnimation();
-                    //                    holder.clickon = true;
-                    //                    Map<String, Object> postValues = job.toMap();
-                    //                    Map<String, Object> childUpdates = new HashMap<>();
-                    //                    childUpdates.put("/" + job.getJobkey() + "/", postValues);
-                    //                    favoriteRef.updateChildren(childUpdates);
-
-                }
-            }
-        });
+//        holder.animationView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Log.e("holderPosition:", String.valueOf(i));
+//
+//                if(jobList.get(i).isFavd()) {
+//                    Log.e("getView", String.valueOf(tempJob.isFavd()));
+//
+//                    LottieAnimationView av = v.findViewById(R.id.animationView);
+//                    jobList.get(i).setFav(false);
+//                    av.setProgress(0f);
+//                    //                    holder.clickon = false;
+//                    //                    Map<String, Object> postValues = job.toMap();
+//                    //                    Map<String, Object> childUpdates = new HashMap<>();
+//                    //                    childUpdates.put("/" + job.getJobkey() + "/", postValues);
+//                    //                    favoriteRef.child(job.getJobkey()).removeValue();
+//
+//                } else {
+//                    Log.e("getView", String.valueOf(tempJob.isFavd()));
+//                    LottieAnimationView av = v.findViewById(R.id.animationView);
+//                    jobList.get(i).setFav(true);
+//                    av.playAnimation();
+//                    //                    holder.clickon = true;
+//                    //                    Map<String, Object> postValues = job.toMap();
+//                    //                    Map<String, Object> childUpdates = new HashMap<>();
+//                    //                    childUpdates.put("/" + job.getJobkey() + "/", postValues);
+//                    //                    favoriteRef.updateChildren(childUpdates);
+//
+//                }
+//            }
+//        });
 //        holder.animationView.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -167,6 +167,6 @@ public class JobAdapter extends BaseAdapter {
         TextView job_area;
         TextView job_description;
         TextView job_posttime;
-        LottieAnimationView animationView;
+//        LottieAnimationView animationView;
     }
 }
