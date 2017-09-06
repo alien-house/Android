@@ -104,7 +104,7 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
     private WebView webView;
     private FirebaseController firebaseController;
 //    private GithubApp mApp;
-    private ProgressDialog pd;
+    private ProgressDialog progressDialog;
 
 //    private static final String REDIRECT_URL_CALLBACK = "melardev://git.oauth2token";
     private static final String REDIRECT_URL_CALLBACK = "https://programming-473ea.firebaseapp.com/__/auth/handler";
@@ -117,7 +117,8 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
         setContentView(R.layout.activity_main);
 //        FirebaseAuth.getInstance().signOut();
 
-        pd = new ProgressDialog(this);
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Start");
         firebaseController = FirebaseController.getInstance();
         storageRef = storage.getReference();
 
@@ -193,7 +194,7 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
 
             @Override
             public void onClick(View view) {
-                pd.show();
+                progressDialog.show();
                 // Github auth
                 HttpUrl httpUrl = new HttpUrl.Builder()
                         .scheme("http")
@@ -323,7 +324,7 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
                                     }
 
                                 });
-                                pd.hide();
+                                progressDialog.dismiss();
                                 myTask.execute(userData.photourl);
                                 gotoNextIntent();
                             }

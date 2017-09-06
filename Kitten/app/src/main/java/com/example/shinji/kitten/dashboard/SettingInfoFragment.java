@@ -180,8 +180,6 @@ public class SettingInfoFragment extends Fragment {
 
         //for devdata
         DatabaseReference devStatusRef = database.getReference("devStatus");
-
-        //just once
         devStatusRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

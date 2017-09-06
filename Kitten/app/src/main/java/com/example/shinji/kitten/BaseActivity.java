@@ -68,15 +68,13 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        if(getActionBar().isShowing()){
-//            getActionBar().hide();
-//        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         setContentView(R.layout.main_base_activity);
         progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("BaseActivity");
         progressDialog.show();
         mSectionPageAdapter = new SectionPageAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.containers);
@@ -97,7 +95,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                 System.out.println("BaseActivity:" + userData.country);
                 System.out.println("BaseActivity:" + userData.bio);
                 setupViewPager(mViewPager);
-                progressDialog.hide();
+                progressDialog.dismiss();
             }
         });
 

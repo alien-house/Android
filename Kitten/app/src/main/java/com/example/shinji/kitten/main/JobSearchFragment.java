@@ -29,6 +29,11 @@ import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -46,6 +51,9 @@ public class JobSearchFragment extends Fragment {
     private int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     private FirebaseController firebaseController;
     private User userData;
+//    private List devAutoArray = new ArrayList<String>();
+    private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private String[] devAutoArray;
 
     @Nullable
     @Override
@@ -53,12 +61,44 @@ public class JobSearchFragment extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.main_job_search_fragment, container, false);
 
+        firebaseController = FirebaseController.getInstance();
         btnSearch = view.findViewById(R.id.btnSearch);
         txtSearchLocation = view.findViewById(R.id.searchLocation);
 //        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment) getChildFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
         multiAutoCompleteTextView = view.findViewById(R.id.searchWordMultiAuto);
-        String[] devAutoArray = {"web designer","front end developer", "android developer"};
-        acAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, devAutoArray);
+
+        DatabaseReference devStatusRef = database.getReference("devStatus");
+        firebaseController.getDevStatusDataEventListener(devStatusRef);
+        firebaseController.setOnCallBack(new FirebaseController.CallBackTask(){
+            @Override
+            public void CallBack(String[] devStatusArray) {
+                super.CallBack(devStatusArray);
+                Log.d("JobSearchFragment:", "CallBack: " + "おわた＝＝＝＝＝＝＝＝");
+                if(devStatusArray != null){
+                    devAutoArray = devStatusArray;
+//                    String[] stringArray = list.toArray(new String[0]);
+//                    String[] stringArray = devStatusArray.toArray(new String[0]);
+
+                }else{
+                    String[] repArray = {"web designer","front end developer","android developer"};
+                    devAutoArray = repArray;
+                }
+                Log.d("Value:", "setOnCallBackValue is: " + devAutoArray);
+                acAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, devAutoArray);
+
+                //multiAutoCompleteTextView
+                multiAutoCompleteTextView.setAdapter(acAdapter);
+                multiAutoCompleteTextView.setThreshold(1);
+        //        multiAutoCompleteTextView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+                        multiAutoCompleteTextView.setTokenizer(new SpaceTokenizer());
+        //        multiAutoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        //            @Override
+        //            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        //                Toast.makeText(getActivity(), "multiAutoCompleteTextView:" + adapterView.getItemAtPosition(i), Toast.LENGTH_SHORT).show();
+        //            }
+        //        });
+            }
+        });
 
         firebaseController = firebaseController.getInstance();
         userData = firebaseController.getUserData();
@@ -127,18 +167,6 @@ public class JobSearchFragment extends Fragment {
 //            }
 //        });
 
-
-        //multiAutoCompleteTextView
-        multiAutoCompleteTextView.setAdapter(acAdapter);
-        multiAutoCompleteTextView.setThreshold(1);
-//        multiAutoCompleteTextView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
-        multiAutoCompleteTextView.setTokenizer(new SpaceTokenizer());
-//        multiAutoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                Toast.makeText(getActivity(), "multiAutoCompleteTextView:" + adapterView.getItemAtPosition(i), Toast.LENGTH_SHORT).show();
-//            }
-//        });
 
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -33,6 +33,7 @@ public class FirebaseController {
     private User userData;
     private ValueEventListener userListener = null;
     private ValueEventListener favDataListener = null;
+    private ValueEventListener devStatusDataListener = null;
     private CallBackTask callbacktask;
     public boolean isFistLoad = true;
 
@@ -48,7 +49,6 @@ public class FirebaseController {
         }
         return firebaseController;
     }
-
 
     public static User getUserData() {
         System.out.println("^getUserData"+firebaseController.userData);
@@ -158,16 +158,45 @@ public class FirebaseController {
             usersRef.addValueEventListener(firebaseController.userListener);
         }
     }
-
-
     public void setOnCallBack(CallBackTask _cbj) {
         callbacktask = _cbj;
     }
-
     public static class CallBackTask {
         public void CallBack() {
         }
+        public void CallBack(String[] devStatusArray) {
+        }
+        public void CallBack(String txt) {
+        }
     }
+
+    public static void getDevStatusDataEventListener(DatabaseReference devStatusRef){
+        if(firebaseController.devStatusDataListener == null) {
+//        DatabaseReference devStatusRef = database.getReference("devStatus");
+            firebaseController.devStatusDataListener = new ValueEventListener() {
+                //        devStatusRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    // This method is called once with the initial value and again whenever data at this location is updated.
+                    String devStatusValue = dataSnapshot.getValue(String.class);
+                    String[] array = {};
+                    array = devStatusValue.split(",", 0);
+//                    List devStatusArray = Arrays.asList(array);
+//                    Log.d("Value:", "Value is: " + devStatusValue);
+                    firebaseController.callbacktask.CallBack(array);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    // Failed to read value
+                    Log.w("Value:", "Failed to read value.", error.toException());
+                }
+            };
+            devStatusRef.addListenerForSingleValueEvent(firebaseController.devStatusDataListener);
+        }
+    }
+
+
 
     public static void writeUserToData(DatabaseReference usersRef) {
         Map<String, Object> postValues = firebaseController.userData.toMap();
@@ -195,9 +224,7 @@ public class FirebaseController {
                     array = devStatusValue.split(",", 0);
                     firebaseController.devStatusArray = Arrays.asList(array);
                     Log.d("Value:", "Value is: " + devStatusValue);
-
                 }
-
                 @Override
                 public void onCancelled(DatabaseError error) {
                     // Failed to read value
@@ -208,5 +235,8 @@ public class FirebaseController {
             favRef.addValueEventListener(firebaseController.favDataListener);
         }
     }
+
+
+
 
 }
