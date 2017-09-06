@@ -4,11 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-<LinearLayout
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:padding="20dp">
+  <LinearLayout
+      android:orientation="vertical"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:padding="20dp">
 
   <LinearLayout
       android:layout_width="match_parent"
@@ -128,7 +128,19 @@
   </LinearLayout>
 
 
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical">
 
+    <Spinner
+        android:id="@+id/countrySpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/array_country"
+        android:entryValues="@array/array_country_value"
+        android:layout_margin="20dp"></Spinner>
+  </LinearLayout>
 
   <Button
       android:id="@+id/btnUpdate"

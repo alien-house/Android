@@ -1,12 +1,21 @@
 package com.example.shinji.kitten.dashboard;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,7 +48,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.isseiaoki.simplecropview.CropImageView;
+import com.isseiaoki.simplecropview.callback.CropCallback;
+import com.isseiaoki.simplecropview.callback.SaveCallback;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -57,16 +70,28 @@ public class SettingInfoFragment extends Fragment {
     private StorageReference storageRef;
     private DatabaseReference usersRef;
     private TextView nameEdit,emailEdit,bioEdit,locationEdit,urlEdit;
-    private ImageView profileImg;
+    private static ImageView profileImg;
     private Button btnUpdate,btnSignOut;
     private Spinner roleSpinner;
+    private Spinner countrySpinner;
     private String userID = "";
+
+    private DialogFragment dialogFragment;
+    private FragmentManager flagmentManager;
 //    private String spinnerItems[] = {};
-    private ProgressDialog pd;
+    private ProgressDialog progressDialog;
 
     private User userData;
     private List<String> devStatusArray = new ArrayList<String>();
+//    private List<String> countryArray = new ArrayList<String>();
+    private String[] countryArrayValue;
     private FirebaseController firebaseController;
+    private static final int REQUEST_GALLERY = 0;
+//    private static final int RESULT_OK = 1;
+    private static Bitmap img;
+    private static Bitmap.CompressFormat mCompressFormat = Bitmap.CompressFormat.JPEG;
+    private static Uri mSourceUri = null;
+    private static RectF mFrameRect = null;
 
     @Nullable
     @Override
@@ -81,12 +106,14 @@ public class SettingInfoFragment extends Fragment {
         btnUpdate = (Button) view.findViewById(R.id.btnUpdate);
         btnSignOut = (Button) view.findViewById(R.id.btnSignOut);
         roleSpinner = view.findViewById(R.id.roleSpinner);
+        countrySpinner = view.findViewById(R.id.countrySpinner);
         profileImg = view.findViewById(R.id.profileImg);
+        countryArrayValue = getResources().getStringArray(R.array.array_country_value);
 
         storageRef = storage.getReference();
 
-        pd = new ProgressDialog(getActivity());
-        pd.setMessage("saving");
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("saving");
         firebaseController = FirebaseController.getInstance();
 
         mAuth = FirebaseAuth.getInstance();
@@ -94,12 +121,14 @@ public class SettingInfoFragment extends Fragment {
 
         firebaseController = FirebaseController.getInstance();
         userData = firebaseController.getUserData();
+        usersRef = database.getReference("users/" + userData.userID);
         if(userData != null){
-            System.out.println("SettingInfoFragment:User aru" + userData.username);
+            System.out.println("SettingInfoFragment:User aru:" + userData.username);
+            System.out.println("SettingInfoFragment:User aru:" + userData.country);
+            System.out.println("SettingInfoFragment:User aru:" + userData.bio);
             changeUI();
         }
 
-        System.out.println("SettingInfoFragment userData@@:" + userData.username);
 
         return view;
     }
@@ -117,12 +146,11 @@ public class SettingInfoFragment extends Fragment {
         userImagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                System.out.println(uri);
-                if(uri != null){
-                    GetImageTask myTask = new GetImageTask(profileImg);
-                    myTask.execute(uri.toString());
-                }
-
+            System.out.println(uri);
+            if(uri != null){
+                GetImageTask myTask = new GetImageTask(profileImg);
+                myTask.execute(uri.toString());
+            }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -131,9 +159,22 @@ public class SettingInfoFragment extends Fragment {
             }
         });
 
+        profileImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            // ギャラリー呼び出し
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(intent, REQUEST_GALLERY);
+
+//                flagmentManager = getFragmentManager();
+//                dialogFragment = new AlertDialogFragment();
+//                dialogFragment.show(flagmentManager, "test alert dialog");
+            }
+        });
         System.out.println("======DatabaseReference========");
-        usersRef = database.getReference("users/" + userData.userID);
-        firebaseController.getUserDataEventListener(usersRef);
 
         //for devdata
         DatabaseReference devStatusRef = database.getReference("devStatus");
@@ -176,7 +217,7 @@ public class SettingInfoFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 writeUser();
-                pd.show();
+                progressDialog.show();
             }
         });
 
@@ -184,29 +225,59 @@ public class SettingInfoFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 FirebaseAuth.getInstance().signOut();
+                firebaseController.isFistLoad = false;
                 Intent nextItent;
                 nextItent = new Intent(getActivity(), StartActivity.class);
                 startActivity(nextItent);
             }
         });
 
+        int posCS = changeUICountrySpinner();
+        System.out.println("posCS::" + posCS);
+        countrySpinner.setSelection(posCS, false);
+        countrySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            //　アイテムが選択された時
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Spinner spinner = (Spinner) parent;
+                String item = (String) spinner.getSelectedItem();
 
+                userData.country = countryArrayValue[position].toString();
+//                userData.devStatus = parent.getItemAtPosition(position).toString();
+            }
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
     }
 
     public int changeUIRole(){
+        System.out.println("changeUIRole::");
         int pos = 0,
             maxnum = devStatusArray.size();
         if(devStatusArray != null){
-            System.out.println("changeUIRole::");
             for(int i = 0; i < maxnum; i++){
                 if(devStatusArray.get(i).matches(userData.devStatus)){
                     pos = i;
+                    break;
                 }
             }
         }
         return pos;
     }
 
+    public int changeUICountrySpinner(){
+        System.out.println("changeUICountrySpinner::"+userData.country);
+        int pos = 0,
+            maxnum = countryArrayValue.length;
+        if(countryArrayValue != null){
+            for(int i = 0; i < maxnum; i++){
+                if(countryArrayValue[i].matches(userData.country)){
+                    pos = i;
+                    break;
+                }
+            }
+        }
+        return pos;
+    }
     public void writeUser(){
         userData.bio = bioEdit.getText().toString();
         userData.username = nameEdit.getText().toString();
@@ -219,7 +290,7 @@ public class SettingInfoFragment extends Fragment {
                 } else {
                     System.out.println("Data saved successfully.");
                 }
-                pd.hide();
+                progressDialog.hide();
             }
         });
         FirebaseUser user = mAuth.getCurrentUser();
@@ -237,22 +308,121 @@ public class SettingInfoFragment extends Fragment {
                 });
     }
 
+
+    public static class AlertDialogFragment extends DialogFragment {
+
+        private AlertDialog dialog ;
+        private AlertDialog.Builder alert;
+//        private ImageView bag1;
+        private CropImageView cropImageView;
+        private Button btnCancel;
+        private Button btnUpload;
+
+        public static AlertDialogFragment newInstance() {
+            AlertDialogFragment frag = new AlertDialogFragment();
+            Bundle args = new Bundle();
+            frag.setArguments(args);
+            return frag;
+        }
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            alert = new AlertDialog.Builder(getActivity());
+            alert.setTitle("Are you going to upload this image?");
+
+            // カスタムレイアウトの生成
+            View alertView = getActivity().getLayoutInflater().inflate(R.layout.dialog_layout, null);
+
+            btnCancel = alertView.findViewById(R.id.btnCancel);
+            btnUpload = alertView.findViewById(R.id.btnUpload);
+
+            // alert_layout.xmlにあるボタンIDを使う
+//            bag1 = (ImageView) alertView.findViewById(R.id.bag_1);
+            cropImageView = (CropImageView) alertView.findViewById(R.id.cropImageView);
+//            mCropView.load(sourceUri).execute(mLoadCallback);
+            cropImageView.setImageBitmap(img);
+            cropImageView.setCropMode(CropImageView.CropMode.SQUARE);
+
+
+            btnCancel.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    getDialog().dismiss();
+                }
+            });
+            btnUpload.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    cropImageView.crop(mSourceUri).execute(mCropCallback);
+                }
+            });
+            alert.setView(alertView);
+            dialog = alert.create();
+            dialog.show();
+            return dialog;
+        }
+        private final CropCallback mCropCallback = new CropCallback() {
+            @Override public void onSuccess(Bitmap cropped) {
+
+                profileImg.setImageBitmap(cropped);
+                getDialog().dismiss();
+            }
+
+            @Override public void onError(Throwable e) {
+            }
+        };
+//        private final SaveCallback mSaveCallback = new SaveCallback() {
+//            @Override public void onSuccess(Uri outputUri) {
+////                dismissProgress();
+////                ((BasicActivity) getActivity()).startResultActivity(outputUri);
+//            }
+//
+//            @Override public void onError(Throwable e) {
+////                dismissProgress();
+//            }
+//        };
+
+//        private void setMassage(String message) {
+//            BaseActivity mainActivity = (BaseActivity) getActivity();
+//            mainActivity.setTextView(message);
+//        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
         Log.d("SettingInfoFragment", "onResume ーーーーーーーー");
-
     }
-
     @Override
     public void onStop() {
         super.onStop();
         Log.d("SettingInfoFragment", "onStop settingがonStop終わりましたヨーーーーーーーー");
     }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
         Log.d("SettingInfoFragment", "onDestroy settingが終わりましたヨーーーーーーーー");
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d("onActivityResult", "onActivityResultヨーーーーーーーー");
+        if(requestCode == REQUEST_GALLERY && resultCode == Activity.RESULT_OK) {
+            try {
+                mSourceUri = data.getData();
+                InputStream in = getContext().getContentResolver().openInputStream(data.getData());
+                img = BitmapFactory.decodeStream(in);
+                in.close();
+                // 選択した画像を表示
+                Log.d("onActivityResult", "imgー");
+                System.out.println(img);
+
+                AlertDialogFragment dialogFragment = AlertDialogFragment.newInstance();
+//                dialogFragment = new AlertDialogFragment();
+                flagmentManager = getFragmentManager();
+                dialogFragment.show(flagmentManager, "test alert dialog");
+//                dialogFragment.setImage(img);
+
+            } catch (Exception e) {
+            }
+            }
     }
 }

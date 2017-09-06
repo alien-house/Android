@@ -10,15 +10,14 @@ import java.util.Map;
  */
 
 public class User {
-    public String userID,username,role,devStatus,email,bio,location,url,photourl = "";
-    public static String USER_COUNTRY;
+    public String userID,username,role,devStatus,email,bio,location,url,photourl,country = "";
     //,comapny,lindkedin,twitter,github,facebook,dribbble
-
+    public static String USER_COUNTRY = "";
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(Post.class)
     }
 
-    public User(String userID, String username, String devStatus, String email, String bio, String location, String url, String photourl) {
+    public User(String userID, String username, String devStatus, String email, String bio, String location, String url, String photourl, String country) {
         this.userID = userID;
         this.username = username;
         this.devStatus = devStatus;
@@ -27,6 +26,7 @@ public class User {
         this.location = location;
         this.url = url;
         this.photourl = photourl;
+        this.country = country;
     }
 
     @Exclude
@@ -37,10 +37,11 @@ public class User {
         result.put("devStatus", devStatus);
 //        result.put("email", email);
         System.out.println("^^^^^bio^^^^^^");
-        System.out.println(bio);
+        System.out.println(country);
         result.put("bio", bio);
         result.put("location", location);
         result.put("url", url);
+        result.put("country", country);
 
         return result;
     }

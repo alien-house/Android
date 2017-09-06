@@ -24,7 +24,6 @@ public class JobFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-
         View view = inflater.inflate(R.layout.tab_base_job_fragment, container, false);
         return view;
     }
@@ -42,9 +41,11 @@ public class JobFragment extends Fragment {
         }
         JobSearchFragment jobSearchFragment = new JobSearchFragment();
 //        FragmentManager fragMan = getChildFragmentManager();
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.job_fragment, jobSearchFragment);
+        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+//        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.replace(R.id.job_fragment, jobSearchFragment);
+//        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
     @Override

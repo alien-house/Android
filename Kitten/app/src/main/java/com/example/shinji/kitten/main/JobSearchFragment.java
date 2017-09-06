@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.example.shinji.kitten.BaseActivity;
 import com.example.shinji.kitten.R;
+import com.example.shinji.kitten.util.FirebaseController;
 import com.example.shinji.kitten.util.User;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -43,6 +44,8 @@ public class JobSearchFragment extends Fragment {
     private MultiAutoCompleteTextView multiAutoCompleteTextView;
     private ArrayAdapter<String> acAdapter;
     private int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+    private FirebaseController firebaseController;
+    private User userData;
 
     @Nullable
     @Override
@@ -57,6 +60,8 @@ public class JobSearchFragment extends Fragment {
         String[] devAutoArray = {"web designer","front end developer", "android developer"};
         acAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, devAutoArray);
 
+        firebaseController = firebaseController.getInstance();
+        userData = firebaseController.getUserData();
         return view;
     }
 
@@ -159,7 +164,10 @@ public class JobSearchFragment extends Fragment {
                 argument.putString(BaseActivity.SEARCH_LOC, txtSearchLocation.getText().toString());
                 argument.putString(BaseActivity.SEARCH_WORD, multiAutoCompleteTextView.getText().toString());
                 jobResultFragment.setArguments(argument);
-                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+
+//                FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+                FragmentTransaction fragmentTransaction = getParentFragment().getChildFragmentManager().beginTransaction();
+//                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.job_fragment, jobResultFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
@@ -167,14 +175,13 @@ public class JobSearchFragment extends Fragment {
             }
         });
 
-
     }
 
     public void showAutoCompPlace(){
         try {
             AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
                     .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
-                    .setCountry(User.USER_COUNTRY)//* should be changed! later *_*
+                    .setCountry(userData.country)//* should be changed! later *_*
                     .build();
             Intent intent =
                     new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)

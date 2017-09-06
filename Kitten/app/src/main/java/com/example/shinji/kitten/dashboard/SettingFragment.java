@@ -27,7 +27,7 @@ public class SettingFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
+        super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.tab_base_setting_fragment, container, false);
         return view;
     }
@@ -43,7 +43,8 @@ public class SettingFragment extends Fragment {
             return;
         }
         SettingInfoFragment settingInfoFragment = new SettingInfoFragment();
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+//        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.replace(R.id.setting_fragment, settingInfoFragment);
         fragmentTransaction.commit();

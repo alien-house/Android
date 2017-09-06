@@ -31,8 +31,10 @@ public class FirebaseController {
     private DatabaseReference devStatusRef;
     private List<String> devStatusArray = new ArrayList<String>();
     private User userData;
-    private ValueEventListener userListener;
-    private ValueEventListener favDataListener;
+    private ValueEventListener userListener = null;
+    private ValueEventListener favDataListener = null;
+    private CallBackTask callbacktask;
+    public boolean isFistLoad = true;
 
     private static FirebaseController firebaseController;
 
@@ -50,9 +52,9 @@ public class FirebaseController {
 
     public static User getUserData() {
         System.out.println("^getUserData"+firebaseController.userData);
+        if(firebaseController.userData == null){
             FirebaseUser userFirebase = FirebaseAuth.getInstance().getCurrentUser();
             firebaseController.setUserToData(userFirebase);
-        if(firebaseController.userData == null){
         }
         return firebaseController.userData;
     }
@@ -60,7 +62,7 @@ public class FirebaseController {
     public static void setUserToData(FirebaseUser user) {
         System.out.println("^^setUserToData:FirebaseUser");
             if (user != null) {
-                System.out.println("^^setUserToData:User is signed in~~~~");
+                if(firebaseController.userData == null){
                     firebaseController.userData = new User(
                             user.getUid(),
                             user.getDisplayName(),
@@ -69,25 +71,17 @@ public class FirebaseController {
                             "",
                             "",
                             "",
-                            user.getPhotoUrl().toString()
+                            user.getPhotoUrl().toString(),
+                            ""
                     );
-            }
-        if(firebaseController.userData == null){
-        }
-    }
-
-    public static void writeUserToData(DatabaseReference usersRef) {
-        Map<String, Object> postValues = firebaseController.userData.toMap();
-        usersRef.updateChildren(postValues, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                if (databaseError != null) {
-                    System.out.println("Data could not be saved " + databaseError.getMessage());
-                } else {
-                    System.out.println("Data saved successfully.");
                 }
+                System.out.println("^^setUserToData:User is signed in~~~~");
+                firebaseController.userData.userID = user.getUid();
+                firebaseController.userData.username = user.getDisplayName();
+                firebaseController.userData.email = user.getEmail();
+                firebaseController.userData.photourl = user.getPhotoUrl().toString();
             }
-        });
+
     }
 
 //    public static void writeFavDatabase(DatabaseReference usersFavRef){
@@ -115,7 +109,23 @@ public class FirebaseController {
             firebaseController.userListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    System.out.println("======onDataChange========");
+                    System.out.println("======getUserDataEventListener:onDataChange========");
+                    if(firebaseController.userData == null){
+                        System.out.println("======nullなんじゃ:onDataChange========");
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        firebaseController.userData = new User(
+                                user.getUid(),
+                                user.getDisplayName(),
+                                "",
+                                user.getEmail(),
+                                "",
+                                "",
+                                "",
+                                user.getPhotoUrl().toString(),
+                                ""
+                        );
+                    }
+
                     // This method is called once with the initial value and again whenever data at this location is updated.
                     User usersValue = dataSnapshot.getValue(User.class);
     //                String[] array = {};
@@ -123,15 +133,21 @@ public class FirebaseController {
     //                devStatusArray = Arrays.asList(array);
                     System.out.println(usersValue);
 
-                    firebaseController.userData.userID = usersValue.userID;
-                    firebaseController.userData.username = usersValue.username;
+//                    firebaseController.userData.userID = usersValue.userID;
+//                    firebaseController.userData.username = usersValue.username;
                     firebaseController.userData.devStatus = usersValue.devStatus;
-                    firebaseController.userData.email = usersValue.email;
+//                    firebaseController.userData.email = usersValue.email;
                     firebaseController.userData.bio = usersValue.bio;
                     firebaseController.userData.location = usersValue.location;
                     firebaseController.userData.url = usersValue.url;
+                    firebaseController.userData.country = usersValue.country;
+                    System.out.println(firebaseController.userData.country);
     //                userData.role = usersValue.getProperty('devStatus');
-                    Log.d("usersValue:", "usersValue is: " + usersValue);
+//                    Log.d("usersValue:", "usersValue is: " + usersValue);
+                    if(firebaseController.isFistLoad){
+                        firebaseController.callbacktask.CallBack();
+                        firebaseController.isFistLoad = false;
+                    }
                 }
                 @Override
                 public void onCancelled(DatabaseError error) {
@@ -143,6 +159,29 @@ public class FirebaseController {
         }
     }
 
+
+    public void setOnCallBack(CallBackTask _cbj) {
+        callbacktask = _cbj;
+    }
+
+    public static class CallBackTask {
+        public void CallBack() {
+        }
+    }
+
+    public static void writeUserToData(DatabaseReference usersRef) {
+        Map<String, Object> postValues = firebaseController.userData.toMap();
+        usersRef.updateChildren(postValues, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (databaseError != null) {
+                    System.out.println("Data could not be saved " + databaseError.getMessage());
+                } else {
+                    System.out.println("Data saved successfully.");
+                }
+            }
+        });
+    }
 
     public static void getFavDataEventListener(DatabaseReference favRef) {
         if(firebaseController.favDataListener == null) {
@@ -169,4 +208,5 @@ public class FirebaseController {
             favRef.addValueEventListener(firebaseController.favDataListener);
         }
     }
+
 }

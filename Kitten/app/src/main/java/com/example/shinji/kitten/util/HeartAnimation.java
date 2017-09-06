@@ -2,6 +2,7 @@ package com.example.shinji.kitten.util;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.widget.CheckBox;
 
 import com.airbnb.lottie.LottieAnimationView;
 
@@ -9,7 +10,7 @@ import com.airbnb.lottie.LottieAnimationView;
  * Created by shinji on 2017/09/04.
  */
 
-public class HeartAnimation extends LottieAnimationView {
+public class HeartAnimation extends LottieAnimationView  {
 
     public HeartAnimation(Context context) {
         super(context);
@@ -25,5 +26,12 @@ public class HeartAnimation extends LottieAnimationView {
     }
     public void setOn(){
         this.playAnimation();
+    }
+    public void setState(boolean boo){
+        if(boo){
+            this.setProgress(1f);
+        }else{
+            this.setProgress(0f);
+        }
     }
 }

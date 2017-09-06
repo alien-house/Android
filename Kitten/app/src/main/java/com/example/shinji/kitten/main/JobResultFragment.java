@@ -514,9 +514,10 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
     }
 
     public void setCountry(){
-        if(User.USER_COUNTRY != null){
-            url_co = "&co=" + User.USER_COUNTRY;
+        if(userData.country != null){
+            url_co = "&co=" + userData.country;
         }else{
+            userData.country = "us";
             url_co = "&co=us";
         }
     }
