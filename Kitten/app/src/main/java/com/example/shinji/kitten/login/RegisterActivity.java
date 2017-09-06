@@ -2,6 +2,10 @@ package com.example.shinji.kitten.login;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -15,12 +19,21 @@ import android.widget.Toast;
 import com.example.shinji.kitten.BaseActivity;
 import com.example.shinji.kitten.R;
 import com.example.shinji.kitten.dashboard.SettingActivity;
+import com.example.shinji.kitten.util.FirebaseController;
+import com.example.shinji.kitten.util.User;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
 
 /**
  * Created by shinji on 2017/08/27.
@@ -30,11 +43,13 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private FirebaseAuth mAuth;
     private final String TAG = "onAuthStateChanged";
 
+    private FirebaseStorage storage = FirebaseStorage.getInstance();
+    private StorageReference storageRef;
     private EditText mEmailField;
     private EditText mPasswordField;
     private EditText mUsernameField;
     private Button btnRegister;
-    private ProgressDialog pd;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +61,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         mUsernameField = (EditText) findViewById(R.id.editTextName);
         btnRegister = (Button) findViewById(R.id.btnRegister);
         btnRegister.setOnClickListener(this);
-        pd = new ProgressDialog(RegisterActivity.this);
-        pd.setMessage("loading");
+        progressDialog = new ProgressDialog(RegisterActivity.this);
+        progressDialog.setMessage("Generating your account");
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -57,19 +72,16 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     public void onClick(View v) {
         int i = v.getId();
         if (i == R.id.btnRegister) {
-//            System.out.println("dddddddddddss");
             createAccount(mEmailField.getText().toString(), mPasswordField.getText().toString(), mUsernameField.getText().toString());
         }
     }
-
 
     private void createAccount(String email, String password, final String username) {
         Log.d(TAG, "createAccount:" + email);
         if (!validateForm()) {
             return;
         }
-        pd.show();
-
+        progressDialog.show();
         // [START create_user_with_email]
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -88,7 +100,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()) {
                                                 Log.d(TAG, "User profile updated.");
-
                                                 Intent nextItent;
                                                 nextItent = new Intent(RegisterActivity.this, BaseActivity.class);
                                                 startActivity(nextItent);
@@ -96,16 +107,37 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                         }
                                     });
 
-//                            updateUI(user);
+                            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.profile);
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                            byte[] data = baos.toByteArray();
+
+                            storageRef = storage.getReference();
+                            FirebaseController firebaseController = FirebaseController.getInstance();
+                            User userdata = firebaseController.getUserData();
+                            StorageReference userImagesRef = storageRef.child("images/" + userdata.userID + "/profile.jpg");
+                            UploadTask uploadTask = userImagesRef.putBytes(data);
+                            uploadTask.addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    System.out.println("onFailure:Handle unsuccessful uploads");
+                                }
+                            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    System.out.println("onSuccess:UploadTask");
+                                    @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                                }
+                            });
+
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
                             Toast.makeText(RegisterActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
-//                            updateUI(null);
                         }
 
-                        pd.hide();
+                        progressDialog.hide();
                     }
                 });
         // [END create_user_with_email]

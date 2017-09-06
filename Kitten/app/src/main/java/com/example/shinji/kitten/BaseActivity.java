@@ -46,7 +46,7 @@ import java.util.List;
  */
 //https://github.com/delaroy/MaterialTabs
 
-public class BaseActivity extends FragmentActivity implements GoogleApiClient.OnConnectionFailedListener {
+public class BaseActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference usersRef;
@@ -71,6 +71,9 @@ public class BaseActivity extends FragmentActivity implements GoogleApiClient.On
 //        if(getActionBar().isShowing()){
 //            getActionBar().hide();
 //        }
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         setContentView(R.layout.main_base_activity);
         progressDialog = new ProgressDialog(this);

@@ -48,10 +48,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.isseiaoki.simplecropview.CropImageView;
 import com.isseiaoki.simplecropview.callback.CropCallback;
 import com.isseiaoki.simplecropview.callback.SaveCallback;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,7 +83,7 @@ public class SettingInfoFragment extends Fragment {
 //    private String spinnerItems[] = {};
     private ProgressDialog progressDialog;
 
-    private User userData;
+    private static User userData;
     private List<String> devStatusArray = new ArrayList<String>();
 //    private List<String> countryArray = new ArrayList<String>();
     private String[] countryArrayValue;
@@ -362,7 +364,30 @@ public class SettingInfoFragment extends Fragment {
             @Override public void onSuccess(Bitmap cropped) {
 
                 profileImg.setImageBitmap(cropped);
-                getDialog().dismiss();
+                FirebaseStorage storage = FirebaseStorage.getInstance();
+                StorageReference storageRef = storage.getReference();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                cropped.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                byte[] data = baos.toByteArray();
+
+                StorageReference userImagesRef = storageRef.child("images/" + userData.userID + "/profile.jpg");
+                UploadTask uploadTask = userImagesRef.putBytes(data);
+                uploadTask.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                        System.out.println("onFailure:Handle unsuccessful uploads");
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        System.out.println("onSuccess:CropUploadTask");
+                        getDialog().dismiss();
+                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                        @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                    }
+                });
+
             }
 
             @Override public void onError(Throwable e) {

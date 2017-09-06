@@ -303,7 +303,6 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
                                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                                         byte[] data = baos.toByteArray();
 
-
                                         StorageReference userImagesRef = storageRef.child("images/" + userIDRes + "/profile.jpg");
                                         UploadTask uploadTask = userImagesRef.putBytes(data);
                                         uploadTask.addOnFailureListener(new OnFailureListener() {
