@@ -23,7 +23,7 @@
       android:id="@+id/searchLocation"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:hint="e.g.) city"/>
+      android:hint="Location"/>
 
   <LinearLayout
       android:id="@+id/place_autocomplete_liner"
@@ -37,7 +37,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:inputType="text"
-      android:hint="e.g.) this one, Cook, Developer"/>
+      android:hint="Job TItle, Position or Keywords "/>
 
   <Button
       android:id="@+id/btnSearch"

@@ -290,7 +290,7 @@ public class SettingInfoFragment extends Fragment {
                 } else {
                     System.out.println("Data saved successfully.");
                 }
-                progressDialog.hide();
+                progressDialog.dismiss();
             }
         });
         FirebaseUser user = mAuth.getCurrentUser();
@@ -391,21 +391,6 @@ public class SettingInfoFragment extends Fragment {
             @Override public void onError(Throwable e) {
             }
         };
-//        private final SaveCallback mSaveCallback = new SaveCallback() {
-//            @Override public void onSuccess(Uri outputUri) {
-////                dismissProgress();
-////                ((BasicActivity) getActivity()).startResultActivity(outputUri);
-//            }
-//
-//            @Override public void onError(Throwable e) {
-////                dismissProgress();
-//            }
-//        };
-
-//        private void setMassage(String message) {
-//            BaseActivity mainActivity = (BaseActivity) getActivity();
-//            mainActivity.setTextView(message);
-//        }
     }
 
     @Override

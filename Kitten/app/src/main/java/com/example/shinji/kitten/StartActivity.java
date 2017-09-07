@@ -2,6 +2,7 @@ package com.example.shinji.kitten;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +18,13 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
@@ -32,6 +39,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.shinji.kitten.dashboard.SettingInfoFragment;
 import com.example.shinji.kitten.util.FirebaseController;
 import com.example.shinji.kitten.util.GetImageTaskUpload;
 import com.example.shinji.kitten.util.User;
@@ -53,6 +61,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
+import com.isseiaoki.simplecropview.CropImageView;
+import com.isseiaoki.simplecropview.callback.CropCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -83,7 +93,7 @@ import okhttp3.OkHttpClient;
 
  */
 
-public class StartActivity extends Activity implements View.OnClickListener, LocationListener {
+public class StartActivity extends AppCompatActivity implements View.OnClickListener, LocationListener {
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -100,13 +110,16 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
     private Button btnLoginTo;
     private Button btnRegisterTo;
     private Button btnGithub;
-    private Button btnSignOut;
     private WebView webView;
     private FirebaseController firebaseController;
+
+
+    private DialogFragment dialogFragment;
+    private FragmentManager flagmentManager;
+    private static HttpUrl httpUrl;
 //    private GithubApp mApp;
     private ProgressDialog progressDialog;
 
-//    private static final String REDIRECT_URL_CALLBACK = "melardev://git.oauth2token";
     private static final String REDIRECT_URL_CALLBACK = "https://programming-473ea.firebaseapp.com/__/auth/handler";
     public static String OAUTH_URL = "https://github.com/login/oauth/authorize";
     public static String OAUTH_ACCESS_TOKEN_URL = "https://github.com/login/oauth/access_token";
@@ -115,7 +128,15 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        FirebaseAuth.getInstance().signOut();
+
+        /* If you want to show the toolbar or actionbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(true);
+        }
+        */
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Start");
@@ -126,28 +147,28 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
         btnLoginTo.setOnClickListener(this);
         btnRegisterTo = (Button) findViewById(R.id.btnRegisterTo);
         btnGithub = (Button) findViewById(R.id.btnGithub);
-        btnSignOut = (Button) findViewById(R.id.btnSignOut);
         btnRegisterTo.setOnClickListener(this);
 
-        webView = findViewById(R.id.webview);
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-        webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                Uri uri = Uri.parse(url);
-                if (uri.getQueryParameter("code") != null
-                        && uri.getScheme() != null
-                        && uri.getScheme().equalsIgnoreCase("https")) {
-
-                    String code = uri.getQueryParameter("code");
-                    String state = uri.getQueryParameter("state");
-                    sendPost(code, state);
-                    return true;
-                }
-                return super.shouldOverrideUrlLoading(view, url);
-            }
-        });
+//        webView = findViewById(R.id.webview);
+//        webView.setBackgroundColor(0x00000000);
+//        webView.getSettings().setJavaScriptEnabled(true);
+//        webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+//        webView.setWebViewClient(new WebViewClient() {
+//            @Override
+//            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+//                Uri uri = Uri.parse(url);
+//                if (uri.getQueryParameter("code") != null
+//                        && uri.getScheme() != null
+//                        && uri.getScheme().equalsIgnoreCase("https")) {
+//
+//                    String code = uri.getQueryParameter("code");
+//                    String state = uri.getQueryParameter("state");
+//                    sendPost(code, state);
+//                    return true;
+//                }
+//                return super.shouldOverrideUrlLoading(view, url);
+//            }
+//        });
 
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -196,7 +217,7 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
             public void onClick(View view) {
                 progressDialog.show();
                 // Github auth
-                HttpUrl httpUrl = new HttpUrl.Builder()
+                httpUrl = new HttpUrl.Builder()
                         .scheme("http")
                         .host("github.com")
                         .addPathSegment("login")
@@ -210,20 +231,16 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
                 Log.d(TAG, httpUrl.toString());
 //                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(httpUrl.toString()));
 //                startActivity(intent);
+//                webView.loadUrl(httpUrl.toString());
 
-                webView.loadUrl(httpUrl.toString());
+                flagmentManager = getSupportFragmentManager();
+                dialogFragment = new AlertDialogFragment();
+                dialogFragment.show(flagmentManager, "test alert dialog");
 
             }
         });
 
 
-        btnSignOut.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                FirebaseAuth.getInstance().signOut();
-            }
-        });
 
         locationStart();
     }
@@ -295,10 +312,14 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
                                     @Override
                                     public void CallBack(Bitmap bitmap) {
                                         super.CallBack(bitmap);
-                                        // ※１
-                                        // resultにはdoInBackgroundの返り値が入ります。
-                                        // ここからAsyncTask処理後の処理を記述します。
-                                        Log.i("AsyncTaskCallback", "非同期処理が終了しました。");
+                                        if(bitmap == null){
+                                            Log.i("AsyncTaskCallback", "Error happend");
+                                        }else{
+                                            // ※１
+                                            // resultにはdoInBackgroundの返り値が入ります。
+                                            // ここからAsyncTask処理後の処理を記述します。
+                                            Log.i("AsyncTaskCallback", "非同期処理が終了しました。");
+                                        }
 
                                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
@@ -572,6 +593,7 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
 
     }
 
+
     private void gotoNextIntent(){
         Intent nextItent;
         nextItent = new Intent(StartActivity.this, BaseActivity.class);
@@ -580,5 +602,60 @@ public class StartActivity extends Activity implements View.OnClickListener, Loc
 
     private String getRandomString() {
         return new BigInteger(130, random).toString(32);
+    }
+
+
+
+    public static class AlertDialogFragment extends DialogFragment {
+
+        private AlertDialog dialog;
+        private AlertDialog.Builder alert;
+        //        private ImageView bag1;
+        private CropImageView cropImageView;
+        private Button btnCancel;
+        private Button btnUpload;
+
+        public static SettingInfoFragment.AlertDialogFragment newInstance() {
+            SettingInfoFragment.AlertDialogFragment frag = new SettingInfoFragment.AlertDialogFragment();
+            Bundle args = new Bundle();
+            frag.setArguments(args);
+            return frag;
+        }
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            alert = new AlertDialog.Builder(getActivity());
+//            alert.setTitle("Are you going to upload this image?");
+
+            // カスタムレイアウトの生成
+            View alertView = getActivity().getLayoutInflater().inflate(R.layout.dialog_login_web_layout, null);
+
+            WebView webview = alertView.findViewById(R.id.webview);
+            webview.loadUrl(httpUrl.toString());
+
+            webview.getSettings().setJavaScriptEnabled(true);
+            webview.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+            webview.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                Uri uri = Uri.parse(url);
+                if (uri.getQueryParameter("code") != null
+                    && uri.getScheme() != null
+                    && uri.getScheme().equalsIgnoreCase("https")) {
+                String code = uri.getQueryParameter("code");
+                String state = uri.getQueryParameter("state");
+//                StartActivity startActivity = getActivity();
+                    StartActivity activity = (StartActivity) getActivity();
+                    activity.sendPost(code, state);
+            return true;
+            }
+            return super.shouldOverrideUrlLoading(view, url);
+            }
+            });
+
+            alert.setView(alertView);
+            dialog = alert.create();
+            dialog.show();
+            return dialog;
+        }
     }
 }

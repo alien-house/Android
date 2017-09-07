@@ -11,13 +11,25 @@
 
   <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
     <item name="colorPrimary">@color/colorPrimary</item>
-    <item name="android:textColorPrimary">@color/colorPrimaryDark</item>
-    <item name="android:textColorSecondary">@color/colorPrimaryDark</item>
+    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    <item name="colorAccent">@color/colorAccent</item>
+    <item name="android:textColorPrimary">@color/colorText</item>
+    <item name="android:textColorSecondary">@color/colorText</item>
+
   </style>
 
   <style name="AppTheme.NoActionBar">
     <item name="windowActionBar">false</item>
     <item name="windowNoTitle">true</item>
+  </style>
+
+  <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
+    <item name="android:windowBackground">@drawable/splash_background</item>
+  </style>
+
+  <style name="StartTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <item name="android:windowBackground">@drawable/home_bg</item>
+    <item name="android:windowNoTitle">true</item>
   </style>
 
   <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
@@ -27,4 +39,15 @@
   <style name="MineCustomTabText" parent="TextAppearance.Design.Tab">
     <item name="android:textSize">11sp</item>
   </style>
+
+  <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
+    <item name="colorControlNormal">@color/colorAccent</item>
+    <item name="colorControlActivated">@color/colorAccent</item>
+    <item name="android:textCursorDrawable">@color/colorAccent</item>
+    <!--<item name="android:textColor">@color/orange500</item>-->
+    <!--<item name="android:textColorHint">@color/teal500</item>-->
+    <item name="android:textColorHighlight">@color/colorAccent</item>
+  </style>
+
+
 </resources>

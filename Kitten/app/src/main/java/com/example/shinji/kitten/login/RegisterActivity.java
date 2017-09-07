@@ -9,8 +9,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,6 +31,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -43,7 +47,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private FirebaseAuth mAuth;
     private final String TAG = "onAuthStateChanged";
 
+    private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private FirebaseStorage storage = FirebaseStorage.getInstance();
+    private DatabaseReference usersRef;
     private StorageReference storageRef;
     private EditText mEmailField;
     private EditText mPasswordField;
@@ -64,6 +70,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         progressDialog = new ProgressDialog(RegisterActivity.this);
         progressDialog.setMessage("Generating your account");
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setTitle("Sign up");
+
         mAuth = FirebaseAuth.getInstance();
 
     }
@@ -74,6 +86,20 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         if (i == R.id.btnRegister) {
             createAccount(mEmailField.getText().toString(), mPasswordField.getText().toString(), mUsernameField.getText().toString());
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        boolean result = true;
+        switch (id) {
+            case android.R.id.home:
+                finish();
+                break;
+            default:
+                result = super.onOptionsItemSelected(item);
+        }
+        return result;
     }
 
     private void createAccount(String email, String password, final String username) {
@@ -88,9 +114,20 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+                            FirebaseController firebaseController = FirebaseController.getInstance();
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
+//                            usersRef = database.getReference("users/" + user.getUid());
+
+                            User userData = firebaseController.getUserData();
+                            final String userIDRes = userData.userID;
+                            if(userData != null) {
+                                Log.d(TAG, "isSuccessfulCUWEAP:" + userData.userID);
+                                usersRef = database.getReference("users/" + userData.userID);
+                                firebaseController.writeUserToData(usersRef);
+                            }
+
                             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                     .setDisplayName(username)
                                     .build();
@@ -113,9 +150,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             byte[] data = baos.toByteArray();
 
                             storageRef = storage.getReference();
-                            FirebaseController firebaseController = FirebaseController.getInstance();
-                            User userdata = firebaseController.getUserData();
-                            StorageReference userImagesRef = storageRef.child("images/" + userdata.userID + "/profile.jpg");
+//                            User userdata = firebaseController.getUserData();
+                            StorageReference userImagesRef = storageRef.child("images/" + userData.userID + "/profile.jpg");
                             UploadTask uploadTask = userImagesRef.putBytes(data);
                             uploadTask.addOnFailureListener(new OnFailureListener() {
                                 @Override
