@@ -176,7 +176,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         progressDialog.hide();
                     }
                 });
-        // [END create_user_with_email]
     }
 
     private boolean validateForm() {

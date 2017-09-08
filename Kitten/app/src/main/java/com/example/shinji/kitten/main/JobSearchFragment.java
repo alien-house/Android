@@ -67,6 +67,8 @@ public class JobSearchFragment extends Fragment {
 //        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment) getChildFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
         multiAutoCompleteTextView = view.findViewById(R.id.searchWordMultiAuto);
 
+        firebaseController = firebaseController.getInstance();
+        userData = firebaseController.getUserData();
         DatabaseReference devStatusRef = database.getReference("devStatus");
         firebaseController.getDevStatusDataEventListener(devStatusRef);
         firebaseController.setOnCallBack(new FirebaseController.CallBackTask(){
@@ -83,25 +85,23 @@ public class JobSearchFragment extends Fragment {
                     String[] repArray = {"web designer","front end developer","android developer"};
                     devAutoArray = repArray;
                 }
-                Log.d("Value:", "setOnCallBackValue is: " + devAutoArray);
+                Log.d("Value:", "setOnCallBackValue is: " + devAutoArray[0]);
                 acAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, devAutoArray);
 
                 //multiAutoCompleteTextView
                 multiAutoCompleteTextView.setAdapter(acAdapter);
-                multiAutoCompleteTextView.setThreshold(1);
+                multiAutoCompleteTextView.setThreshold(0);
         //        multiAutoCompleteTextView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
                         multiAutoCompleteTextView.setTokenizer(new SpaceTokenizer());
-        //        multiAutoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-        //            @Override
-        //            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        //                Toast.makeText(getActivity(), "multiAutoCompleteTextView:" + adapterView.getItemAtPosition(i), Toast.LENGTH_SHORT).show();
-        //            }
-        //        });
+//                multiAutoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//                    @Override
+//                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                        Toast.makeText(getActivity(), "multiAutoCompleteTextView:" + adapterView.getItemAtPosition(i), Toast.LENGTH_SHORT).show();
+//                    }
+//                });
             }
         });
 
-        firebaseController = firebaseController.getInstance();
-        userData = firebaseController.getUserData();
         return view;
     }
 
@@ -134,6 +134,11 @@ public class JobSearchFragment extends Fragment {
 //                Log.i("onError", "An error occurred: " + status);
 //            }
 //        });
+
+        Log.d("Value:", "onActivityCreated:きてる？毎回 ");
+        if(userData.location != null && !userData.location.matches("")){
+            txtSearchLocation.setText(userData.location);
+        }
 
         txtSearchLocation.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override

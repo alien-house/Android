@@ -14,9 +14,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -55,7 +57,7 @@ import java.util.Map;
  * Created by shinji on 2017/08/28.
  */
 
-public class JobResultFragment extends Fragment implements JobRecyclerAdapter.ListItemClickListener,AdapterView.OnItemClickListener {
+public class JobResultFragment extends Fragment implements JobRecyclerAdapter.ListItemClickListener {
 
     private ArrayList<Job> joblist = new ArrayList<Job>();
     public static final String LOG_TAG = "volley_test";
@@ -71,6 +73,7 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
     private boolean listenerLock = false;
     private Button btnSearch;
     private TextView txtSearchWord;
+    private LinearLayout sortWrap;
     ProgressDialog progressDialog;
     private String url_location;
     private String url_query;
@@ -96,6 +99,7 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
         btnSearch = view.findViewById(R.id.btnSearch);
         btnDate = view.findViewById(R.id.btnDate);
         switchSort = view.findViewById(R.id.sort_switch);
+        sortWrap = view.findViewById(R.id.sortWrap);
 
         progressDialog = new ProgressDialog(getActivity());
 //        progressDialog.setTitle("Loading");
@@ -161,15 +165,22 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
 
         //slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED); //to close
         //slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED); //to open
+
         slidingLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
-//                Log.e("addPanelSlideListener",String.valueOf(slideOffset));
+                Log.e("addPanelSlideListener",String.valueOf(slideOffset));
             }
 
             @Override
             public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
-//                Log.e("onPanelStateChanged",String.valueOf(previousState));
+                Log.e("onPanelStateChanged",String.valueOf(previousState));
+
+                if(newState == SlidingUpPanelLayout.PanelState.COLLAPSED){
+                    Log.e("onPanelStateChanged","しまった");
+                }else{
+                    Log.e("onPanelStateChanged","空いた");
+                }
             }
         });
 
@@ -260,7 +271,7 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
                                 String txt = "No results were found for \" " + response.getString("query") + "\"";
                                 Toast.makeText(getActivity(), txt, Toast.LENGTH_SHORT).show();
                             }else{
-                                Toast.makeText(getActivity(), String.valueOf(response.getInt("totalResults")), Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(getActivity(), String.valueOf(response.getInt("totalResults")), Toast.LENGTH_SHORT).show();
 
 //                                getActivity().setTitle("Results:" + response.getInt("totalResults"));
                                 resultTotalItem = response.getInt("totalResults");
@@ -303,6 +314,20 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
 
     }
 
+    @Override
+    public void onListItemClick(int index) {
+        Log.e("onListItemClick", String.valueOf(index));
+        Job job_tmp = joblist.get(index);
+//        Job job_tmp = (Job)myAdapter.getItemId(index)
+        Uri uri = Uri.parse(job_tmp.getUrl());
+        Intent i = new Intent(Intent.ACTION_VIEW, uri);
+//                i.putExtra("JOB_DETAIL_URL", job_tmp.getUrl());
+
+        startActivity(i);
+
+    }
+
+
     /* 一度でいい処理 */
     void settingListView() {
 //        myAdapter.setJobList(joblist);
@@ -311,12 +336,17 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
         Log.e("settingListView", "settingListView======");
 //        myAdapter.notifyDataSetChanged();
 
-        //リスト項目が選択された時のイベントを追加
-//
-//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+
+//        listView.setOnItemClickListener(new OnItemClickListener() {
 //            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 //                Job job_tmp = (Job)myAdapter.getItem(position);
 //                Log.e("setOnItemClickListener", String.valueOf(position));
+//                        Uri uri = Uri.parse(job_tmp.getUrl());
+//                        Intent i = new Intent(Intent.ACTION_VIEW, uri);
+////                i.putExtra("JOB_DETAIL_URL", job_tmp.getUrl());
+//
+//                        startActivity(i);
 ////
 ////                switch (view.getId()) {
 ////                    case R.id.animationView:
@@ -456,27 +486,14 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
     }
 
 
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//        switch (view.getId()) {
-//            case R.id.animationView:
-//                Toast.makeText(getActivity(), "tap!!", Toast.LENGTH_LONG).show();
-//                break;
-//        }
-    }
-
-    @Override
-    public void onListItemClick(int index) {
-//        Job job_tmp = joblist.get(index);
-////        Job job_tmp = (Job)myAdapter.getItemId(index)
-//        Uri uri = Uri.parse(job_tmp.getUrl());
-//        Intent i = new Intent(Intent.ACTION_VIEW, uri);
-////                i.putExtra("JOB_DETAIL_URL", job_tmp.getUrl());
-//
-//        startActivity(i);
-//        Log.e("onListItemClick", String.valueOf(index));
-
-    }
+//    @Override
+//    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+////        switch (view.getId()) {
+////            case R.id.animationView:
+////                Toast.makeText(getActivity(), "tap!!", Toast.LENGTH_LONG).show();
+////                break;
+////        }
+//    }
 
     /**
      * get the indeed url

@@ -1,14 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+  <LinearLayout
+      android:id="@+id/sortWrap"
+      android:orientation="vertical"
+      android:padding="20dp"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:background="@color/colorPrimaryDark">
 
   <TextView
-      android:layout_width="match_parent"
+      android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:gravity="center|top"
       android:text="Sort and filter"
+      android:drawableLeft="@drawable/ic_adjust_24dp"
+      android:drawablePadding="5dp"
+      android:layout_gravity="center"
+      android:textColor="@android:color/white"
       android:textSize="16sp" />
 
   <Switch android:id="@+id/sort_switch"
@@ -64,4 +77,5 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:text="sort by date button"/>
+</LinearLayout>
 </LinearLayout>

@@ -2,9 +2,10 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:backgroundTint="@color/colorBg">
 
-  <LinearLayout
+<LinearLayout
       android:orientation="vertical"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
@@ -13,6 +14,7 @@
   <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:layout_marginBottom="20dp"
       android:orientation="vertical">
     <ImageView
         android:id="@+id/profileImg"
@@ -20,139 +22,231 @@
         android:layout_height="100dp"
         android:layout_gravity="center"/>
   </LinearLayout>
-  <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:orientation="vertical">
-  <TextView
-      android:id="@+id/nameTitle"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:text="name"/>
-  <EditText
-      android:id="@+id/nameEdit"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:hint="name"
-      android:inputType="text"
-      />
-  </LinearLayout>
 
   <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:background="@drawable/box_white"
+      android:layout_marginBottom="15dp"
+      android:padding="15dp"
       android:orientation="vertical">
-    <TextView
-        android:id="@+id/roleTitle"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Your Role"/>
-    <Spinner
-        android:id="@+id/roleSpinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"></Spinner>
-  </LinearLayout>
 
-  <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:orientation="vertical">
-    <TextView
-        android:id="@+id/emailTitle"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="E-Mail"/>
-    <EditText
-        android:id="@+id/emailEdit"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="name"
-        android:inputType="text"
+        android:orientation="vertical">
+      <TextView
+          android:id="@+id/nameTitle"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:paddingBottom="5dp"
+          android:textSize="@dimen/font_size_mini"
+          android:text="name"/>
+      <EditText
+          android:id="@+id/nameEdit"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:hint="name"
+          android:background="@drawable/text_field_nostyle"
+          android:inputType="text"
         />
-  </LinearLayout>
+    </LinearLayout>
 
-  <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:orientation="vertical">
-    <TextView
-        android:id="@+id/bioTitle"
+    <View
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Biography"/>
-    <EditText
-        android:id="@+id/bioEdit"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_gravity="top"
-        android:hint="bio"
-        android:inputType="text"
-        />
-  </LinearLayout>
+        android:layout_height="1px"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:background="@color/colorLightGray" />
 
-  <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:orientation="vertical">
-    <TextView
-        android:id="@+id/locationTitle"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Location"/>
-    <EditText
-        android:id="@+id/locationEdit"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="location"
-        android:inputType="text"
-        />
-  </LinearLayout>
+        android:layout_marginBottom="15dp"
+        android:orientation="vertical">
+      <TextView
+          android:id="@+id/roleTitle"
+          android:textSize="@dimen/font_size_mini"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:paddingBottom="5dp"
+          android:text="Your Role"/>
+      <Spinner
+          android:id="@+id/roleSpinner"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:paddingTop="10dp"
+          />
+    </LinearLayout>
 
-  <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:orientation="vertical">
-    <TextView
-        android:id="@+id/urlTitle"
+    <View
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="url"/>
-    <EditText
-        android:id="@+id/urlEdit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="url"
-        android:inputType="text"
-        />
-  </LinearLayout>
+        android:layout_height="1px"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:background="@color/colorLightGray" />
 
-
-  <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:orientation="vertical">
-
-    <Spinner
-        android:id="@+id/countrySpinner"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:entries="@array/array_country"
-        android:entryValues="@array/array_country_value"
-        android:layout_margin="20dp"></Spinner>
-  </LinearLayout>
+        android:orientation="vertical">
+      <TextView
+          android:id="@+id/emailTitle"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:paddingBottom="5dp"
+          android:textSize="@dimen/font_size_mini"
+          android:text="E-Mail"/>
+      <EditText
+          android:id="@+id/emailEdit"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:hint="email"
+          android:inputType="text"
+          android:background="@drawable/text_field_nostyle"
+          />
+    </LinearLayout>
 
-  <Button
-      android:id="@+id/btnUpdate"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:text="UpDate"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:background="@color/colorLightGray" />
 
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical">
+        <TextView
+            android:id="@+id/bioTitle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="5dp"
+            android:textSize="@dimen/font_size_mini"
+            android:text="Biography"/>
+        <EditText
+            android:id="@+id/bioEdit"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_gravity="top"
+            android:hint=""
+            android:inputType="textMultiLine"
+            android:gravity="center|top"
+            android:minLines="3"
+            android:maxLines="4"
+            android:maxHeight="80dp"
+            android:textAlignment="textStart"
+            android:background="@drawable/text_field_nostyle"
+            />
+      </LinearLayout>
 
-  <Button
-      android:id="@+id/btnSignOut"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:text="Sign Out"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:background="@color/colorLightGray" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+      <TextView
+          android:id="@+id/cityTitle"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:textSize="@dimen/font_size_mini"
+          android:text="Country"/>
+      <Spinner
+          android:id="@+id/countrySpinner"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:entries="@array/array_country"
+          android:entryValues="@array/array_country_value"
+          android:paddingTop="10dp"
+          ></Spinner>
+    </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"
+            android:background="@color/colorLightGray" />
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical">
+        <TextView
+            android:id="@+id/locationTitle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="5dp"
+            android:textSize="@dimen/font_size_mini"
+            android:text="Location"/>
+        <EditText
+            android:id="@+id/locationEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint=""
+            android:inputType="text"
+            android:background="@drawable/text_field_nostyle"
+            />
+      </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:background="@color/colorLightGray" />
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical">
+        <TextView
+            android:id="@+id/urlTitle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="5dp"
+            android:textSize="@dimen/font_size_mini"
+            android:text="url"/>
+        <EditText
+            android:id="@+id/urlEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint=""
+            android:inputType="text"
+            android:background="@drawable/text_field_nostyle"
+            />
+      </LinearLayout>
+
 </LinearLayout>
-  </ScrollView>
+
+    <Button
+        android:id="@+id/btnUpdate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#fff"
+        android:height="46dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/btn_normal"
+        style="@style/KittenButtonTextAppearance"
+        android:text="Update"/>
+
+    <Button
+        android:id="@+id/btnSignOut"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:height="46dp"
+        android:background="@drawable/btn_normal_gray"
+        style="@style/KittenButtonTextAppearance"
+        android:text="Sign Out"/>
+
+</LinearLayout>
+
+</ScrollView>

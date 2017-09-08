@@ -43,7 +43,6 @@ public class JobRecyclerAdapter extends RecyclerView.Adapter<JobRecyclerAdapter.
 
     final private ListItemClickListener onClickListner;
 
-
     public interface ListItemClickListener{
         void onListItemClick(int index);
     }
@@ -127,6 +126,10 @@ public class JobRecyclerAdapter extends RecyclerView.Adapter<JobRecyclerAdapter.
         return position;
     }
 
+//    public Job getItem(int position) {
+//        return this.jobList.get(position);
+//    }
+
     @Override
     public int getItemCount() {
         return this.jobList.size();
@@ -161,9 +164,8 @@ public class JobRecyclerAdapter extends RecyclerView.Adapter<JobRecyclerAdapter.
         @Override
         public void onClick(View view) {
             int position = getAdapterPosition();
-            onClickListner.onListItemClick(position);
 
-//            if (view.getId() == job_chk.getId()){
+
             if (view.getId() == animationView.getId()){
 
                 if(jobList.get(position).isFavd()) {
@@ -186,9 +188,11 @@ public class JobRecyclerAdapter extends RecyclerView.Adapter<JobRecyclerAdapter.
                     favoriteRef.updateChildren(childUpdates);
                     Log.e("animationView:", String.valueOf(jobList.get(position).isFavd()));
                 }
-                Toast.makeText(view.getContext(), "ITEM PRESSED = " + String.valueOf(getAdapterPosition()), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(view.getContext(), "ITEM PRESSED = " + String.valueOf(getAdapterPosition()), Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(view.getContext(), "ROW PRESSED = " + String.valueOf(getAdapterPosition()), Toast.LENGTH_SHORT).show();
+
+                onClickListner.onListItemClick(position);
+//                Toast.makeText(view.getContext(), "ROW PRESSED = " + String.valueOf(getAdapterPosition()), Toast.LENGTH_SHORT).show();
             }
         }
     }

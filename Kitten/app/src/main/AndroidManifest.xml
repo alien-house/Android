@@ -40,7 +40,9 @@
     </activity>
     <activity android:name=".login.RegisterActivity">
     </activity>
-    <activity android:name=".BaseActivity">
+    <activity android:name=".BaseActivity"
+              android:theme="@style/BgTheme"
+              android:windowSoftInputMode="stateAlwaysHidden">
     </activity>
 
   </application>

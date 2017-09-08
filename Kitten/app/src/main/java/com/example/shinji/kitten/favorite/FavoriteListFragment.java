@@ -128,6 +128,12 @@ public class FavoriteListFragment extends Fragment implements FavoriteRecyclerAd
     }
 
     @Override
+    public void onListItemClick(int index) {
+        Log.w("onListItemClick:", String.valueOf(index));
+
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
@@ -156,8 +162,4 @@ public class FavoriteListFragment extends Fragment implements FavoriteRecyclerAd
 
     }
 
-    @Override
-    public void onListItemClick(int index) {
-
-    }
 }

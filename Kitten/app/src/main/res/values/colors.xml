@@ -8,6 +8,7 @@
   <color name="colorKey">#fae500</color>
   <color name="colorLightBlack">#424242</color>
   <color name="colorBrightGray">#e8e8e8</color>
+  <color name="colorBg">#f5f6f5</color>
   <color name="colorLightGray">#9f9f9f</color>
   <color name="colorText">#1f1f1f</color>
 </resources>

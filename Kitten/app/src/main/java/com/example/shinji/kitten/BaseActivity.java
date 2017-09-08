@@ -74,7 +74,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
 
         setContentView(R.layout.main_base_activity);
         progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("BaseActivity");
+        progressDialog.setMessage("Data Loading");
         progressDialog.show();
         mSectionPageAdapter = new SectionPageAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.containers);

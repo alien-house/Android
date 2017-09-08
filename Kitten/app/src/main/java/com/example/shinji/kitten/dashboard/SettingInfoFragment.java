@@ -105,8 +105,8 @@ public class SettingInfoFragment extends Fragment {
         bioEdit = view.findViewById(R.id.bioEdit);
         locationEdit = view.findViewById(R.id.locationEdit);
         urlEdit = view.findViewById(R.id.urlEdit);
-        btnUpdate = (Button) view.findViewById(R.id.btnUpdate);
-        btnSignOut = (Button) view.findViewById(R.id.btnSignOut);
+        btnUpdate = view.findViewById(R.id.btnUpdate);
+        btnSignOut = view.findViewById(R.id.btnSignOut);
         roleSpinner = view.findViewById(R.id.roleSpinner);
         countrySpinner = view.findViewById(R.id.countrySpinner);
         profileImg = view.findViewById(R.id.profileImg);
@@ -137,6 +137,9 @@ public class SettingInfoFragment extends Fragment {
     private void changeUI(){
         nameEdit.setText(userData.username);
         emailEdit.setText(userData.email);
+        bioEdit.setText(userData.bio);
+        locationEdit.setText(userData.location);
+        urlEdit.setText(userData.url);
     }
 
     @Override
@@ -278,9 +281,14 @@ public class SettingInfoFragment extends Fragment {
         }
         return pos;
     }
+
     public void writeUser(){
         userData.bio = bioEdit.getText().toString();
         userData.username = nameEdit.getText().toString();
+        userData.email = emailEdit.getText().toString();
+        userData.location = locationEdit.getText().toString();
+        userData.url = urlEdit.getText().toString();
+
         Map<String, Object> postValues = userData.toMap();
         usersRef.updateChildren(postValues, new DatabaseReference.CompletionListener() {
             @Override
@@ -293,7 +301,9 @@ public class SettingInfoFragment extends Fragment {
                 progressDialog.dismiss();
             }
         });
+
         FirebaseUser user = mAuth.getCurrentUser();
+        //change display name
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                 .setDisplayName(userData.username)
                 .build();
@@ -306,7 +316,26 @@ public class SettingInfoFragment extends Fragment {
                         }
                     }
                 });
+
+        // change email
+        if(!user.getEmail().matches(userData.email)){
+            user.updateEmail(userData.email)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Log.d("writeUser:", "User email address updated.");
+                            }
+                        }
+                    });
+        }
     }
+
+
+
+
+
+
 
 
     public static class AlertDialogFragment extends DialogFragment {
