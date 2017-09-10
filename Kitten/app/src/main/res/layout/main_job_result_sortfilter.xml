@@ -8,35 +8,71 @@
   <LinearLayout
       android:id="@+id/sortWrap"
       android:orientation="vertical"
-      android:padding="20dp"
+      android:padding="15dp"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:background="@color/colorPrimaryDark">
+      android:background="@color/colorGray">
+    <TextView
+        android:id="@+id/filterTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center|top"
+        android:text="Sort and filter"
+        android:drawableLeft="@drawable/ic_adjust_24dp"
+        android:drawablePadding="5dp"
+        android:layout_gravity="center"
+        android:textColor="@android:color/white"
+        android:layout_marginBottom="15dp"
+        android:textSize="16sp" />
 
-  <TextView
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:gravity="center|top"
-      android:text="Sort and filter"
-      android:drawableLeft="@drawable/ic_adjust_24dp"
-      android:drawablePadding="5dp"
-      android:layout_gravity="center"
-      android:textColor="@android:color/white"
-      android:textSize="16sp" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-  <Switch android:id="@+id/sort_switch"
+      <TextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginBottom="32dip"
-          android:checked="false"/>
+          android:gravity="left"
+          android:text="Sort"
+          android:layout_marginRight="20dp"
+          android:layout_marginBottom="10dp"
+          android:textStyle="bold"
+          android:textSize="16sp" />
+
+      <LinearLayout
+          android:orientation="horizontal"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content">
+
+        <Switch android:id="@+id/sort_switch"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginBottom="32dip"
+              android:checked="false"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:text="Sort by Date"
+            android:layout_marginLeft="15dp"
+            android:textSize="16sp" />
+      </LinearLayout>
+
+    </LinearLayout>
+
 
   <TextView
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:textStyle="bold"
+      android:layout_marginBottom="10dp"
       android:text="Filter"/>
   <RadioGroup
       android:id="@+id/radioJobType"
-      android:layout_width="wrap_content"
+      android:layout_marginBottom="10dp"
+      android:layout_width="match_parent"
       android:layout_height="wrap_content" >
 
     <RadioButton
@@ -76,6 +112,11 @@
       android:id="@+id/btnDate"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:text="sort by date button"/>
+      android:textColor="#fff"
+      android:layout_marginBottom="10dp"
+      android:height="46dp"
+      android:background="@drawable/btn_normal"
+      style="@style/KittenButtonTextAppearance"
+      android:text="Done"/>
 </LinearLayout>
 </LinearLayout>

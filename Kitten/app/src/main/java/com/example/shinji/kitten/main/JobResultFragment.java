@@ -1,11 +1,19 @@
 package com.example.shinji.kitten.main;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -73,6 +81,7 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
     private boolean listenerLock = false;
     private Button btnSearch;
     private TextView txtSearchWord;
+    private TextView filterTitle;
     private LinearLayout sortWrap;
     ProgressDialog progressDialog;
     private String url_location;
@@ -90,6 +99,7 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
     private User userData;
 
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -100,6 +110,7 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
         btnDate = view.findViewById(R.id.btnDate);
         switchSort = view.findViewById(R.id.sort_switch);
         sortWrap = view.findViewById(R.id.sortWrap);
+        filterTitle = view.findViewById(R.id.filterTitle);
 
         progressDialog = new ProgressDialog(getActivity());
 //        progressDialog.setTitle("Loading");
@@ -166,10 +177,17 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
         //slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED); //to close
         //slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED); //to open
 
+        final int colorFrom = ContextCompat.getColor(getContext(), R.color.colorGray);
+        final int colorBlack = ContextCompat.getColor(getContext(), R.color.colorText);
+        final int colorWhite = Color.WHITE;
+        final Drawable[] mDrawable = filterTitle.getCompoundDrawables();
+
         slidingLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
                 Log.e("addPanelSlideListener",String.valueOf(slideOffset));
+                sortWrap.setBackgroundColor((int) new ArgbEvaluator().evaluate(slideOffset, colorFrom, colorWhite));
             }
 
             @Override
@@ -178,7 +196,16 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
 
                 if(newState == SlidingUpPanelLayout.PanelState.COLLAPSED){
                     Log.e("onPanelStateChanged","しまった");
+                    filterTitle.setTextColor(colorWhite);
+                    mDrawable[0].setColorFilter(new PorterDuffColorFilter(colorWhite, PorterDuff.Mode.SRC_IN));
+//                    sortWrap.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorGray));
                 }else{
+//                    sortWrap.setBackgroundColor(Color.WHITE);
+                    filterTitle.setTextColor(colorBlack);
+//                    Drawable mDrawable = getContext().getResources().getDrawable(R.drawable.ic_adjust_24dp);
+                    int imgResource = R.drawable.ic_adjust_24dp;
+                    mDrawable[0].setColorFilter(new PorterDuffColorFilter(colorBlack, PorterDuff.Mode.SRC_IN));
+
                     Log.e("onPanelStateChanged","空いた");
                 }
             }
@@ -189,15 +216,11 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
                 // do something, the isChecked will be
                 // true if the switch is in the On position
                 Log.e("setOnCedChange:", String.valueOf(isChecked));
-                progressDialog.show();
-                joblist.clear();
                 if(isChecked){
                     url_sort = "date";
                 }else{
                     url_sort = "";
                 }
-                String url = getJobSearchURL(search_loc, txtSearchWord.getText().toString());
-                makeJsonArrayRequest(url, false);
             }
         });
 

@@ -6,7 +6,7 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:gravity="bottom"
-      sothree:umanoPanelHeight="55dp"
+      sothree:umanoPanelHeight="50dp"
       sothree:umanoShadowHeight="4dp">
   <LinearLayout
                 android:orientation="vertical"

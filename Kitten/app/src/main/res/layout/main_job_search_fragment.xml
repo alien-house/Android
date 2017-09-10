@@ -54,6 +54,7 @@
       android:layout_marginBottom="20dp"
       android:background="@drawable/text_field"
       android:textSize="@dimen/font_size_normal"
+      android:text="Web Developer"
       android:hint="Job TItle, Position or Keywords "/>
 
   <Button
