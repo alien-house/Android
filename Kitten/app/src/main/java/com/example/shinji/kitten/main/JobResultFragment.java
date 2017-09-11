@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,6 +21,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -32,6 +35,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,7 +49,9 @@ import com.android.volley.toolbox.Volley;
 import com.example.shinji.kitten.BaseActivity;
 import com.example.shinji.kitten.R;
 import com.example.shinji.kitten.util.FirebaseController;
+import com.example.shinji.kitten.util.HidingScrollListener;
 import com.example.shinji.kitten.util.User;
+import com.example.shinji.kitten.util.Utils;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -82,7 +88,9 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
     private Button btnSearch;
     private TextView txtSearchWord;
     private TextView filterTitle;
+    private TextView resultsTxt;
     private LinearLayout sortWrap;
+    private LinearLayout mToolbarContainer;
     ProgressDialog progressDialog;
     private String url_location;
     private String url_query;
@@ -97,6 +105,7 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
     private DatabaseReference favoriteRef;
     private FirebaseController firebaseController;
     private User userData;
+    private int mToolbarHeight;
 
 
 
@@ -111,6 +120,9 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
         switchSort = view.findViewById(R.id.sort_switch);
         sortWrap = view.findViewById(R.id.sortWrap);
         filterTitle = view.findViewById(R.id.filterTitle);
+        resultsTxt = view.findViewById(R.id.resultsTxt);
+        mToolbarHeight = Utils.getToolbarHeight(getContext());
+//        mToolbarContainer = view.findViewById(R.id.rlistWrap);
 
         progressDialog = new ProgressDialog(getActivity());
 //        progressDialog.setTitle("Loading");
@@ -123,6 +135,9 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         listViewRecycle.setLayoutManager(layoutManager);
         listViewRecycle.setHasFixedSize(true);
+
+
+
         /**/
         slidingLayout = view.findViewById(R.id.sliding_layout);
         radioJobtypeGroup = view.findViewById(R.id.radioJobType);
@@ -134,7 +149,6 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
 
         return view;
     }
-
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -288,6 +302,7 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
                             progressDialog.dismiss();
                             Log.d(LOG_TAG, "Value: " + response.getString("query"));
                             Log.d(LOG_TAG, "results: " + response.getJSONArray("results"));
+                            Log.d(LOG_TAG, "totalResults: " + response.getInt("totalResults"));
                             // if no result
                             if(response.getInt("totalResults") == 0){
                                 txtSearchWord.setText("");
@@ -296,7 +311,7 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
                             }else{
 //                                Toast.makeText(getActivity(), String.valueOf(response.getInt("totalResults")), Toast.LENGTH_SHORT).show();
 
-//                                getActivity().setTitle("Results:" + response.getInt("totalResults"));
+                                resultsTxt.setText("Results:" + response.getInt("totalResults"));
                                 resultTotalItem = response.getInt("totalResults");
                                 JSONArray itemArray = response.getJSONArray("results");
                                 makeDataToListview(itemArray);
@@ -441,6 +456,24 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
             }
         });
 
+//        listViewRecycle.setOnScrollListener(new HidingScrollListener(getActivity()) {
+//            @Override
+//            public void onMoved(int distance) {
+//                slidingLayout.setTranslationY(-distance);
+//            }
+//
+//            @Override
+//            public void onShow() {
+//                slidingLayout.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+//
+//            }
+//
+//            @Override
+//            public void onHide() {
+//                slidingLayout.animate().translationY(-mToolbarHeight).setInterpolator(new AccelerateInterpolator(2)).start();
+//
+//            }
+//        });
 //        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
 //            @Override
 //            public void onScrollStateChanged(AbsListView absListView, int i) {

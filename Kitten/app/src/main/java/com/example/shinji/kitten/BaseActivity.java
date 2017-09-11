@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.shinji.kitten.dashboard.SettingFragment;
@@ -58,7 +59,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
     private static final String TAG = "MainActivity";
     private SectionPageAdapter mSectionPageAdapter;
     private ViewPager mViewPager;
-    TabLayout tabLayout;
+    private TabLayout tabLayout;
     public static final String SEARCH_LOC = "SEARCH_LOC";
     public static final String SEARCH_WORD = "SEARCH_WORD";
 //    private GoogleApiClient mGoogleApiClient;
@@ -102,16 +103,34 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
     }
 
     private void setupViewPager(ViewPager viewPager){
+        String[] nameNames = {"Job","Favorite",/*"Event","Learning",*/"Setting"};
         SectionPageAdapter adapter = new SectionPageAdapter(getSupportFragmentManager());
-        adapter.addFragment(new JobFragment(), "Job");
-        adapter.addFragment(new FavoriteFragment(), "Favorite");
-        adapter.addFragment(new SettingFragment(), "Setting");
+        adapter.addFragment(new JobFragment(), nameNames[0]);
+        adapter.addFragment(new FavoriteFragment(), nameNames[1]);
+        adapter.addFragment(new SettingFragment(), nameNames[2]);
+//        adapter.addFragment(new SettingFragment(), nameNames[3]);
+//        adapter.addFragment(new SettingFragment(), nameNames[4]);
         viewPager.setAdapter(adapter);
+
         tabLayout = (TabLayout) findViewById(R.id.tabs);
+//        TabLayout.Tab tab = tabLayout.newTab();
+//        tab.setCustomView(R.layout.custom_tab);
+//        tab.setText("Tab 1");
+//        tab.setIcon(R.drawable.ic_adjust_24dp);
+//        tabLayout.addTab(tab);
+
         tabLayout.setupWithViewPager(mViewPager);
-        tabLayout.getTabAt(0).setIcon(R.drawable.ic_business_center_24dp);
-        tabLayout.getTabAt(1).setIcon(R.drawable.ic_favorite_24dp);
-        tabLayout.getTabAt(2).setIcon(R.drawable.ic_settings_24dp);
+        setTabs(nameNames);
+//        tabLayout.getTabAt(0).setCustomView(R.layout.custom_tab);
+//        View tabviews = tabLayout.getTabAt(0).getCustomView();
+//        TextView tabTxtView = tabviews.findViewById(R.id.tabContent);
+//        ImageView tabImageView = tabviews.findViewById(R.id.tabIcon);
+//        tabTxtView.setText("Job");
+//        tabImageView.setImageResource(R.drawable.ic_business_center_24dp);
+
+//        tabLayout.getTabAt(0).setIcon(R.drawable.ic_business_center_24dp);
+//        tabLayout.getTabAt(1).setIcon(R.drawable.ic_favorite_24dp);
+//        tabLayout.getTabAt(2).setIcon(R.drawable.ic_settings_24dp);
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -127,6 +146,25 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
 
             }
         });
+    }
+
+    public void setTabs(String[] tabName){
+        int[] iconsName = {
+                R.drawable.ic_business_center_24dp,
+                R.drawable.ic_favorite_24dp,
+//                R.drawable.ic_favorite_24dp,
+//                R.drawable.ic_favorite_24dp,
+                R.drawable.ic_settings_24dp
+        };
+        int maxNum = tabName.length;
+        for (int i = 0; i < maxNum; i++){
+            tabLayout.getTabAt(i).setCustomView(R.layout.custom_tab);
+            View tabview2 = tabLayout.getTabAt(i).getCustomView();
+            TextView tabTxtView = tabview2.findViewById(R.id.tabContent);
+            ImageView tabImageView = tabview2.findViewById(R.id.tabIcon);
+            tabTxtView.setText(tabName[i]);
+            tabImageView.setImageResource(iconsName[i]);
+        }
     }
 
 
