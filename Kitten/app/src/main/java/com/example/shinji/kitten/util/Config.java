@@ -8,4 +8,10 @@ public class Config {
     public static String GITHUB_ID = "5a71911fdeceb4d69eee";
     public static String GITHUB_SECRET = "718114c4f8b9ff50593707853cf8c3f61ba05c25";
     public static String CALLBACK_URL = "https://programming-473ea.firebaseapp.com/__/auth/handler";
+
+
+    public static String EVENTBRITE_TOKEN = "CVKT5QQJUJYOJDWX2KNX";
+
+
+
 }

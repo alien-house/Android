@@ -424,6 +424,12 @@ public class SettingInfoFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("SettingInfoFragment", "onStart ーーーーーーーー");
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         Log.d("SettingInfoFragment", "onResume ーーーーーーーー");

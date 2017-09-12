@@ -117,6 +117,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("User Data Loading");
         progressDialog.show();
+        setTitle("Job Search");
 //        mSectionPageAdapter = new SectionPageAdapter(getSupportFragmentManager());
 
 
@@ -291,17 +292,12 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         } else if (id == R.id.nav_favorite) {
             System.out.println("nav_favorite");
             mViewPager.setCurrentItem(1);
-
-        }
-//        else if (id == R.id.nav_event) {
-//            System.out.println("nav_event");
-//            mViewPager.setCurrentItem(2);
-//
-//        }
-        else if (id == R.id.nav_setting) {
-            System.out.println("nav_setting");
+        }else if (id == R.id.nav_event) {
+            System.out.println("nav_event");
             mViewPager.setCurrentItem(2);
-
+        }else if (id == R.id.nav_setting) {
+            System.out.println("nav_setting");
+            mViewPager.setCurrentItem(3);
         }
 
 

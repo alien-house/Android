@@ -76,6 +76,7 @@ public class FavoriteRecyclerAdapter extends RecyclerView.Adapter<FavoriteRecycl
         holder.job_area.setText(job.getArea());
         CharSequence source = Html.fromHtml(job.getDescription());
         holder.job_description.setText(source);
+        holder.animationView.setState(job.isFavd());
     }
 
     @Override
@@ -102,13 +103,45 @@ public class FavoriteRecyclerAdapter extends RecyclerView.Adapter<FavoriteRecycl
             job_company = (TextView) itemView.findViewById(R.id.job_company);
             job_area = (TextView) itemView.findViewById(R.id.job_area);
             job_description = (TextView) itemView.findViewById(R.id.job_description);
+            animationView = (HeartAnimation) itemView.findViewById(R.id.animationView);
             itemView.setOnClickListener((View.OnClickListener) this);
+            animationView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
             int position = getAdapterPosition();
-            onClickListner.onListItemClick(position);
+
+
+            if (view.getId() == animationView.getId()){
+
+                if(jobList.get(position).isFavd()) {
+                    animationView.setProgress(0f);
+                    jobList.get(position).setFav(false);
+                    Log.e("position " , " off - " + position);
+                    Map<String, Object> postValues = jobList.get(position).toMap();
+                    Map<String, Object> childUpdates = new HashMap<>();
+                    childUpdates.put("/" + jobList.get(position).getJobkey() + "/", postValues);
+                    favoriteRef.child(jobList.get(position).getJobkey()).removeValue();
+                    Log.e("animationView:", String.valueOf(jobList.get(position).isFavd()));
+                }else{
+//                    animationView.setProgress(1f);
+                    animationView.playAnimation();
+                    jobList.get(position).setFav(true);
+                    Log.e("position " , " on - " + position);
+                    Map<String, Object> postValues = jobList.get(position).toMap();
+                    Map<String, Object> childUpdates = new HashMap<>();
+                    childUpdates.put("/" + jobList.get(position).getJobkey() + "/", postValues);
+                    favoriteRef.updateChildren(childUpdates);
+                    Log.e("animationView:", String.valueOf(jobList.get(position).isFavd()));
+                }
+//                Toast.makeText(view.getContext(), "ITEM PRESSED = " + String.valueOf(getAdapterPosition()), Toast.LENGTH_SHORT).show();
+            } else {
+
+                onClickListner.onListItemClick(position);
+//                Toast.makeText(view.getContext(), "ROW PRESSED = " + String.valueOf(getAdapterPosition()), Toast.LENGTH_SHORT).show();
+            }
+
         }
     }
 

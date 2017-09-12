@@ -103,10 +103,9 @@ public class FavoriteListFragment extends Fragment implements FavoriteRecyclerAd
                     favlist.clear();
                     for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                         Log.d("postSnapshot:", postSnapshot.getKey());
-                        Map<String, String> favMap = (Map<String, String>) postSnapshot.getValue();
+//                        Map<String, String> favMap = (Map<String, String>) postSnapshot.getValue();
                         addList(postSnapshot);
                     }
-                    listViewRecycle.setAdapter(frAdapter);
                 }
                 @Override
                 public void onCancelled(DatabaseError error) {
@@ -116,6 +115,7 @@ public class FavoriteListFragment extends Fragment implements FavoriteRecyclerAd
             };
             favRef.addValueEventListener(favDataListener);
             frAdapter = new FavoriteRecyclerAdapter(favlist, this);
+            listViewRecycle.setAdapter(frAdapter);
         }
 
 //        btnSearch = view.findViewById(R.id.btnSearch);
@@ -141,7 +141,7 @@ public class FavoriteListFragment extends Fragment implements FavoriteRecyclerAd
 
 
     void addList(DataSnapshot child)  {
-        String title = (String) child.child("title").getValue();
+//        String title = (String) child.child("title").getValue();
 //        System.out.println("addList val : " + title);
         Job newJob = new Job(
                 (String)child.child("title").getValue(),
