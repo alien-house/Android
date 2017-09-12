@@ -35,6 +35,7 @@ public class JobFragment extends Fragment {
     }
 
     private void initFragment(){
+        System.out.println("ここまできてる？");
         FragmentManager fm = getChildFragmentManager();
         if(fm.findFragmentById(R.id.job_fragment) != null){
             return;

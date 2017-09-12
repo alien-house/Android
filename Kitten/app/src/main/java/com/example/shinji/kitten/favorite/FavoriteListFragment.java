@@ -152,6 +152,7 @@ public class FavoriteListFragment extends Fragment implements FavoriteRecyclerAd
                 (String)child.child("area").getValue(),
                 (String)child.child("jobkey").getValue()
         );
+        newJob.setFav(true);
         favlist.add(newJob);
         frAdapter.notifyDataSetChanged();
     }

@@ -46,7 +46,7 @@ public class GetImageTask extends AsyncTask<String, Void, Bitmap> {
 
     @Override
     protected void onPostExecute(Bitmap bitmap) {
-        System.out.println("onPostExecute :: ");
+        System.out.println("GetImageTask:onPostExecute :: ");
         bmImage.setImageBitmap(bitmap);
     }
 

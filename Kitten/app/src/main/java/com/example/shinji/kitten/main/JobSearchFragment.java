@@ -66,6 +66,7 @@ public class JobSearchFragment extends Fragment {
         txtSearchLocation = view.findViewById(R.id.searchLocation);
 //        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment) getChildFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
         multiAutoCompleteTextView = view.findViewById(R.id.searchWordMultiAuto);
+        multiAutoCompleteTextView.requestFocus();
 
         firebaseController = firebaseController.getInstance();
         userData = firebaseController.getUserData();
@@ -187,7 +188,7 @@ public class JobSearchFragment extends Fragment {
                 }
 
 //                Intent preferencesIntent = new Intent(getActivity(), ResultActivity.class);
-//                System.out.println( "=========================" );
+                System.out.println( "=========================" );
 //                preferencesIntent.putExtra("SEARCH_LOC", txtSearchLocation.getText().toString());
 //                preferencesIntent.putExtra("SEARCH_WORD", txtSearchWord.getText().toString());
 //                startActivity(preferencesIntent);
@@ -199,8 +200,8 @@ public class JobSearchFragment extends Fragment {
                 jobResultFragment.setArguments(argument);
 
 //                FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-                FragmentTransaction fragmentTransaction = getParentFragment().getChildFragmentManager().beginTransaction();
-//                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+//                FragmentTransaction fragmentTransaction = getParentFragment().getChildFragmentManager().beginTransaction();
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.job_fragment, jobResultFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();

@@ -59,7 +59,7 @@ public class FavoriteRecyclerAdapter extends RecyclerView.Adapter<FavoriteRecycl
     public JobHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.favorite_list_item, parent, false);//this time, only textview
+        View view = inflater.inflate(R.layout.main_job_result_list_item, parent, false);//this time, only textview
         JobHolder nh = new JobHolder(view);
         JobHolderList.add(nh);
         viewHolderCount++;

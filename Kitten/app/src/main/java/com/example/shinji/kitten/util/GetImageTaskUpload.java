@@ -32,7 +32,7 @@ public class GetImageTaskUpload extends AsyncTask<String, Void, Bitmap> {
 
     @Override
     protected void onPostExecute(Bitmap bitmap) {
-        System.out.println("onPostExecute :: ");
+        System.out.println("GetImageTaskUpload:onPostExecute :: ");
         callbacktask.CallBack(bitmap);
     }
 

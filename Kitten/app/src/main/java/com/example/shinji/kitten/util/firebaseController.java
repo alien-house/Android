@@ -35,6 +35,7 @@ public class FirebaseController {
     private ValueEventListener favDataListener = null;
     private ValueEventListener devStatusDataListener = null;
     private CallBackTask callbacktask;
+    private CallBackTaskNormal callbacktaskNormal;
     public boolean isFistLoad = true;
 
     private static FirebaseController firebaseController;
@@ -171,11 +172,17 @@ public class FirebaseController {
                         firebaseController.userData.country = usersValue.country;
                         System.out.println(firebaseController.userData.country);
                         //                userData.role = usersValue.getProperty('devStatus');
-                        firebaseController.callbacktask.CallBack();
 //                    if(firebaseController.isFistLoad){
 //                        firebaseController.callbacktask.CallBack();
 //                        firebaseController.isFistLoad = false;
 //                    }
+                    }
+                    //nullでもなくっても
+
+                    System.out.println("=====firebaseController.callbacktask====");
+                    if(firebaseController.isFistLoad) {
+                        firebaseController.callbacktaskNormal.CallBack();
+                        firebaseController.isFistLoad = false;
                     }
 
                 }
@@ -183,6 +190,11 @@ public class FirebaseController {
                 public void onCancelled(DatabaseError error) {
                     // Failed to read value
                     Log.w("Value:", "Failed to read value.", error.toException());
+                    //ミスってもコールバックする
+                    if(firebaseController.isFistLoad) {
+                        firebaseController.callbacktaskNormal.CallBack();
+                        firebaseController.isFistLoad = false;
+                    }
                 }
             };
             usersRef.addValueEventListener(firebaseController.userListener);
@@ -197,6 +209,13 @@ public class FirebaseController {
         public void CallBack(String[] devStatusArray) {
         }
         public void CallBack(String txt) {
+        }
+    }
+    public void setOnCallBackNormal(CallBackTaskNormal _cbj) {
+        callbacktaskNormal = _cbj;
+    }
+    public static class CallBackTaskNormal {
+        public void CallBack() {
         }
     }
 

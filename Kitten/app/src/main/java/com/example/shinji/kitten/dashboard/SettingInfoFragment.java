@@ -116,6 +116,7 @@ public class SettingInfoFragment extends Fragment {
 
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage("saving");
+
         firebaseController = FirebaseController.getInstance();
 
         mAuth = FirebaseAuth.getInstance();
