@@ -46,6 +46,8 @@ dependencies {
 
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile 'com.airbnb.android:lottie:2.2.0'
+    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
+    compile 'com.github.apl-devs:appintro:v4.2.2'
 }
 
 apply plugin: 'com.google.gms.google-services'

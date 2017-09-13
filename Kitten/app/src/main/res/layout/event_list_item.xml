@@ -37,16 +37,18 @@
           android:id="@+id/event_image"
           android:layout_width="80dp"
           android:layout_height="80dp"
+          android:scaleType="centerCrop"
+          android:src="@drawable/profile"
           android:backgroundTint="@color/cardview_light_background"
           />
       <LinearLayout
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_marginLeft="5dp"
+          android:layout_marginLeft="13dp"
           android:orientation="vertical">
       <TextView
           android:id="@+id/event_title"
-          android:text="CROSSPOST: Vancouver VR Community presents Back to School Cool"
+          android:text="Event Title"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:gravity="left"
@@ -70,17 +72,6 @@
               android:textColor="#333333"
               android:textSize="12sp"/>
 
-          <TextView
-              android:id="@+id/event_time"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:gravity="left"
-              android:text="6:15 PM to 9:00 PM"
-              android:textColor="#333333"
-              android:inputType="text"
-              android:focusableInTouchMode="false"
-              android:focusable="false"
-              android:textSize="10sp"/>
         </LinearLayout>
       <LinearLayout
           android:layout_width="match_parent"

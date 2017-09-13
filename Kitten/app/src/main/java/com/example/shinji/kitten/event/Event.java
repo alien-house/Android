@@ -10,28 +10,31 @@ import java.util.Map;
  */
 
 public class Event {
-    private int id;
+    private String id;
     private String title;
     private String url;
     private String organizer;
     private String description;
     private String holdDate;
-    private String holdTime;
+    private String holdEnd;
     private String venues;
     private String address;
+    private String img_url;
 
-    public Event(int id, String title, String url, String organizer, String description, String holdDate, String holdTime, String venues, String address){
+    public Event(String id, String title, String url, String organizer, String description,
+                 String holdDate, String holdEnd, String venues, String address, String img_url){
         this.id = id;
         this.title = title;
         this.url = url;
         this.organizer = organizer;
         this.description = description;
         this.holdDate = holdDate;
-        this.holdTime = holdTime;
+        this.holdEnd = holdEnd;
         this.venues = venues;
         this.address = address;
+        this.img_url = img_url;
     }
-    public int getID(){
+    public String getID(){
         return this.id;
     }
     public String getTitle(){
@@ -47,14 +50,17 @@ public class Event {
     public String getHoldDate(){
         return this.holdDate;
     }
-    public String getHoldTime(){
-        return this.holdTime;
+    public String getHoldEnd(){
+        return this.holdEnd;
     }
     public String getVenues(){
         return this.venues;
     }
     public String getAddress(){
         return this.address;
+    }
+    public String getImgUrl(){
+        return this.img_url;
     }
 
 //    @Exclude

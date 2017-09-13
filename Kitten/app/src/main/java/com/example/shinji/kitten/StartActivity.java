@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Criteria;
@@ -127,6 +128,11 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+
+
+
         setContentView(R.layout.activity_main);
 
         /* If you want to show the toolbar or actionbar
@@ -137,6 +143,20 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
             actionBar.setDisplayShowTitleEnabled(true);
         }
         */
+
+        SharedPreferences pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
+        boolean bool = pref.getBoolean("activity_executed",false);
+        if(!bool){
+            Intent intent = new Intent(this, IntroActivity.class);
+            startActivity(intent);
+//            finish();
+        }
+        SharedPreferences.Editor ed = pref.edit();
+        ed.putBoolean("activity_executed", true);
+        ed.apply();
+
+
+
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Start");
@@ -318,7 +338,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                                             // ※１
                                             // resultにはdoInBackgroundの返り値が入ります。
                                             // ここからAsyncTask処理後の処理を記述します。
-                                            Log.i("AsyncTaskCallback", "非同期処理が終了しました。");
+                                            Log.i("AsyncTaskCallback", "finished");
                                         }
 
                                         ByteArrayOutputStream baos = new ByteArrayOutputStream();

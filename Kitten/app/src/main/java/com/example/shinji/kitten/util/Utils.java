@@ -22,4 +22,6 @@ public class Utils {
     public static int getTabsHeight(Context context) {
         return (int) context.getResources().getDimension(R.dimen.tabsHeight);
     }
+
+    public static final String[] WEEK_NAME = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 }
