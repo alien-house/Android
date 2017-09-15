@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     buildToolsVersion '26.0.0'
     defaultConfig {
-        applicationId "com.example.shinji.kitten"
+        applicationId "com.alienhouse.kitten"
         minSdkVersion 25
         targetSdkVersion 26
         versionCode 1
@@ -20,6 +20,9 @@ android {
     compileOptions {
         sourceCompatibility
         targetCompatibility
+    }
+    packagingOptions {
+        exclude 'META-INF/rxjava.properties'
     }
 }
 
@@ -45,9 +48,11 @@ dependencies {
     compile 'com.android.support:cardview-v7:26.+'
 
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
+    compile 'com.github.alorma:github-sdk:3.2.5'
     compile 'com.airbnb.android:lottie:2.2.0'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     compile 'com.github.apl-devs:appintro:v4.2.2'
+
 }
 
 apply plugin: 'com.google.gms.google-services'

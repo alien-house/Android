@@ -16,7 +16,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.example.shinji.kitten.BaseActivity">
+        tools:context="com.alienhouse.kitten.BaseActivity">
 
       <android.support.design.widget.AppBarLayout
           android:layout_width="match_parent"
@@ -32,7 +32,7 @@
 
       </android.support.design.widget.AppBarLayout>
 
-        <com.example.shinji.kitten.NonSwipeableViewPager
+        <com.alienhouse.kitten.NonSwipeableViewPager
             android:id="@+id/containers"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

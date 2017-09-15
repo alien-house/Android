@@ -16,6 +16,10 @@
         android:icon="@drawable/ic_event"
         android:title="Event"/>
     <item
+        android:id="@+id/nav_onlinecourse"
+        android:icon="@drawable/ic_onlinecourse"
+        android:title="Online Course"/>
+    <item
         android:id="@+id/nav_setting"
         android:icon="@drawable/ic_settings_24dp"
         android:title="Setting"/>

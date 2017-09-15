@@ -12,4 +12,7 @@
   <color name="colorLightGray">#9f9f9f</color>
   <color name="colorGray">#777777</color>
   <color name="colorText">#1f1f1f</color>
+
+  <color name="colorTextBlack">#333333</color>
+  <color name="colorTextGray">#AAAAAA</color>
 </resources>

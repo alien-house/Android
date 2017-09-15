@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.example.shinji.kitten">
+          package="com.alienhouse.kitten">
 
   <uses-permission android:name="android.permission.INTERNET"/>
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -22,18 +22,18 @@
     <activity
         android:name=".SplashActivity"
         android:theme="@style/SplashTheme">
-      <!--<intent-filter>-->
-        <!--<action android:name="android.intent.action.MAIN" />-->
-        <!--<category android:name="android.intent.category.LAUNCHER" />-->
-      <!--</intent-filter>-->
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
     </activity>
 
     <activity android:name=".StartActivity"
               android:theme="@style/StartTheme"
               android:label="@string/app_name">
       <intent-filter>
-        <action android:name="android.intent.action.MAIN"/>
-        <category android:name="android.intent.category.LAUNCHER"/>
+        <!--<action android:name="android.intent.action.MAIN"/>-->
+        <!--<category android:name="android.intent.category.LAUNCHER"/>-->
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
       </intent-filter>
@@ -46,6 +46,8 @@
     </activity>
     <activity android:name=".BaseActivity"
               android:theme="@style/BgTheme">
+    </activity>
+    <activity android:name=".WebviewActivity">
     </activity>
 
   </application>
