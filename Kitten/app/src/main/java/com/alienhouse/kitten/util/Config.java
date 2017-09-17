@@ -5,11 +5,11 @@ package com.alienhouse.kitten.util;
  */
 
 public class Config {
+    public static String GOOGLEAPIS_KEY = "AIzaSyCOvdiOD-i_OlyLIjrN8fJQp96P3gFYX6Q";
+
     public static String GITHUB_ID = "5a71911fdeceb4d69eee";
     public static String GITHUB_SECRET = "718114c4f8b9ff50593707853cf8c3f61ba05c25";
     public static String CALLBACK_URL = "https://programming-473ea.firebaseapp.com/__/auth/handler";
-
-
 
     public static final String EVENTBRITE_URL_BASE = "https://www.eventbriteapi.com";
     public static final String EVENTBRITE_URL_API = "/v3/events/search/?";

@@ -2,16 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:gravity="center"
-              android:background="#ddd"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
-
 
   <LinearLayout
       android:orientation="vertical"
       android:gravity="center"
       android:layout_width="match_parent"
-      android:layout_height="300dp">
+      android:layout_height="320dp">
 
     <com.isseiaoki.simplecropview.CropImageView
         xmlns:custom="http://schemas.android.com/apk/res-auto"
@@ -45,11 +43,19 @@
         android:id="@+id/btnCancel"
         android:text="Cancel"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:textSize="@dimen/font_size_mini"
+        android:background="@drawable/btn_normal_gray"
+        style="@style/KittenButtonTextAppearance"/>
     <Button
         android:id="@+id/btnUpload"
         android:text="upload"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:textColor="#fff"
+        android:background="@drawable/btn_normal"
+        style="@style/KittenButtonTextAppearance"/>
   </LinearLayout>
 </LinearLayout>

@@ -43,7 +43,7 @@ public class OnlinecourseFragment extends Fragment {
         OnlinecourseListFragment onlinecourseListFragment = new OnlinecourseListFragment();
 //        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-        fragmentTransaction.addToBackStack(null);
+//        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.replace(R.id.onlinecourse_fragment, onlinecourseListFragment);
         fragmentTransaction.commit();
 

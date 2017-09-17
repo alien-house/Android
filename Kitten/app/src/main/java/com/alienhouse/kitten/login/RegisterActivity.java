@@ -127,7 +127,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                 usersRef = database.getReference("users/" + userData.userID);
                                 firebaseController.writeUserToData(usersRef);
                             }
-
+                            userData.username = username;
+                            Log.d(TAG, "User profile updated:username." + username);
                             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                     .setDisplayName(username)
                                     .build();
@@ -170,11 +171,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(RegisterActivity.this, "Authentication failed.",
+                            Toast.makeText(getApplicationContext(), "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         }
 
-                        progressDialog.hide();
+                        progressDialog.dismiss();
                     }
                 });
     }

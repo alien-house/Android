@@ -89,7 +89,7 @@ public class EventRecyclerAdapter extends RecyclerView.Adapter<EventRecyclerAdap
         }else{
             holder.event_image.setImageResource(R.drawable.noimage);
         }
-        System.out.println("一回だけやろうな！========"+position);
+//        System.out.println("一回だけやろうな！========"+position);
 
 
     }

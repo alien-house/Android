@@ -448,17 +448,19 @@ public class EventListFragment extends Fragment implements EventRecyclerAdapter.
         String url = "";
         String devStatus = "";
         String location = "";
-
-        if(!userData.location.matches("")){
-            location = userData.location;
+        if(userData.location != null){
+            if(userData.location.matches("")){
+                location = userData.location;
+            }
+        }
+        if(userData.devStatus != null){
+            if(userData.devStatus.matches("")){
+                devStatus = "Developer";
+            }else{
+                devStatus = userData.devStatus;
+            }
         }
         String url_locationWithQuery = "&location=" + location;
-
-        if(userData.devStatus.matches("")){
-            devStatus = "Developer";
-        }else{
-            devStatus = userData.devStatus;
-        }
         String url_queryWithQuery = "&text=" + devStatus;
 
         //https://www.eventbriteapi.com/v3/events/search/?q=ios developer&location.address=vancouver,bc&token=CVKT5QQJUJYOJDWX2KNX

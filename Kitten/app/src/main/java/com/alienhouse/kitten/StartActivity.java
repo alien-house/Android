@@ -115,7 +115,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
     private Button btnGithub;
     private WebView webView;
     private FirebaseController firebaseController;
-
+    private User userData;
 
     private DialogFragment dialogFragment;
     private FragmentManager flagmentManager;
@@ -123,16 +123,14 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
 //    private GithubApp mApp;
     private ProgressDialog progressDialog;
 
-    private static final String REDIRECT_URL_CALLBACK = "https://programming-473ea.firebaseapp.com/__/auth/handler";
-    public static String OAUTH_URL = "https://github.com/login/oauth/authorize";
-    public static String OAUTH_ACCESS_TOKEN_URL = "https://github.com/login/oauth/access_token";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+//        FirebaseAuth.getInstance().signOut();
 
+        //
         SharedPreferences pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
         boolean bool = pref.getBoolean("activity_executed",false);
         if(!bool){
@@ -154,56 +152,30 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         btnGithub = (Button) findViewById(R.id.btnGithub);
         btnRegisterTo.setOnClickListener(this);
 
-//        webView = findViewById(R.id.webview);
-//        webView.setBackgroundColor(0x00000000);
-//        webView.getSettings().setJavaScriptEnabled(true);
-//        webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-//        webView.setWebViewClient(new WebViewClient() {
-//            @Override
-//            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-//                Uri uri = Uri.parse(url);
-//                if (uri.getQueryParameter("code") != null
-//                        && uri.getScheme() != null
-//                        && uri.getScheme().equalsIgnoreCase("https")) {
-//
-//                    String code = uri.getQueryParameter("code");
-//                    String state = uri.getQueryParameter("state");
-//                    sendPost(code, state);
-//                    return true;
-//                }
-//                return super.shouldOverrideUrlLoading(view, url);
-//            }
-//        });
-
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                User userdata = FirebaseController.getUserData();
+                User userdata = firebaseController.getUserData();
                 if (user != null) {
                     // User is signed in
-//                    userdata.userID = user.getUid();
-                    FirebaseController.setUserToData(user);
+                    firebaseController.setUserToData(user);
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
 
                 } else {
                     // User is signed out
-                    FirebaseController.deleteUserData();
+                    firebaseController.deleteUserData();
                     Log.d(TAG, "onAuthStateChanged:signed_out");
 
                 }
             }
         };
 
-        // If login, go to tab contents
-/*
-*/
-//
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             System.out.println("^^onCreate:User is signed in");
-            User userdata = FirebaseController.getUserData();
+            User userdata = firebaseController.getUserData();
             if(userdata != null){
                 System.out.println("^^userdata:User aru");
                 gotoNextIntent();
@@ -214,14 +186,14 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
 
         //Called after the github server redirect us to REDIRECT_URL_CALLBACK
         Uri uri = getIntent().getData();
-        if (uri != null && uri.toString().startsWith(REDIRECT_URL_CALLBACK)) {
+        if (uri != null && uri.toString().startsWith(Config.CALLBACK_URL)) {
             String code = uri.getQueryParameter("code");
             String state = uri.getQueryParameter("state");
             if (code != null && state != null)
                 sendPost(code, state);
         }
 
-
+        // 1) Github : generating URL
         btnGithub.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -235,7 +207,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                         .addPathSegment("oauth")
                         .addPathSegment("authorize")
                         .addQueryParameter("client_id", Config.GITHUB_ID)
-                        .addQueryParameter("redirect_uri", REDIRECT_URL_CALLBACK)
+                        .addQueryParameter("redirect_uri", Config.CALLBACK_URL)
                         .addQueryParameter("state", getRandomString())
                         .addQueryParameter("scope", "user,user:email")
                         .build();
@@ -251,13 +223,11 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
             }
         });
 
-
-
         locationStart();
     }
 
 
-
+    // 3) Github : requesting token
     private void sendPost(String code, String state) {
         //POST https://github.com/login/oauth/access_token
         System.out.println("sendPostきtア？");
@@ -266,7 +236,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                 .add("client_id", Config.GITHUB_ID)
                 .add("client_secret", Config.GITHUB_SECRET)
                 .add("code", code)
-                .add("redirect_uri", REDIRECT_URL_CALLBACK)
+                .add("redirect_uri", Config.CALLBACK_URL)
                 .add("state", state)
                 .build();
         okhttp3.Request request = new okhttp3.Request.Builder()
@@ -294,6 +264,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         });
     }
 
+    // 5) Github :  auth using token
     public void signInWithToken(String token) {
         Log.d(TAG, "signInWithToken:" + token);
         AuthCredential credential = GithubAuthProvider.getCredential(token);
@@ -308,64 +279,102 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                             Log.w(TAG, "signInWithCredential", task.getException());
                             Toast.makeText(StartActivity.this, "GitHub Authentication failed.", Toast.LENGTH_SHORT).show();
                         }else{
+                            //ここで初めてfirebaseのユーザーが取れる。
                             FirebaseUser user = mAuth.getCurrentUser();
-                            User userData = firebaseController.getUserData();
-                            final String userIDRes = userData.userID;
-                            userData.userID = userIDRes;
-                            if(userData != null){
-                                Log.d(TAG, "isSuccessful:" + userData.userID);
-                                usersRef = database.getReference("users/" + userData.userID);
-                                firebaseController.writeUserToData(usersRef);
 
-                                // save images
-                                GetImageTaskUpload myTask = new GetImageTaskUpload();
-                                myTask.setOnCallBack(new GetImageTaskUpload.CallBackTask(){
+                            //ここでfirebase Auth と databaseの同期する：githubの場合
+                            usersRef = database.getReference("users/" + user.getUid());
+                            firebaseController.getUserDataOnceEventListener(usersRef);
+                            Log.d(TAG, "FirebaseUser写真URL取れてる？:" + user.getPhotoUrl());
 
-                                    @Override
-                                    public void CallBack(Bitmap bitmap) {
-                                        super.CallBack(bitmap);
-                                        if(bitmap == null){
-                                            Log.i("AsyncTaskCallback", "Error happend");
-                                        }else{
-                                            // ※１
-                                            // resultにはdoInBackgroundの返り値が入ります。
-                                            // ここからAsyncTask処理後の処理を記述します。
-                                            Log.i("AsyncTaskCallback", "finished");
-                                        }
+                            firebaseController.setOnCallBackNormal(new FirebaseController.CallBackTaskNormal(){
+                            @Override
+                            public void CallBack() {
+                                super.CallBack();
+                                Log.d("BaseActivity:", "CallBack: " + "多分終わらん＝＝＝＝＝＝＝＝");
 
-                                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
-                                        byte[] data = baos.toByteArray();
+                                userData = firebaseController.getUserData();
+                                //ここでコールバックしないと、時差がある。。
 
-                                        StorageReference userImagesRef = storageRef.child("images/" + userIDRes + "/profile.jpg");
-                                        UploadTask uploadTask = userImagesRef.putBytes(data);
-                                        uploadTask.addOnFailureListener(new OnFailureListener() {
+                                final String userIDRes = userData.userID;
+                                Log.d(TAG, "userData写真URL取れてる？:" + userData.photourl);
+                                Log.d(TAG, "userData写真URL取れてる？:" + userData.created);
+                                userData.userID = userIDRes;
+                                if(userData != null){
+                                    Log.d(TAG, "isSuccessful:" + userData.userID);
+
+                                    if(userData.created == 0){
+                                        // save images
+                                        Log.i("signInWithCredential", "一回だけですよ〜");
+                                        GetImageTaskUpload myTask = new GetImageTaskUpload();
+                                        myTask.setOnCallBack(new GetImageTaskUpload.CallBackTask(){
+
                                             @Override
-                                            public void onFailure(@NonNull Exception exception) {
-                                                // Handle unsuccessful uploads
-                                                System.out.println("onFailure:Handle unsuccessful uploads");
-                                            }
-                                        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                            @Override
-                                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                                System.out.println("onSuccess:UploadTask");
-                                                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                                                @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                                            public void CallBack(Bitmap bitmap) {
+                                                super.CallBack(bitmap);
+                                                if(bitmap == null){
+                                                    Log.i("AsyncTaskCallback", "Error happend");
+                                                }else{
+                                                    Log.i("AsyncTaskCallback", "finished");
+                                                }
+
+                                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                                bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
+                                                byte[] data = baos.toByteArray();
+
+                                                StorageReference userImagesRef = storageRef.child("images/" + userIDRes + "/profile.jpg");
+                                                UploadTask uploadTask = userImagesRef.putBytes(data);
+                                                uploadTask.addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception exception) {
+                                                        // Handle unsuccessful uploads
+                                                        System.out.println("onFailure:Handle unsuccessful uploads");
+                                                    }
+                                                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                    @Override
+                                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                        System.out.println("onSuccess:UploadTask");
+                                                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                                                        @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                                                    }
+                                                });
                                             }
                                         });
-
+                                        myTask.execute(userData.photourl);
+                                        locationSave();
                                     }
+                                    userData.created = 1;
 
-                                });
-                                progressDialog.dismiss();
-                                myTask.execute(userData.photourl);
-                                gotoNextIntent();
+                                    firebaseController.writeUserToData(usersRef);
+                                    progressDialog.dismiss();
+                                    gotoNextIntent();
+                                }
+
                             }
+                            });
+
                         }
                     }
                 });
     }
 
+    private void locationSave(){
+
+        //とりあえずここで保存：国と市のため　初回のみ
+        if(!User.USER_COUNTRY.matches("")) {
+            userData.country = User.USER_COUNTRY;
+        }
+        if(!User.USER_LOCATION.matches("")) {
+            userData.location = User.USER_LOCATION;
+        }
+        if(!Double.isNaN(User.USER_LAT)) {
+            userData.lat = User.USER_LAT;
+            userData.lon = User.USER_LON;
+        }
+
+    }
+
+    // 4) Github :  get username by token
     private void requestGitHubUserData( final String accessToken ){
         System.out.println("requestGitHubUserData=====");
         GetAuthUserClient getAuthUserClient = new GetAuthUserClient( accessToken );
@@ -373,22 +382,28 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                 .observable()
                 .subscribe(new Observer<com.alorma.github.sdk.bean.dto.response.User>() {
                     @Override
-                    public void onCompleted() {}
-
+                    public void onCompleted() {
+                        System.out.println("requestGitH:onCompleted=====");
+                    }
                     @Override
                     public void onError(Throwable e) {
-
                         System.out.println("requestGitH:Throwable=====");
                         FirebaseCrash.report( e );
                     }
 
                     @Override
                     public void onNext(com.alorma.github.sdk.bean.dto.response.User user) {
+                        System.out.println("requestGitH:onNext=====");
+                        // todo: ここでユーザーデータ取れてないんじゃないの？
+//                        User userData = firebaseController.getUserData();
+//                        userData.username = user.name;
+                        System.out.println("requestGitH:name====="+user.name);
+                        System.out.println("requestGitH:avatar_url====="+user.avatar_url);
+                        System.out.println("requestGitH:email====="+user.email);
+                        System.out.println("requestGitH:bio====="+user.bio);
+                        System.out.println("requestGitH:location====="+user.location);
                         System.out.println("requestGitH:accessToken====="+accessToken);
                         signInWithToken(accessToken);
-                        System.out.println("requestGitH:onNext=====");
-                        User userData = firebaseController.getUserData();
-                        userData.username = user.name;
 //                        userData.email = user.email;
 //                        usersRef = database.getReference("users/" + userData.userID);
 //                        firebaseController.writeUserToData(usersRef);
@@ -405,10 +420,8 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
             // 使用が許可された
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Log.d("debug","checkSelfPermission true");
-
                 locationStart();
                 return;
-
             } else {
                 // それでも拒否された時の対応
                 Toast toast = Toast.makeText(this, "It might not get a data appropriately.", Toast.LENGTH_SHORT);
@@ -418,9 +431,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void locationStart(){
-
         Log.d("debug","locationStart()");
-
         // LocationManager インスタンス生成
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
@@ -449,31 +460,6 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         mQueue = Volley.newRequestQueue(this);
 
     }
-
-//
-//    public void signIn(String email, String password){
-//
-//        if (!validateForm()) {
-//            return;
-//        }
-//
-//        System.out.println("アッレレレ");
-//        mAuth.signInWithEmailAndPassword(email, password)
-//                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<AuthResult> task) {
-//                        Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
-//
-//                        if (!task.isSuccessful()) {
-//                            Log.w(TAG, "signInWithEmail:failed", task.getException());
-//                            Toast.makeText(StartActivity.this, "auth_failed",
-//                                    Toast.LENGTH_SHORT).show();
-//                        }
-//
-//                    }
-//                });
-//    }
-
 
     @Override
     public void onClick(View v) {
@@ -514,18 +500,12 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
     public void onLocationChanged(Location location) {
         locationManager.removeUpdates(this);
         Log.d("onLocation--======--", "onLocationChanged");
-        // 緯度の表示
-//        textView1.setText("Latitude:"+location.getLatitude());
-
-        // 経度の表示
-//        textView2.setText("Longit:"+location.getLongitude());
-        Log.d("onLocationChanged:", "onLocationChanged==============");
         User.USER_LAT = location.getLatitude();
         User.USER_LON = location.getLongitude();
 
         String url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" +
                 location.getLatitude() + "," + location.getLongitude() +
-                "&key=AIzaSyCOvdiOD-i_OlyLIjrN8fJQp96P3gFYX6Q";
+                "&key=" + Config.GOOGLEAPIS_KEY;
 
         JsonObjectRequest jsonObjectReq = new JsonObjectRequest(
                 Request.Method.GET, url,
@@ -535,17 +515,11 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                         Log.d("onResponse::","====================");
 //                        Log.d(LOG_TAG, response.toString());
                         try {
-//                            Log.d(LOG_TAG, "Value: " + response.getString("query"));
                             JSONArray itemArray = response.getJSONArray("results");
                             JSONObject rootObject = itemArray.getJSONObject(0);
-
                             JSONArray location_array = rootObject.getJSONArray("address_components");
-
                             Log.d(LOG_TAG, "results****: " + location_array);
-
-//                            rootObject["address_components"];
                             makeDataToListview(location_array);
-
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -555,7 +529,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d("error::","~~~~~~~~~~~~~~~~~~~~~~");
+                        Log.d("error:googleapis:","~~~~~~~~~~~~~~~~~~~~~~");
                         Log.d(LOG_TAG, error.toString());
 //                        progressDialog.dismiss();
                     }
@@ -570,11 +544,9 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
 //                Log.d("location", addresses.get(0).toString());
 //                Log.d("location", addresses.get(0).getCountryCode().toString());
 //            } catch (IOException e) {
-//                Log.d("onLocationChanged:", "IOException==============");
 //                e.printStackTrace();
 //            }
 //        };
-        Log.d("onLocationChanged:", "@@==============");
 
     }
 
@@ -601,22 +573,21 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
     public void onProviderDisabled(String s) {
     }
 
-
+    // getting country from location with googleapis : coz GPS doesn't work on emulater
     public void makeDataToListview(JSONArray rootObject){
-        System.out.println("=========makeDataToListview=========");
         ArrayList<LocationData> locationDatas = new ArrayList();
-
-        String test = null;
+        String rootObjString = null;
         try {
             for (int i = 0 ; i < rootObject.length(); i++) {
-                test = rootObject.getString(i);
-                LocationData ld = new Gson().fromJson(test, LocationData.class);
+                rootObjString = rootObject.getString(i);
+                LocationData ld = new Gson().fromJson(rootObjString, LocationData.class);
                 locationDatas.add(ld);
-                Log.d(LOG_TAG, "ldmaktview****: " + ld.types[0] );
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        //set country
         String[] string = {"country"};
         LocationData l = new LocationData("", "", string);
         Collections.sort(locationDatas, LocationData.getLocationDataComparable());
@@ -624,18 +595,15 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         User.USER_COUNTRY = locationDatas.get(index).short_name;
         Log.d(LOG_TAG, "indexindex: " + locationDatas.get(index).short_name);
 
-        System.out.println(User.USER_COUNTRY);
-
-
+        //set locality
         String[] stringCity = {"locality"};
         LocationData lstringCity = new LocationData("", "", stringCity);
         int indexCity = Collections.binarySearch(locationDatas, lstringCity);
         User.USER_LOCATION = locationDatas.get(indexCity).short_name;
-        System.out.println(User.USER_LOCATION);
-        System.out.println(locationDatas.get(indexCity).short_name);
+//        System.out.println(User.USER_LOCATION);
+//        System.out.println(locationDatas.get(indexCity).short_name);
 
     }
-
 
     private void gotoNextIntent(){
         Intent nextItent;
@@ -648,13 +616,11 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         return new BigInteger(130, random).toString(32);
     }
 
-
-
+    // 2) Github : show web for connecting with Github
     public static class AlertDialogFragment extends DialogFragment {
 
         private AlertDialog dialog;
         private AlertDialog.Builder alert;
-        //        private ImageView bag1;
         private CropImageView cropImageView;
         private Button btnCancel;
         private Button btnUpload;
@@ -670,9 +636,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
             alert = new AlertDialog.Builder(getActivity());
 //            alert.setTitle("Are you going to upload this image?");
 
-            // カスタムレイアウトの生成
             View alertView = getActivity().getLayoutInflater().inflate(R.layout.dialog_login_web_layout, null);
-
             WebView webview = alertView.findViewById(R.id.webview);
             webview.loadUrl(httpUrl.toString());
 

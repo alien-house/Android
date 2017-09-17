@@ -3,6 +3,7 @@ package com.alienhouse.kitten.dashboard;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -55,6 +56,8 @@ import com.isseiaoki.simplecropview.callback.SaveCallback;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -94,6 +97,13 @@ public class SettingInfoFragment extends Fragment {
     private static Bitmap.CompressFormat mCompressFormat = Bitmap.CompressFormat.JPEG;
     private static Uri mSourceUri = null;
     private static RectF mFrameRect = null;
+    private static boolean isImgChanged = false;
+    private Uri photourl;
+
+    public interface SettingInfoFragmentInterface{
+        void onSavedImage(boolean isImgChanged);
+    }
+    public SettingInfoFragmentInterface settingInfoFragmentInterface;
 
     @Nullable
     @Override
@@ -144,6 +154,17 @@ public class SettingInfoFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        settingInfoFragmentInterface = (SettingInfoFragmentInterface) context;
+    }
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        settingInfoFragmentInterface = null;
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
@@ -156,6 +177,7 @@ public class SettingInfoFragment extends Fragment {
             if(uri != null){
                 GetImageTask myTask = new GetImageTask(profileImg);
                 myTask.execute(uri.toString());
+//                userData.photourl = uri.toString();
             }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -229,7 +251,7 @@ public class SettingInfoFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 FirebaseAuth.getInstance().signOut();
-                firebaseController.isFistLoad = false;
+//                firebaseController.isFistLoad = false;
                 Intent nextItent;
                 nextItent = new Intent(getActivity(), StartActivity.class);
                 startActivity(nextItent);
@@ -303,11 +325,12 @@ public class SettingInfoFragment extends Fragment {
                 progressDialog.dismiss();
             }
         });
-
         FirebaseUser user = mAuth.getCurrentUser();
+
         //change display name
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                 .setDisplayName(userData.username)
+                .setPhotoUri(Uri.parse(userData.photourl))
                 .build();
         user.updateProfile(profileUpdates)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -318,6 +341,8 @@ public class SettingInfoFragment extends Fragment {
                         }
                     }
                 });
+
+        settingInfoFragmentInterface.onSavedImage(isImgChanged);
 
         // change email
         if(!user.getEmail().matches(userData.email)){
@@ -331,13 +356,8 @@ public class SettingInfoFragment extends Fragment {
                         }
                     });
         }
+        isImgChanged = false;
     }
-
-
-
-
-
-
 
 
     public static class AlertDialogFragment extends DialogFragment {
@@ -408,11 +428,12 @@ public class SettingInfoFragment extends Fragment {
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         System.out.println("onSuccess:CropUploadTask");
                         getDialog().dismiss();
+                        isImgChanged = true;
                         // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
                         @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                        userData.photourl = downloadUrl.toString();
                     }
                 });
-
             }
 
             @Override public void onError(Throwable e) {
@@ -459,7 +480,7 @@ public class SettingInfoFragment extends Fragment {
                 AlertDialogFragment dialogFragment = AlertDialogFragment.newInstance();
 //                dialogFragment = new AlertDialogFragment();
                 flagmentManager = getFragmentManager();
-                dialogFragment.show(flagmentManager, "test alert dialog");
+                dialogFragment.show(flagmentManager, " alert dialog");
 //                dialogFragment.setImage(img);
 
             } catch (Exception e) {

@@ -36,7 +36,7 @@ public class FirebaseController {
     private ValueEventListener devStatusDataListener = null;
     private CallBackTask callbacktask;
     private CallBackTaskNormal callbacktaskNormal;
-    public boolean isFistLoad = true;
+//    public boolean isFistLoad = true;
     private ValueEventListener getUserOnceListener;
 
     private static FirebaseController firebaseController;
@@ -67,60 +67,42 @@ public class FirebaseController {
 
     public static void setUserToData(FirebaseUser user) {
         System.out.println("^^setUserToData:FirebaseUser");
-            if (user != null) {
-                if(firebaseController.userData == null){
-                    createUserToData(user);
-                }
-                firebaseController.userData.userID = user.getUid();
-                if(user.getDisplayName() != null) {
-                    firebaseController.userData.username = user.getDisplayName();
-                }
-                firebaseController.userData.email = user.getEmail();
-                if(user.getPhotoUrl() != null) {
-                    firebaseController.userData.photourl = user.getPhotoUrl().toString();
-                }
+        if (user != null) {
+            if(firebaseController.userData == null){
+                createUserToData(user);
             }
-
+            firebaseController.userData.userID = user.getUid();
+            if(user.getDisplayName() != null) {
+                firebaseController.userData.username = user.getDisplayName();
+            }
+            firebaseController.userData.email = user.getEmail();
+            if(user.getPhotoUrl() != null) {
+                System.out.println("勝手にsetUserToData:githubの画像URLがすとく？"+user.getPhotoUrl().toString());
+                firebaseController.userData.photourl = user.getPhotoUrl().toString();
+            }
+        }
     }
-
-//    public static void writeFavDatabase(DatabaseReference usersFavRef){
-//
-//        userData.username = nameEdit.getText().toString();
-//        String key = usersRef.push().getKey();
-//        Map<String, Object> postValues = userData.toMap();
-//        usersFavRef.updateChildren(postValues, new DatabaseReference.CompletionListener() {
-//            @Override
-//            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-//                if (databaseError != null) {
-//                    System.out.println("Data could not be saved " + databaseError.getMessage());
-//                } else {
-//                    System.out.println("Data saved successfully.");
-//                }
-//                pd.hide();
-//            }
-//        });
-//    }
 
     public static void createUserToData(FirebaseUser user) {
         String imgurl = null;
         if(user.getPhotoUrl() != null){
             imgurl = user.getPhotoUrl().toString();
+            System.out.println("勝手にgithubの画像URLがすとく？"+imgurl);
         }
-        firebaseController.userData = new User(
-                user.getUid(),
-                user.getDisplayName(),
-                "",
-                user.getEmail(),
-                "",
-                "",
-                "",
-                imgurl,
-                ""
-        );
+        //for initilaze
+        firebaseController.userData = new User();
+        firebaseController.userData.userID = user.getUid();
+        firebaseController.userData.username = user.getDisplayName();
+        firebaseController.userData.devStatus = "Web Developer";
+        firebaseController.userData.email = user.getEmail();
+        firebaseController.userData.bio = "";
+        firebaseController.userData.location = "Vancouver";
+        firebaseController.userData.url = "";
+        firebaseController.userData.country = "";
+        firebaseController.userData.photourl = imgurl;
     }
 
     public static void getUserDataEventListener(DatabaseReference usersRef) {
-
         if(firebaseController.userListener != null){
             usersRef.removeEventListener(firebaseController.userListener);
         }
@@ -137,26 +119,28 @@ public class FirebaseController {
                     }
 
                     if(dataSnapshot != null){
-                        // This method is called once with the initial value and again whenever data at this location is updated.
                         User usersValue = dataSnapshot.getValue(User.class);
                         //                String[] array = {};
                         //                array = devStatusValue.split(",", 0);
                         //                devStatusArray = Arrays.asList(array);
                         System.out.println(usersValue);
 
+                        if(usersValue != null) {
 //                    firebaseController.userData.userID = usersValue.userID;
 //                    firebaseController.userData.username = usersValue.username;
-                        firebaseController.userData.devStatus = usersValue.devStatus;
+                            firebaseController.userData.devStatus = usersValue.devStatus;
 //                    firebaseController.userData.email = usersValue.email;
-                        firebaseController.userData.bio = usersValue.bio;
-                        firebaseController.userData.location = usersValue.location;
-                        firebaseController.userData.url = usersValue.url;
-                        firebaseController.userData.country = usersValue.country;
-                        firebaseController.userData.lat = usersValue.lat;
-                        firebaseController.userData.lon = usersValue.lon;
-                        System.out.println(firebaseController.userData.country);
-                        //                userData.role = usersValue.getProperty('devStatus');
+                            firebaseController.userData.bio = usersValue.bio;
+                            firebaseController.userData.location = usersValue.location;
+                            firebaseController.userData.url = usersValue.url;
+                            firebaseController.userData.country = usersValue.country;
+                            firebaseController.userData.lat = usersValue.lat;
+                            firebaseController.userData.lon = usersValue.lon;
+                            //                userData.role = usersValue.getProperty('devStatus');
 //                        firebaseController.callbacktask.CallBack(usersValue.location, usersValue.devStatus);
+                        }
+                    }else{
+                        FirebaseAuth.getInstance().signOut();
                     }
                     //nullでもなくっても
 
@@ -201,21 +185,25 @@ public class FirebaseController {
                     // This method is called once with the initial value and again whenever data at this location is updated.
                     User usersValue = dataSnapshot.getValue(User.class);
                     System.out.println(usersValue);
-
-                    firebaseController.userData.devStatus = usersValue.devStatus;
-//                    firebaseController.userData.email = usersValue.email;
-                    firebaseController.userData.bio = usersValue.bio;
-                    firebaseController.userData.location = usersValue.location;
-                    firebaseController.userData.url = usersValue.url;
-                    firebaseController.userData.country = usersValue.country;
-                    firebaseController.userData.lat = usersValue.lat;
-                    firebaseController.userData.lon = usersValue.lon;
-                    System.out.println(firebaseController.userData.country);
-                    //                userData.role = usersValue.getProperty('devStatus');
-//                    if(firebaseController.isFistLoad){
-//                        firebaseController.callbacktask.CallBack();
-//                        firebaseController.isFistLoad = false;
-//                    }
+                    if(usersValue != null){
+                        firebaseController.userData.devStatus = usersValue.devStatus;
+    //                    firebaseController.userData.email = usersValue.email;
+                        firebaseController.userData.bio = usersValue.bio;
+                        firebaseController.userData.location = usersValue.location;
+                        firebaseController.userData.url = usersValue.url;
+                        firebaseController.userData.country = usersValue.country;
+                        firebaseController.userData.created = usersValue.created;
+                        firebaseController.userData.lat = usersValue.lat;
+                        firebaseController.userData.lon = usersValue.lon;
+                        System.out.println(firebaseController.userData.country);
+                        //                userData.role = usersValue.getProperty('devStatus');
+    //                    if(firebaseController.isFistLoad){
+    //                        firebaseController.callbacktask.CallBack();
+    //                        firebaseController.isFistLoad = false;
+    //                    }
+                    }else{
+                        FirebaseAuth.getInstance().signOut();
+                    }
                 }
 
                 System.out.println("=====firebaseController.callbacktask====");

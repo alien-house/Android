@@ -44,7 +44,7 @@ public class FavoriteFragment extends Fragment {
         FavoriteListFragment favoriteListFragment = new FavoriteListFragment();
 //        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-        fragmentTransaction.addToBackStack(null);
+//        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.replace(R.id.favorite_fragment, favoriteListFragment);
 //        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();

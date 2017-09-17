@@ -45,7 +45,7 @@ public class SettingFragment extends Fragment {
         SettingInfoFragment settingInfoFragment = new SettingInfoFragment();
 //        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-        fragmentTransaction.addToBackStack(null);
+//        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.replace(R.id.setting_fragment, settingInfoFragment);
         fragmentTransaction.commit();
 

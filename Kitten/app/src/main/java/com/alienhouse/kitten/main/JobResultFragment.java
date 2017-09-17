@@ -136,8 +136,6 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
         listViewRecycle.setLayoutManager(layoutManager);
         listViewRecycle.setHasFixedSize(true);
 
-
-
         /**/
         slidingLayout = view.findViewById(R.id.sliding_layout);
         radioJobtypeGroup = view.findViewById(R.id.radioJobType);
@@ -595,4 +593,8 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
             url_co = "&co=us";
         }
     }
+
+
+
+
 }

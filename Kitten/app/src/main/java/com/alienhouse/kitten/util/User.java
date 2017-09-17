@@ -10,8 +10,9 @@ import java.util.Map;
  */
 
 public class User {
-    public String userID,username,role,devStatus,email,bio,location,url,photourl,country = "";
+    public String userID,username,devStatus,email,bio,location,url,photourl,country = "";
     public double lat,lon = 0.0;
+    public int created = 0;
     //,comapny,lindkedin,twitter,github,facebook,dribbble
     public static String USER_COUNTRY = "";
     public static String USER_LOCATION = "";
@@ -22,17 +23,17 @@ public class User {
         // Default constructor required for calls to DataSnapshot.getValue(Post.class)
     }
 
-    public User(String userID, String username, String devStatus, String email, String bio, String location, String url, String photourl, String country) {
-        this.userID = userID;
-        this.username = username;
-        this.devStatus = devStatus;
-        this.email = email;
-        this.bio = bio;
-        this.location = location;
-        this.url = url;
-        this.photourl = photourl;
-        this.country = country;
-    }
+//    public User(String userID, String username, String devStatus, String email, String bio, String location, String url, String photourl, String country) {
+//        this.userID = userID;
+//        this.username = username;
+//        this.devStatus = devStatus;
+//        this.email = email;
+//        this.bio = bio;
+//        this.location = location;
+//        this.url = url;
+//        this.photourl = photourl;
+//        this.country = country;
+//    }
 
     @Exclude
     public Map<String, Object> toMap() {
@@ -46,6 +47,7 @@ public class User {
         result.put("country", country);
         result.put("lat", lat);
         result.put("lon", lon);
+        result.put("created", created);
 
         return result;
     }

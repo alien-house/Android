@@ -14,6 +14,7 @@ import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -39,6 +40,7 @@ import android.widget.TextView;
 
 import com.alienhouse.kitten.dashboard.GetImageTask;
 import com.alienhouse.kitten.dashboard.SettingFragment;
+import com.alienhouse.kitten.dashboard.SettingInfoFragment;
 import com.alienhouse.kitten.favorite.FavoriteFragment;
 import com.alienhouse.kitten.main.JobFragment;
 import com.alienhouse.kitten.main.JobSearchFragment;
@@ -62,7 +64,9 @@ import java.util.List;
  */
 //https://github.com/delaroy/MaterialTabs
 
-public class BaseActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener,NavigationView.OnNavigationItemSelectedListener  {
+public class BaseActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener,
+        NavigationView.OnNavigationItemSelectedListener,
+        SettingInfoFragment.SettingInfoFragmentInterface{
 
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference usersRef;
@@ -131,64 +135,97 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         usersRef = database.getReference("users/" + userData.userID);
 
 
-        usersRef = database.getReference("users/" + userData.userID);
-        firebaseController.getUserDataOnceEventListener(usersRef);
-        firebaseController.setOnCallBackNormal(new FirebaseController.CallBackTaskNormal(){
-            @Override
-            public void CallBack() {
-                super.CallBack();
-                Log.d("BaseActivity:", "CallBack: " + "多分終わらん＝＝＝＝＝＝＝＝");
-                System.out.println("BaseActivity:" + userData.username);
-                System.out.println("BaseActivity:" + userData.country);
-                System.out.println("BaseActivity:" + userData.bio);
-                System.out.println("BaseActivity:" + userData.userID);
-//                mViewPager.setAdapter(mSectionPageAdapter);
-//                setupViewPager(mViewPager);
-                //とりあえずここで保存：国と市のため
-                if(!User.USER_COUNTRY.matches("")) {
-                    userData.country = User.USER_COUNTRY;
-                }
-                if(!User.USER_LOCATION.matches("")) {
-                    userData.location = User.USER_LOCATION;
-                }
-                if(!Double.isNaN(User.USER_LAT)) {
-                    userData.lat = User.USER_LAT;
-                    userData.lon = User.USER_LON;
+        progressDialog.dismiss();
+        //ユーザーデータセット後にやったほうがいい。取得できなくても帰って来るはずなのんで。
+        firstPage();
 
-                }
-                System.out.println("BaseActivity-----------");
-                System.out.println(User.USER_COUNTRY);
-                System.out.println(User.USER_LOCATION);
-                System.out.println(userData.country);
-                System.out.println(userData.location);
-                System.out.println(userData.lat);
-                System.out.println(userData.lon);
-                firebaseController.writeUserToData(usersRef);
-                firebaseController.getUserDataEventListener(usersRef);//終わった後に木灰する？
-                progressDialog.dismiss();
-                //ユーザーデータセット後にやったほうがいい。取得できなくても帰って来るはずなのんで。
-                firstPage();
+        firebaseController.getUserDataEventListener(usersRef);//終わった後に木灰する？
+        System.out.println("userImagesRef:userData.photourl "+userData.photourl);
+        System.out.println("userImagesRef:userData.userID "+userData.userID);
+        System.out.println("userImagesRef:userData.userID "+userData.userID);
 
-                StorageReference userImagesRef = storageRef.child("images/" + userData.userID + "/profile.jpg");
-                userImagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        System.out.println("BaseActivity**"+uri);
-                        if(uri != null){
-                            GetImageTask myTask = new GetImageTask(profileSideImg);
-                            myTask.execute(uri.toString());
-                        }
-                }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        System.out.println("userImagesRef :: onFailure");
+        setSideImage(true);
+//        GetImageTask myTask = new GetImageTask(profileSideImg);
+//        myTask.execute(userData.photourl);
+
+
+
+//        StorageReference userImagesRef = storageRef.child("images/" + userData.userID + "/profile.jpg");
+//        System.out.println("userImagesRef:userData.userID "+userData.userID);
+//        userImagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+//            @Override
+//            public void onSuccess(Uri uri) {
+//                System.out.println("BaseActivity**"+uri);
+//                if(uri != null){
+//                    GetImageTask myTask = new GetImageTask(profileSideImg);
+//                    myTask.execute(uri.toString());
+//                }
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception exception) {
+//                System.out.println("userImagesRef :: onFailure");
+//            }
+//        });
+
+
+//        firebaseController.setOnCallBackNormal(new FirebaseController.CallBackTaskNormal(){
+//            @Override
+//            public void CallBack() {
+//                super.CallBack();
+//                Log.d("BaseActivity:", "CallBack: " + "多分終わらん＝＝＝＝＝＝＝＝");
+//                System.out.println("BaseActivity:" + userData.username);
+//                System.out.println("BaseActivity:" + userData.country);
+//                System.out.println("BaseActivity:" + userData.bio);
+//                System.out.println("BaseActivity:" + userData.userID);
+////                mViewPager.setAdapter(mSectionPageAdapter);
+//                System.out.println("BaseActivity-----------");
+//                System.out.println(User.USER_COUNTRY);
+//                System.out.println(User.USER_LOCATION);
+//                System.out.println(userData.country);
+//                System.out.println(userData.location);
+//                System.out.println(userData.lat);
+//                System.out.println(userData.lon);
+//                firebaseController.writeUserToData(usersRef);
+//
+//            }
+//        });
+
+    }
+
+
+    public void setSideImage(boolean isImgChanged){
+        if(isImgChanged){
+
+            StorageReference userImagesRef = storageRef.child("images/" + userData.userID + "/profile.jpg");
+            userImagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    System.out.println(uri);
+                    if(uri != null){
+                        System.out.println("userImagesRef:userData.uri " + uri.toString());
+                        GetImageTask myTask = new GetImageTask(profileSideImg);
+                        myTask.execute(uri.toString());
                     }
-                });
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    System.out.println("userImagesRef :: onFailure");
+                }
+            });
+        }
 
-            }
-        });
+        nhName.setText(userData.username);
+        nhEmail.setText(userData.email);
 
+
+    }
+
+    @Override
+    public void onSavedImage(boolean isImgChanged) {
+        System.out.println("onSavedImage--------:" + isImgChanged);
+        setSideImage(isImgChanged);
     }
 
     @Override
@@ -201,106 +238,39 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         mViewPager = findViewById(R.id.containers);
         mViewPager.setOffscreenPageLimit(2);
         pagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+
         mViewPager.setAdapter(pagerAdapter);
-//        setupViewPager(mViewPager);
-//
-//        JobSearchFragment fragment = new JobSearchFragment();
-//        FragmentManager fragmentManager = getSupportFragmentManager();
-//        fragmentManager.beginTransaction().replace(R.id.containers, fragment).commit();
+
     }
-
-
-    private void setupViewPager(ViewPager viewPager){
-        String[] nameNames = {"Job","Favorite",/*"Onlinecourse","Learning",*/"Setting"};
-        SectionPageAdapter adapter = new SectionPageAdapter(getSupportFragmentManager());
-        adapter.addFragment(new JobFragment(), nameNames[0]);
-        adapter.addFragment(new FavoriteFragment(), nameNames[1]);
-        adapter.addFragment(new SettingFragment(), nameNames[2]);
-//        adapter.addFragment(new SettingFragment(), nameNames[3]);
-//        adapter.addFragment(new SettingFragment(), nameNames[4]);
-        viewPager.setAdapter(adapter);
-
-//        tabLayout = (TabLayout) findViewById(R.id.tabs);
-//        TabLayout.Tab tab = tabLayout.newTab();
-//        tab.setCustomView(R.layout.custom_tab);
-//        tab.setText("Tab 1");
-//        tab.setIcon(R.drawable.ic_adjust_24dp);
-//        tabLayout.addTab(tab);
-
-//        tabLayout.setupWithViewPager(mViewPager);
-//        setTabs(nameNames);
-//        tabLayout.getTabAt(0).setCustomView(R.layout.custom_tab);
-//        View tabviews = tabLayout.getTabAt(0).getCustomView();
-//        TextView tabTxtView = tabviews.findViewById(R.id.tabContent);
-//        ImageView tabImageView = tabviews.findViewById(R.id.tabIcon);
-//        tabTxtView.setText("Job");
-//        tabImageView.setImageResource(R.drawable.ic_business_center_24dp);
-
-//        tabLayout.getTabAt(0).setIcon(R.drawable.ic_business_center_24dp);
-//        tabLayout.getTabAt(1).setIcon(R.drawable.ic_favorite_24dp);
-//        tabLayout.getTabAt(2).setIcon(R.drawable.ic_settings_24dp);
-
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                selected = position;
-            }
-            @Override
-            public void onPageSelected(int position) {
-                selected = position;
-            }
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-    }
-
-//    public void setTabs(String[] tabName){
-//        int[] iconsName = {
-//                R.drawable.ic_business_center_24dp,
-//                R.drawable.ic_favorite_24dp,
-//                R.drawable.ic_settings_24dp
-//        };
-//        int maxNum = tabName.length;
-//        for (int i = 0; i < maxNum; i++){
-//            tabLayout.getTabAt(i).setCustomView(R.layout.custom_tab);
-//            View tabview2 = tabLayout.getTabAt(i).getCustomView();
-//            TextView tabTxtView = tabview2.findViewById(R.id.tabContent);
-//            ImageView tabImageView = tabview2.findViewById(R.id.tabIcon);
-//            tabTxtView.setText(tabName[i]);
-//            tabImageView.setImageResource(iconsName[i]);
-//        }
-//    }
 
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
     }
 
-    // 戻るボタン
-//    @Override
-//    public void onBackPressed() {
-//        System.out.println("selected:"+selected);
-//        // 選択中のタブのRootFragmentにバックスタックがあれば戻る処理
-//        FragmentManager fm = getSupportFragmentManager();
-//        List<Fragment> fragments = fm.getFragments();
-//        Fragment fragment = fragments.get(selected);
-//        FragmentManager fragmentManager = fragment.getChildFragmentManager();
-//        if (0 < fragmentManager.getBackStackEntryCount()) {
-//            fragmentManager.popBackStack();
-//        }
-//    }
-
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
+        int backStackCnt = getSupportFragmentManager().getBackStackEntryCount();
+
+        System.out.println("onBackPressed::backStackCnt"+backStackCnt);
+
+        // if there is a fragment and the back stack of this fragment is not empty,
+        // then emulate 'onBackPressed' behaviour, because in default, it is not working
+        FragmentManager fm = getSupportFragmentManager();
+        for (Fragment frag : fm.getFragments()) {
+            if (frag.isVisible()) {
+                FragmentManager childFm = frag.getChildFragmentManager();
+                if (childFm.getBackStackEntryCount() > 0) {
+                    childFm.popBackStack();
+                    return;
+                }
+            }
         }
+        super.onBackPressed();
+
     }
+
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
@@ -326,7 +296,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
             System.out.println("nav_setting");
             mViewPager.setCurrentItem(4);
         }
-
 
 //        Fragment fragment = null;
 //        Class fragmentClass = null;
@@ -360,16 +329,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
 //        FragmentManager fragmentManager = getSupportFragmentManager();
 //        fragmentManager.beginTransaction().replace(R.id.containers, fragment).commit();
 //
-
-
-
-
-
-
-
-
-
-
         // Highlight the selected item has been done by NavigationView
         item.setChecked(true);
         // Set action bar title
@@ -380,4 +339,5 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
 //        drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
 }

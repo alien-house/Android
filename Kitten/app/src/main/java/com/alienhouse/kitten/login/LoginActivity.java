@@ -151,7 +151,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         pd.hide();
                         if (!task.isSuccessful()) {
                             Log.w(TAG, "signInWithEmail:failed", task.getException());
-                            Toast.makeText(LoginActivity.this, "auth_failed",
+                            Toast.makeText(getApplicationContext(), "auth_failed",
                                     Toast.LENGTH_SHORT).show();
                         }else{
 

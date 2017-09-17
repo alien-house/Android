@@ -44,7 +44,7 @@ public class JobFragment extends Fragment {
 //        FragmentManager fragMan = getChildFragmentManager();
         FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
 //        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.addToBackStack(null);
+//        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.replace(R.id.job_fragment, jobSearchFragment);
 //        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();

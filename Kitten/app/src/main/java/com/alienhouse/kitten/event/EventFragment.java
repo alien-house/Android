@@ -43,7 +43,7 @@ public class EventFragment extends Fragment {
         EventListFragment eventListFragment = new EventListFragment();
 //        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-        fragmentTransaction.addToBackStack(null);
+//        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.replace(R.id.event_fragment, eventListFragment);
         fragmentTransaction.commit();
 
