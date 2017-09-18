@@ -73,24 +73,16 @@ public class EventRecyclerAdapter extends RecyclerView.Adapter<EventRecyclerAdap
     public void onBindViewHolder(final EventHolder holder, final int position) {
 
         final Event event = eventList.get(position);
-//        holder.chkBox.setChecked(jobList.get(position).isSelected());
         holder.event_title.setText(event.getTitle());
         holder.event_date.setText(event.getHoldDate());
-//        holder.event_end.setText(event.getHoldEnd());
-//        CharSequence source = Html.fromHtml(job.getDescription());
         holder.event_venues.setText(event.getVenues());
         holder.event_address.setText(event.getAddress());
-//        holder.event_image.setImageBitmap();
         ImageLoader imageLoader = ImageLoader.getInstance();
         if(!this.eventList.get(position).getImgUrl().matches("") || this.eventList.get(position).getImgUrl() == null){
-//            GetImageTask myTask = new GetImageTask(holder.event_image);
-//            myTask.execute(this.eventList.get(position).getImgUrl());
             imageLoader.displayImage(this.eventList.get(position).getImgUrl(), holder.event_image);
         }else{
             holder.event_image.setImageResource(R.drawable.noimage);
         }
-//        System.out.println("一回だけやろうな！========"+position);
-
 
     }
 

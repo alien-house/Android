@@ -94,8 +94,7 @@ import java.util.Map;
  * Created by shinji on 2017/08/28.
  */
 
-public class EventListFragment extends Fragment implements EventRecyclerAdapter.ListItemClickListener,
-        SettingInfoFragment.SettingInfoFragmentInterface{
+public class EventListFragment extends Fragment implements EventRecyclerAdapter.ListItemClickListener{
     private int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     private int LOAD_DATA_NUM = 20;
     public static final String LOG_TAG = "EventListFragment";
@@ -150,12 +149,11 @@ public class EventListFragment extends Fragment implements EventRecyclerAdapter.
         listViewRecycle.setAdapter(eventAdapter);
         getEventInfo();
     }
-
-
-    @Override
-    public void onSavedImage(boolean isImgChanged) {
-        getEventInfo();
-    }
+//    @Override
+//    public void onSavedImage(boolean isImgChanged) {
+//        System.out.println("EventListFragment:onSavedImage--------:" + isImgChanged);
+//        getEventInfo();
+//    }
 
     public void getEventInfo() {
         eventlist.clear();
@@ -167,6 +165,7 @@ public class EventListFragment extends Fragment implements EventRecyclerAdapter.
 
         String url_meetup = getMeetupEventSearchURL();
         makeJsonArrayRequest(url_meetup, true);
+        Log.e("onActivityCreated::", url_meetup);
     }
 
     /**
@@ -437,10 +436,12 @@ public class EventListFragment extends Fragment implements EventRecyclerAdapter.
         String devStatus = "";
         String location = "";
         if(userData.location != null){
-            if(userData.location.matches("")){
+            if(!userData.location.matches("")){
                 location = userData.location;
             }
         }
+        String url_locationWithQuery = "&location=" + location;
+
         if(userData.devStatus != null){
             if(userData.devStatus.matches("")){
                 devStatus = "Developer";
@@ -448,7 +449,6 @@ public class EventListFragment extends Fragment implements EventRecyclerAdapter.
                 devStatus = userData.devStatus;
             }
         }
-        String url_locationWithQuery = "&location=" + location;
         String url_queryWithQuery = "&text=" + devStatus;
 
         //https://www.eventbriteapi.com/v3/events/search/?q=ios developer&location.address=vancouver,bc&token=CVKT5QQJUJYOJDWX2KNX

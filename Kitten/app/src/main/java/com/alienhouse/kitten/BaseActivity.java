@@ -41,6 +41,7 @@ import android.widget.TextView;
 import com.alienhouse.kitten.dashboard.GetImageTask;
 import com.alienhouse.kitten.dashboard.SettingFragment;
 import com.alienhouse.kitten.dashboard.SettingInfoFragment;
+import com.alienhouse.kitten.event.EventFragment;
 import com.alienhouse.kitten.favorite.FavoriteFragment;
 import com.alienhouse.kitten.main.JobFragment;
 import com.alienhouse.kitten.main.JobSearchFragment;
@@ -120,7 +121,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("User Data Loading");
-        progressDialog.show();
+//        progressDialog.show();
         setTitle("Job Search");
 //        mSectionPageAdapter = new SectionPageAdapter(getSupportFragmentManager());
 
@@ -128,7 +129,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         userData = firebaseController.getUserData();
         usersRef = database.getReference("users/" + userData.userID);
 
-        progressDialog.dismiss();
         //ユーザーデータセット後にやったほうがいい。取得できなくても帰って来るはずなのんで。
         firstPage();
 
@@ -176,6 +176,14 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
     public void onSavedImage(boolean isImgChanged) {
         System.out.println("onSavedImage--------:" + isImgChanged);
         setSideImage(isImgChanged);
+//
+//        EventFragment eventFragment = (EventFragment)pagerAdapter.getItem(mViewPager.getCurrentItem());
+//        eventFragment.update();
+        Fragment fragment = pagerAdapter.getRegisteredFragment(2);
+        EventFragment eventFragment = (EventFragment)fragment;
+        eventFragment.update();
+
+
     }
 
     @Override

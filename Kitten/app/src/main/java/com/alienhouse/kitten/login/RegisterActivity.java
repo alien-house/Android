@@ -119,7 +119,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             FirebaseUser user = mAuth.getCurrentUser();
 
                             User userData = firebaseController.getUserData();
+                            userData.created = 1;
                             userData.username = username;
+                            final String userIDS = userData.userID;
                             Log.d(TAG, "User profile updated:username." + username);
                             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                     .setDisplayName(username)
@@ -131,35 +133,39 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                             if (task.isSuccessful()) {
                                                 progressDialog.dismiss();
                                                 Log.d(TAG, "User profile updated.");
-                                                Intent nextItent;
-                                                nextItent = new Intent(RegisterActivity.this, BaseActivity.class);
-                                                startActivity(nextItent);
-                                                finish();
+
+
+                                                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.profile);
+                                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                                                byte[] data = baos.toByteArray();
+
+                                                storageRef = storage.getReference();
+                                                StorageReference userImagesRef = storageRef.child("images/" + userIDS + "/profile.jpg");
+                                                UploadTask uploadTask = userImagesRef.putBytes(data);
+                                                uploadTask.addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception exception) {
+                                                        System.out.println("onFailure:Handle unsuccessful uploads");
+                                                    }
+                                                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                    @Override
+                                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                        System.out.println("onSuccess:UploadTask createUserWithEmailAndPassword");
+                                                        @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
+
+                                                        Intent nextItent;
+                                                        nextItent = new Intent(RegisterActivity.this, BaseActivity.class);
+                                                        startActivity(nextItent);
+                                                        finish();
+
+                                                    }
+                                                });
+
                                             }
                                         }
                                     });
 
-                            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.profile);
-                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                            byte[] data = baos.toByteArray();
-
-                            storageRef = storage.getReference();
-                            StorageReference userImagesRef = storageRef.child("images/" + userData.userID + "/profile.jpg");
-                            UploadTask uploadTask = userImagesRef.putBytes(data);
-                            uploadTask.addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception exception) {
-                                    System.out.println("onFailure:Handle unsuccessful uploads");
-                                }
-                            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                    System.out.println("onSuccess:UploadTask");
-                                    @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                                }
-                            });
-                            userData.created = 1;
                             firebaseController.locationSave();
                             Log.d(TAG, "isSuccessfulCUWEAP:" + userData.userID);
                             usersRef = database.getReference("users/" + userData.userID);

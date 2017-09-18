@@ -21,6 +21,7 @@ public class EventFragment extends Fragment {
 
     private FirebaseAuth mAuth;
     private TextView texthello;
+    private EventListFragment eventListFragment;
 
     @Nullable
     @Override
@@ -40,12 +41,17 @@ public class EventFragment extends Fragment {
         if(fm.findFragmentById(R.id.event_fragment) != null){
             return;
         }
-        EventListFragment eventListFragment = new EventListFragment();
+        eventListFragment = new EventListFragment();
 //        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
 //        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.replace(R.id.event_fragment, eventListFragment);
         fragmentTransaction.commit();
 
+    }
+
+    public void update(){
+        eventListFragment.getEventInfo();
+        System.out.println("update============");
     }
 }

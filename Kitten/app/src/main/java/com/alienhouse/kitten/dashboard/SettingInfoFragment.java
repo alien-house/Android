@@ -139,8 +139,6 @@ public class SettingInfoFragment extends Fragment {
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage("saving");
 
-        firebaseController = FirebaseController.getInstance();
-
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
 
@@ -263,7 +261,7 @@ public class SettingInfoFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 FirebaseAuth.getInstance().signOut();
-//                firebaseController.isFistLoad = false;
+                firebaseController.deleteUserData();
                 Intent nextItent;
                 nextItent = new Intent(getActivity(), StartActivity.class);
                 startActivity(nextItent);
@@ -371,6 +369,7 @@ public class SettingInfoFragment extends Fragment {
         if(!userData.location.matches(locationEdit.getText().toString())){
             isLocationChange = true;
             getLanLon(locationEdit.getText().toString());
+            Log.d("isLocationChange:", "isLocationChange?????");
         }
 
         userData.bio = bioEdit.getText().toString();
@@ -406,6 +405,7 @@ public class SettingInfoFragment extends Fragment {
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             Log.d("userData.username", "User profile updated.");
+                            progressDialog.dismiss();
                         }
                     }
                 });
@@ -423,6 +423,7 @@ public class SettingInfoFragment extends Fragment {
         }
         if(!isLocationChange){
             settingInfoFragmentInterface.onSavedImage(isImgChanged);
+            Log.d("writeUser:", "settingInfoFragmentInterface.onSavedImage");
             progressDialog.dismiss();
         }
 

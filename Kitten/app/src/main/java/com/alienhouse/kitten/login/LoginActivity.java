@@ -18,11 +18,14 @@ import com.alienhouse.kitten.BaseActivity;
 import com.alienhouse.kitten.R;
 import com.alienhouse.kitten.dashboard.SettingActivity;
 import com.alienhouse.kitten.util.FirebaseController;
+import com.alienhouse.kitten.util.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 /**
  * Created by shinji on 2017/08/26.
@@ -34,6 +37,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseController firebaseController;
+    private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private DatabaseReference usersRef;
 
     private final String TAG = "onAuthStateChanged";
 
@@ -51,6 +56,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mPasswordField = (EditText) findViewById(R.id.editTextPass);
         loginbtn = (Button) findViewById(R.id.btnLogin);
         loginbtn.setOnClickListener(this);
+        firebaseController = FirebaseController.getInstance();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -59,6 +65,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         getSupportActionBar().setTitle("Sign in");
 
         pd = new ProgressDialog(LoginActivity.this);
+        pd.setMessage("User Data Loadings");
 
         mAuth = FirebaseAuth.getInstance();
 //        mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -148,36 +155,44 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
 
-                        pd.hide();
                         if (!task.isSuccessful()) {
                             Log.w(TAG, "signInWithEmail:failed", task.getException());
                             Toast.makeText(getApplicationContext(), "auth_failed",
                                     Toast.LENGTH_SHORT).show();
                         }else{
 
-                            firebaseController = FirebaseController.getInstance();
-                            firebaseController.deleteUserData();
-                            Intent nextItent;
-                            nextItent = new Intent(LoginActivity.this, BaseActivity.class);
-                            startActivity(nextItent);
-                            finish();
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            User userdata = firebaseController.getUserData();
+                            if(userdata != null){
+                                System.out.println("^^userdata:User aru");
+                                //if its existed, retrieve usre's data.
+                                usersRef = database.getReference("users/" + user.getUid());
+                                firebaseController.getUserDataOnceEventListener(usersRef);
+
+                                firebaseController.setOnCallBackNormal(new FirebaseController.CallBackTaskNormal(){
+                                    @Override
+                                    public void CallBack() {
+                                        super.CallBack();
+                                        pd.dismiss();
+                                        Log.d("BaseActivity:", "CallBack: " + "ログインにてログインお場合");
+                                        User userData = firebaseController.getUserData();
+                                        Intent nextItent;
+                                        nextItent = new Intent(LoginActivity.this, BaseActivity.class);
+                                        startActivity(nextItent);
+                                        finish();
+                                    }
+                                });
+                            }
+
+
+
                         }
+
+
+
                     }
                 });
     }
 
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//        mAuth.addAuthStateListener(mAuthListener);
-//    }
-//
-//    @Override
-//    public void onStop() {
-//        super.onStop();
-//        if (mAuthListener != null) {
-//            mAuth.removeAuthStateListener(mAuthListener);
-//        }
-//    }
 
 }

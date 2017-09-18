@@ -40,6 +40,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.alienhouse.kitten.WebviewActivity;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -355,13 +356,14 @@ public class JobResultFragment extends Fragment implements JobRecyclerAdapter.Li
     public void onListItemClick(int index) {
         Log.e("onListItemClick", String.valueOf(index));
         Job job_tmp = joblist.get(index);
-//        Job job_tmp = (Job)myAdapter.getItemId(index)
-        Uri uri = Uri.parse(job_tmp.getUrl());
-        Intent i = new Intent(Intent.ACTION_VIEW, uri);
-//                i.putExtra("JOB_DETAIL_URL", job_tmp.getUrl());
+//        Uri uri = Uri.parse(job_tmp.getUrl());
+//        Intent i = new Intent(Intent.ACTION_VIEW, uri);
+//        startActivity(i);
 
+        Intent i = new Intent(getActivity(), WebviewActivity.class);
+        i.putExtra(Utils.SEND_URL, job_tmp.getUrl());
+        i.putExtra(Utils.SEND_PAGE_TITLE, job_tmp.getTitle());
         startActivity(i);
-
     }
 
 

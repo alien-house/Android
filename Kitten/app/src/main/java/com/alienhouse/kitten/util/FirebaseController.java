@@ -140,7 +140,7 @@ public class FirebaseController {
 //                        firebaseController.callbacktask.CallBack(usersValue.location, usersValue.devStatus);
                         }
                     }else{
-                        FirebaseAuth.getInstance().signOut();
+//                        FirebaseAuth.getInstance().signOut();
                     }
                     //nullでもなくっても
 
@@ -202,7 +202,7 @@ public class FirebaseController {
     //                        firebaseController.isFistLoad = false;
     //                    }
                     }else{
-                        FirebaseAuth.getInstance().signOut();
+//                        FirebaseAuth.getInstance().signOut();
                     }
                 }
 

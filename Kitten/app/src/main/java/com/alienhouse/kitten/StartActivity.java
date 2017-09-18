@@ -130,7 +130,6 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
 
 //        FirebaseAuth.getInstance().signOut();
 
-        //
         SharedPreferences pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
         boolean bool = pref.getBoolean("activity_executed",false);
         if(!bool){
@@ -160,15 +159,16 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                 User userdata = firebaseController.getUserData();
                 if (user != null) {
                     // User is signed in
-                    firebaseController.setUserToData(user);
+//                    firebaseController.setUserToData(user);
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
 
-                } else {
-                    // User is signed out
-                    firebaseController.deleteUserData();
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
-
                 }
+//                else {
+//                    // User is signed out
+//                    firebaseController.deleteUserData();
+//                    Log.d(TAG, "onAuthStateChanged:signed_out");
+//
+//                }
             }
         };
 
@@ -241,56 +241,6 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         locationStart();
     }
 
-    // 2) Github : show web for connecting with Github
-    public static class AlertDialogFragment extends DialogFragment {
-
-        private AlertDialog dialog;
-        private AlertDialog.Builder alert;
-        private CropImageView cropImageView;
-        private Button btnCancel;
-        private Button btnUpload;
-
-        public static SettingInfoFragment.AlertDialogFragment newInstance() {
-            SettingInfoFragment.AlertDialogFragment frag = new SettingInfoFragment.AlertDialogFragment();
-            Bundle args = new Bundle();
-            frag.setArguments(args);
-            return frag;
-        }
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            alert = new AlertDialog.Builder(getActivity());
-//            alert.setTitle("Are you going to upload this image?");
-
-            View alertView = getActivity().getLayoutInflater().inflate(R.layout.dialog_login_web_layout, null);
-            WebView webview = alertView.findViewById(R.id.webview);
-            webview.loadUrl(httpUrl.toString());
-
-            webview.getSettings().setJavaScriptEnabled(true);
-            webview.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-            webview.setWebViewClient(new WebViewClient() {
-                @Override
-                public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                    Uri uri = Uri.parse(url);
-                    if (uri.getQueryParameter("code") != null
-                            && uri.getScheme() != null
-                            && uri.getScheme().equalsIgnoreCase("https")) {
-                        String code = uri.getQueryParameter("code");
-                        String state = uri.getQueryParameter("state");
-//                StartActivity startActivity = getActivity();
-                        StartActivity activity = (StartActivity) getActivity();
-                        activity.sendPost(code, state);
-                        return true;
-                    }
-                    return super.shouldOverrideUrlLoading(view, url);
-                }
-            });
-
-            alert.setView(alertView);
-            dialog = alert.create();
-            dialog.show();
-            return dialog;
-        }
-    }
 
     // 3) Github : requesting token
     private void sendPost(String code, String state) {
@@ -399,15 +349,16 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                                 userData = firebaseController.getUserData();
                                 //ここでコールバックしないと、時差がある。。
 
-                                final String userIDRes = userData.userID;
                                 Log.d(TAG, "userData写真URL取れてる？:" + userData.photourl);
                                 Log.d(TAG, "userData写真URL取れてる？:" + userData.created);
-                                userData.userID = userIDRes;
+
                                 if(userData != null){
                                     Log.d(TAG, "isSuccessful:" + userData.userID);
 
                                     if(userData.created == 0){
                                         // save images
+                                        userData.created = 1;
+                                        firebaseController.locationSave();
                                         Log.i("signInWithCredential", "一回だけですよ〜");
                                         GetImageTaskUpload myTask = new GetImageTaskUpload();
                                         myTask.setOnCallBack(new GetImageTaskUpload.CallBackTask(){
@@ -419,38 +370,46 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                                                     Log.i("AsyncTaskCallback", "Error happend");
                                                 }else{
                                                     Log.i("AsyncTaskCallback", "finished");
+                                                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                                    bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
+                                                    byte[] data = baos.toByteArray();
+
+                                                    Log.i("AsyncTaskCallback", "finished"+userData.userID);
+                                                    FirebaseUser user = mAuth.getCurrentUser();
+                                                    if(user != null){
+                                                        Log.i("AsyncTaskCallback", "nulljないあ"+user.getUid());
+                                                        StorageReference userImagesRef = storageRef.child("images/" + userData.userID + "/profile.jpg");
+                                                        UploadTask uploadTask = userImagesRef.putBytes(data);
+                                                        uploadTask.addOnFailureListener(new OnFailureListener() {
+                                                            @Override
+                                                            public void onFailure(@NonNull Exception exception) {
+                                                                // Handle unsuccessful uploads
+                                                                System.out.println("onFailure:Handle unsuccessful uploads");
+                                                            }
+                                                        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                            @Override
+                                                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                                System.out.println("onSuccess:UploadTask");
+                                                                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                                                                @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                                                                firebaseController.writeUserToData(usersRef);
+                                                                progressDialog.dismiss();
+                                                                gotoNextIntent();
+                                                            }
+                                                        });
+                                                    }else {
+                                                        Log.i("AsyncTaskCallback", "user why sign out//_");
+                                                    }
                                                 }
 
-                                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                                bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
-                                                byte[] data = baos.toByteArray();
-
-                                                StorageReference userImagesRef = storageRef.child("images/" + userIDRes + "/profile.jpg");
-                                                UploadTask uploadTask = userImagesRef.putBytes(data);
-                                                uploadTask.addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception exception) {
-                                                        // Handle unsuccessful uploads
-                                                        System.out.println("onFailure:Handle unsuccessful uploads");
-                                                    }
-                                                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                                    @Override
-                                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                                        System.out.println("onSuccess:UploadTask");
-                                                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                                                        @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                                                    }
-                                                });
                                             }
                                         });
                                         myTask.execute(userData.photourl);
-                                        firebaseController.locationSave();
+                                    }else{
+                                        firebaseController.writeUserToData(usersRef);
+                                        progressDialog.dismiss();
+                                        gotoNextIntent();
                                     }
-                                    userData.created = 1;
-
-                                    firebaseController.writeUserToData(usersRef);
-                                    progressDialog.dismiss();
-                                    gotoNextIntent();
                                 }
 
                             }
@@ -651,7 +610,15 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         String[] stringCity = {"locality"};
         LocationData lstringCity = new LocationData("", "", stringCity);
         int indexCity = Collections.binarySearch(locationDatas, lstringCity);
-        User.USER_LOCATION = locationDatas.get(indexCity).short_name;
+        Log.d(LOG_TAG, "indexindexCity: " + indexCity);
+        if(indexCity < 0){
+            String[] stringCity2 = {"administrative_area_level_1"};
+            LocationData lstringCity2 = new LocationData("", "", stringCity2);
+            int indexCity2 = Collections.binarySearch(locationDatas, lstringCity2);
+            User.USER_LOCATION = locationDatas.get(indexCity2).short_name;
+        }else{
+            User.USER_LOCATION = locationDatas.get(indexCity).short_name;
+        }
 //        System.out.println(User.USER_LOCATION);
 //        System.out.println(locationDatas.get(indexCity).short_name);
 
@@ -660,6 +627,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
     private void gotoNextIntent(){
         Intent nextItent;
         nextItent = new Intent(StartActivity.this, BaseActivity.class);
+
         startActivity(nextItent);
         finish();
     }
@@ -668,4 +636,53 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         return new BigInteger(130, random).toString(32);
     }
 
+    // 2) Github : show web for connecting with Github
+    public static class AlertDialogFragment extends DialogFragment {
+
+        private AlertDialog dialog;
+        private AlertDialog.Builder alert;
+        private CropImageView cropImageView;
+        private Button btnCancel;
+        private Button btnUpload;
+
+        public static SettingInfoFragment.AlertDialogFragment newInstance() {
+            SettingInfoFragment.AlertDialogFragment frag = new SettingInfoFragment.AlertDialogFragment();
+            Bundle args = new Bundle();
+            frag.setArguments(args);
+            return frag;
+        }
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            alert = new AlertDialog.Builder(getActivity());
+
+            View alertView = getActivity().getLayoutInflater().inflate(R.layout.dialog_login_web_layout, null);
+            WebView webview = alertView.findViewById(R.id.webview);
+            webview.loadUrl(httpUrl.toString());
+
+            webview.getSettings().setJavaScriptEnabled(true);
+            webview.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+            webview.setWebViewClient(new WebViewClient() {
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                    Uri uri = Uri.parse(url);
+                    if (uri.getQueryParameter("code") != null
+                            && uri.getScheme() != null
+                            && uri.getScheme().equalsIgnoreCase("https")) {
+                        String code = uri.getQueryParameter("code");
+                        String state = uri.getQueryParameter("state");
+//                StartActivity startActivity = getActivity();
+                        StartActivity activity = (StartActivity) getActivity();
+                        activity.sendPost(code, state);
+                        return true;
+                    }
+                    return super.shouldOverrideUrlLoading(view, url);
+                }
+            });
+
+            alert.setView(alertView);
+            dialog = alert.create();
+            dialog.show();
+            return dialog;
+        }
+    }
 }
