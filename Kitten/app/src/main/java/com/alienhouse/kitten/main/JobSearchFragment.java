@@ -137,6 +137,7 @@ public class JobSearchFragment extends Fragment {
 
     public void update(){
         Log.d("Value:", "onActivityCreated:きてる？毎回 ");
+        userData = firebaseController.getUserData();
         if(userData.location != null && !userData.location.matches("")){
             Log.d("Value:", "odlocationある？？？ "+userData.location.toString());
             txtSearchLocation.setText(userData.location.toString());

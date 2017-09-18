@@ -33,8 +33,15 @@ import com.alienhouse.kitten.BaseActivity;
 import com.alienhouse.kitten.R;
 import com.alienhouse.kitten.StartActivity;
 import com.alienhouse.kitten.login.RegisterActivity;
+import com.alienhouse.kitten.util.Config;
 import com.alienhouse.kitten.util.FirebaseController;
 import com.alienhouse.kitten.util.User;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -53,6 +60,10 @@ import com.google.firebase.storage.UploadTask;
 import com.isseiaoki.simplecropview.CropImageView;
 import com.isseiaoki.simplecropview.callback.CropCallback;
 import com.isseiaoki.simplecropview.callback.SaveCallback;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -97,6 +108,7 @@ public class SettingInfoFragment extends Fragment {
     private static Bitmap.CompressFormat mCompressFormat = Bitmap.CompressFormat.JPEG;
     private static Uri mSourceUri = null;
     private static RectF mFrameRect = null;
+    private RequestQueue mQueue;
     private static boolean isImgChanged = false;
     private Uri photourl;
 
@@ -306,7 +318,61 @@ public class SettingInfoFragment extends Fragment {
         return pos;
     }
 
+    public void getLanLon(String address){
+        mQueue = Volley.newRequestQueue(getContext());
+
+        String url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + address +
+                "&key=" + Config.GOOGLEAPIS_KEY;
+
+        JsonObjectRequest jsonObjectReq = new JsonObjectRequest(
+                Request.Method.GET, url,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("onResponse::","====================");
+                        try {
+                            JSONArray itemArray = response.getJSONArray("results");
+                            JSONObject rootObject = itemArray.getJSONObject(0);
+                            JSONArray location_array = rootObject.getJSONArray("address_components");
+                            Log.d("getLanLonLOG", "results****: " + location_array);
+                            double longitute = rootObject
+                                    .getJSONObject("geometry").getJSONObject("location")
+                                    .getDouble("lng");
+
+                            double latitude = rootObject
+                                    .getJSONObject("geometry").getJSONObject("location")
+                                    .getDouble("lat");
+                            Log.d("getLanLonLOG", "results****: " + longitute + ":" +latitude);
+                            userData.lat = latitude;
+                            userData.lon = longitute;
+                            settingInfoFragmentInterface.onSavedImage(isImgChanged);
+                            progressDialog.dismiss();
+//                            makeDataToListview(location_array);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("error:googleapis:","~~~~~~~~~~~~~~~~~~~~~~");
+//                        Log.d(LOG_TAG, error.toString());
+//                        progressDialog.dismiss();
+                    }
+                }
+        );
+        mQueue.add(jsonObjectReq);
+    }
+
     public void writeUser(){
+        boolean isLocationChange = false;
+        if(!userData.location.matches(locationEdit.getText().toString())){
+            isLocationChange = true;
+            getLanLon(locationEdit.getText().toString());
+        }
+
         userData.bio = bioEdit.getText().toString();
         userData.username = nameEdit.getText().toString();
         userData.email = emailEdit.getText().toString();
@@ -322,9 +388,10 @@ public class SettingInfoFragment extends Fragment {
                 } else {
                     System.out.println("Data saved successfully.");
                 }
-                progressDialog.dismiss();
             }
         });
+
+
         FirebaseUser user = mAuth.getCurrentUser();
 
         //change display name
@@ -332,6 +399,7 @@ public class SettingInfoFragment extends Fragment {
                 .setDisplayName(userData.username)
                 .setPhotoUri(Uri.parse(userData.photourl))
                 .build();
+
         user.updateProfile(profileUpdates)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -341,9 +409,6 @@ public class SettingInfoFragment extends Fragment {
                         }
                     }
                 });
-
-        settingInfoFragmentInterface.onSavedImage(isImgChanged);
-
         // change email
         if(!user.getEmail().matches(userData.email)){
             user.updateEmail(userData.email)
@@ -356,15 +421,22 @@ public class SettingInfoFragment extends Fragment {
                         }
                     });
         }
+        if(!isLocationChange){
+            settingInfoFragmentInterface.onSavedImage(isImgChanged);
+            progressDialog.dismiss();
+        }
+
         isImgChanged = false;
     }
+
+
+
 
 
     public static class AlertDialogFragment extends DialogFragment {
 
         private AlertDialog dialog ;
         private AlertDialog.Builder alert;
-//        private ImageView bag1;
         private CropImageView cropImageView;
         private Button btnCancel;
         private Button btnUpload;
@@ -381,12 +453,9 @@ public class SettingInfoFragment extends Fragment {
             alert.setTitle("Crop this image!");
 
             View alertView = getActivity().getLayoutInflater().inflate(R.layout.dialog_layout, null);
-
             btnCancel = alertView.findViewById(R.id.btnCancel);
             btnUpload = alertView.findViewById(R.id.btnUpload);
-
             cropImageView = (CropImageView) alertView.findViewById(R.id.cropImageView);
-//            mCropView.load(sourceUri).execute(mLoadCallback);
             cropImageView.setImageBitmap(img);
             cropImageView.setCropMode(CropImageView.CropMode.SQUARE);
 

@@ -304,6 +304,21 @@ public class FirebaseController {
     }
 
 
+    public static void locationSave(){
+
+        //とりあえずここで保存：国と市のため　初回のみ
+        if(!User.USER_COUNTRY.matches("")) {
+            firebaseController.userData.country = User.USER_COUNTRY;
+        }
+        if(!User.USER_LOCATION.matches("")) {
+            firebaseController.userData.location = User.USER_LOCATION;
+        }
+        if(!Double.isNaN(User.USER_LAT)) {
+            firebaseController.userData.lat = User.USER_LAT;
+            firebaseController.userData.lon = User.USER_LON;
+        }
+
+    }
 
 
 }

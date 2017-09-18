@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alienhouse.kitten.WebviewActivity;
+import com.alienhouse.kitten.dashboard.SettingInfoFragment;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -93,7 +94,8 @@ import java.util.Map;
  * Created by shinji on 2017/08/28.
  */
 
-public class EventListFragment extends Fragment implements EventRecyclerAdapter.ListItemClickListener  {
+public class EventListFragment extends Fragment implements EventRecyclerAdapter.ListItemClickListener,
+        SettingInfoFragment.SettingInfoFragmentInterface{
     private int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     private int LOAD_DATA_NUM = 20;
     public static final String LOG_TAG = "EventListFragment";
@@ -126,7 +128,7 @@ public class EventListFragment extends Fragment implements EventRecyclerAdapter.
         View view = inflater.inflate(R.layout.event_fragment, container, false);
 
         progressDialog = new ProgressDialog(getActivity());
-//        progressDialog.setMessage("....");
+        progressDialog.setMessage("Event Data Loading");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.show();
 
@@ -143,17 +145,20 @@ public class EventListFragment extends Fragment implements EventRecyclerAdapter.
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         mQueue = Volley.newRequestQueue(getActivity());
         eventAdapter = new EventRecyclerAdapter(eventlist, this);
-
         listViewRecycle.setAdapter(eventAdapter);
         getEventInfo();
     }
 
 
-    public void getEventInfo() {
+    @Override
+    public void onSavedImage(boolean isImgChanged) {
+        getEventInfo();
+    }
 
+    public void getEventInfo() {
+        eventlist.clear();
         userData = firebaseController.getUserData();
         progressDialog.setTitle("Events Loading");
         String url = getEventbriteEventSearchURL();
@@ -216,23 +221,6 @@ public class EventListFragment extends Fragment implements EventRecyclerAdapter.
                                 }
                             }
 
-                            // if no result
-//                            if(response.getInt("totalResults") == 0){
-//                                String txt = "No results were found for \" " + response.getString("query") + "\"";
-//                                Toast.makeText(getActivity(), txt, Toast.LENGTH_SHORT).show();
-//                            }else{
-////                                Toast.makeText(getActivity(), String.valueOf(response.getInt("totalResults")), Toast.LENGTH_SHORT).show();
-//
-////                                resultsTxt.setText("Results:" + response.getInt("totalResults"));
-////                                resultTotalItem = response.getInt("totalResults");
-//                                JSONArray itemArray = response.getJSONArray("results");
-//                                makeDataToListview(itemArray);
-//                                eventAdapter.notifyDataSetChanged();
-//                                current_load_num++;
-//                                if(begin){
-//                                    settingListView();
-//                                }
-//                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -477,7 +465,6 @@ public class EventListFragment extends Fragment implements EventRecyclerAdapter.
         System.out.println(url);
         return url;
     }
-
 //https://api.meetup.com/find/events?upcoming_events=true&photo-host=public&location=vancouver&
 // page=20&text=iOS+Developer&sign=true&key=1b7e6b545246732d3b4d6c53f3a5563
 

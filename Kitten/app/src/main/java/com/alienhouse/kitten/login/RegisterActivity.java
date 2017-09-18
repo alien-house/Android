@@ -115,18 +115,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             FirebaseController firebaseController = FirebaseController.getInstance();
-                            // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-//                            usersRef = database.getReference("users/" + user.getUid());
 
                             User userData = firebaseController.getUserData();
-                            final String userIDRes = userData.userID;
-                            if(userData != null) {
-                                Log.d(TAG, "isSuccessfulCUWEAP:" + userData.userID);
-                                usersRef = database.getReference("users/" + userData.userID);
-                                firebaseController.writeUserToData(usersRef);
-                            }
                             userData.username = username;
                             Log.d(TAG, "User profile updated:username." + username);
                             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
@@ -137,6 +129,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()) {
+                                                progressDialog.dismiss();
                                                 Log.d(TAG, "User profile updated.");
                                                 Intent nextItent;
                                                 nextItent = new Intent(RegisterActivity.this, BaseActivity.class);
@@ -152,7 +145,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             byte[] data = baos.toByteArray();
 
                             storageRef = storage.getReference();
-//                            User userdata = firebaseController.getUserData();
                             StorageReference userImagesRef = storageRef.child("images/" + userData.userID + "/profile.jpg");
                             UploadTask uploadTask = userImagesRef.putBytes(data);
                             uploadTask.addOnFailureListener(new OnFailureListener() {
@@ -167,15 +159,20 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                     @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
                                 }
                             });
+                            userData.created = 1;
+                            firebaseController.locationSave();
+                            Log.d(TAG, "isSuccessfulCUWEAP:" + userData.userID);
+                            usersRef = database.getReference("users/" + userData.userID);
+                            firebaseController.writeUserToData(usersRef);
 
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
                             Toast.makeText(getApplicationContext(), "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
+                            progressDialog.dismiss();
                         }
 
-                        progressDialog.dismiss();
                     }
                 });
     }

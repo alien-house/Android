@@ -6,6 +6,7 @@ package com.alienhouse.kitten.util;
 
 public class Config {
     public static String GOOGLEAPIS_KEY = "AIzaSyCOvdiOD-i_OlyLIjrN8fJQp96P3gFYX6Q";
+//    public static String GOOGLEAPIS_KEY = "AIzaSyATToa4mk7JoEWHepNvjeKKX9MZ8kc5IGw";
 
     public static String GITHUB_ID = "5a71911fdeceb4d69eee";
     public static String GITHUB_SECRET = "718114c4f8b9ff50593707853cf8c3f61ba05c25";

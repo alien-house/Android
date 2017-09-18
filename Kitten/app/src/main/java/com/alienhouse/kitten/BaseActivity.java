@@ -124,16 +124,9 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         setTitle("Job Search");
 //        mSectionPageAdapter = new SectionPageAdapter(getSupportFragmentManager());
 
-
         firebaseController = FirebaseController.getInstance();
         userData = firebaseController.getUserData();
-
-        if(userData != null) {
-            nhName.setText(userData.username);
-            nhEmail.setText(userData.email);
-        }
         usersRef = database.getReference("users/" + userData.userID);
-
 
         progressDialog.dismiss();
         //ユーザーデータセット後にやったほうがいい。取得できなくても帰って来るはずなのんで。
@@ -145,51 +138,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         System.out.println("userImagesRef:userData.userID "+userData.userID);
 
         setSideImage(true);
-//        GetImageTask myTask = new GetImageTask(profileSideImg);
-//        myTask.execute(userData.photourl);
-
-
-
-//        StorageReference userImagesRef = storageRef.child("images/" + userData.userID + "/profile.jpg");
-//        System.out.println("userImagesRef:userData.userID "+userData.userID);
-//        userImagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-//            @Override
-//            public void onSuccess(Uri uri) {
-//                System.out.println("BaseActivity**"+uri);
-//                if(uri != null){
-//                    GetImageTask myTask = new GetImageTask(profileSideImg);
-//                    myTask.execute(uri.toString());
-//                }
-//            }
-//        }).addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception exception) {
-//                System.out.println("userImagesRef :: onFailure");
-//            }
-//        });
-
-
-//        firebaseController.setOnCallBackNormal(new FirebaseController.CallBackTaskNormal(){
-//            @Override
-//            public void CallBack() {
-//                super.CallBack();
-//                Log.d("BaseActivity:", "CallBack: " + "多分終わらん＝＝＝＝＝＝＝＝");
-//                System.out.println("BaseActivity:" + userData.username);
-//                System.out.println("BaseActivity:" + userData.country);
-//                System.out.println("BaseActivity:" + userData.bio);
-//                System.out.println("BaseActivity:" + userData.userID);
-////                mViewPager.setAdapter(mSectionPageAdapter);
-//                System.out.println("BaseActivity-----------");
-//                System.out.println(User.USER_COUNTRY);
-//                System.out.println(User.USER_LOCATION);
-//                System.out.println(userData.country);
-//                System.out.println(userData.location);
-//                System.out.println(userData.lat);
-//                System.out.println(userData.lon);
-//                firebaseController.writeUserToData(usersRef);
-//
-//            }
-//        });
 
     }
 
@@ -197,6 +145,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
     public void setSideImage(boolean isImgChanged){
         if(isImgChanged){
 
+            System.out.println("setSideImageUserID:"+userData.userID);
             StorageReference userImagesRef = storageRef.child("images/" + userData.userID + "/profile.jpg");
             userImagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
@@ -204,6 +153,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                     System.out.println(uri);
                     if(uri != null){
                         System.out.println("userImagesRef:userData.uri " + uri.toString());
+                        userData.photourl = uri.toString();
                         GetImageTask myTask = new GetImageTask(profileSideImg);
                         myTask.execute(uri.toString());
                     }

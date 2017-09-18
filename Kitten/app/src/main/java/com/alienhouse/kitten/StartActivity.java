@@ -142,7 +142,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         ed.apply();
 
         progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Start");
+        progressDialog.setMessage("User Data Loading");
         firebaseController = FirebaseController.getInstance();
         storageRef = storage.getReference();
 
@@ -174,13 +174,28 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
 
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
+            progressDialog.show();
             System.out.println("^^onCreate:User is signed in");
             User userdata = firebaseController.getUserData();
             if(userdata != null){
                 System.out.println("^^userdata:User aru");
-                gotoNextIntent();
+                //if its existed, retrieve usre's data.
+                usersRef = database.getReference("users/" + user.getUid());
+                firebaseController.getUserDataOnceEventListener(usersRef);
+
+                firebaseController.setOnCallBackNormal(new FirebaseController.CallBackTaskNormal(){
+                    @Override
+                    public void CallBack() {
+                        super.CallBack();
+                        Log.d("BaseActivity:", "CallBack: " + "勝手にログインお場合");
+                        userData = firebaseController.getUserData();
+                        progressDialog.dismiss();
+                        gotoNextIntent();
+                    }
+                });
             }
         } else {
+            progressDialog.dismiss();
             System.out.println("No user is ");
         }
 
@@ -226,6 +241,56 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         locationStart();
     }
 
+    // 2) Github : show web for connecting with Github
+    public static class AlertDialogFragment extends DialogFragment {
+
+        private AlertDialog dialog;
+        private AlertDialog.Builder alert;
+        private CropImageView cropImageView;
+        private Button btnCancel;
+        private Button btnUpload;
+
+        public static SettingInfoFragment.AlertDialogFragment newInstance() {
+            SettingInfoFragment.AlertDialogFragment frag = new SettingInfoFragment.AlertDialogFragment();
+            Bundle args = new Bundle();
+            frag.setArguments(args);
+            return frag;
+        }
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            alert = new AlertDialog.Builder(getActivity());
+//            alert.setTitle("Are you going to upload this image?");
+
+            View alertView = getActivity().getLayoutInflater().inflate(R.layout.dialog_login_web_layout, null);
+            WebView webview = alertView.findViewById(R.id.webview);
+            webview.loadUrl(httpUrl.toString());
+
+            webview.getSettings().setJavaScriptEnabled(true);
+            webview.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+            webview.setWebViewClient(new WebViewClient() {
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                    Uri uri = Uri.parse(url);
+                    if (uri.getQueryParameter("code") != null
+                            && uri.getScheme() != null
+                            && uri.getScheme().equalsIgnoreCase("https")) {
+                        String code = uri.getQueryParameter("code");
+                        String state = uri.getQueryParameter("state");
+//                StartActivity startActivity = getActivity();
+                        StartActivity activity = (StartActivity) getActivity();
+                        activity.sendPost(code, state);
+                        return true;
+                    }
+                    return super.shouldOverrideUrlLoading(view, url);
+                }
+            });
+
+            alert.setView(alertView);
+            dialog = alert.create();
+            dialog.show();
+            return dialog;
+        }
+    }
 
     // 3) Github : requesting token
     private void sendPost(String code, String state) {
@@ -262,6 +327,44 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                     Toast.makeText(StartActivity.this, "splitted[0] =>" + splitted[0], Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    // 4) Github :  get username by token
+    private void requestGitHubUserData( final String accessToken ){
+        System.out.println("requestGitHubUserData=====");
+        GetAuthUserClient getAuthUserClient = new GetAuthUserClient( accessToken );
+        getAuthUserClient
+                .observable()
+                .subscribe(new Observer<com.alorma.github.sdk.bean.dto.response.User>() {
+                    @Override
+                    public void onCompleted() {
+                        System.out.println("requestGitH:onCompleted=====");
+                    }
+                    @Override
+                    public void onError(Throwable e) {
+                        System.out.println("requestGitH:Throwable=====");
+                        FirebaseCrash.report( e );
+                    }
+
+                    @Override
+                    public void onNext(com.alorma.github.sdk.bean.dto.response.User user) {
+                        System.out.println("requestGitH:onNext=====");
+                        // todo: ここでユーザーデータ取れてないんじゃないの？
+//                        User userData = firebaseController.getUserData();
+//                        userData.username = user.name;
+                        System.out.println("requestGitH:name====="+user.name);
+                        System.out.println("requestGitH:avatar_url====="+user.avatar_url);
+                        System.out.println("requestGitH:email====="+user.email);
+                        System.out.println("requestGitH:bio====="+user.bio);
+                        System.out.println("requestGitH:location====="+user.location);
+                        System.out.println("requestGitH:accessToken====="+accessToken);
+                        signInWithToken(accessToken);
+//                        userData.email = user.email;
+//                        usersRef = database.getReference("users/" + userData.userID);
+//                        firebaseController.writeUserToData(usersRef);
+
+                    }
+                });
     }
 
     // 5) Github :  auth using token
@@ -341,7 +444,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                                             }
                                         });
                                         myTask.execute(userData.photourl);
-                                        locationSave();
+                                        firebaseController.locationSave();
                                     }
                                     userData.created = 1;
 
@@ -354,60 +457,6 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                             });
 
                         }
-                    }
-                });
-    }
-
-    private void locationSave(){
-
-        //とりあえずここで保存：国と市のため　初回のみ
-        if(!User.USER_COUNTRY.matches("")) {
-            userData.country = User.USER_COUNTRY;
-        }
-        if(!User.USER_LOCATION.matches("")) {
-            userData.location = User.USER_LOCATION;
-        }
-        if(!Double.isNaN(User.USER_LAT)) {
-            userData.lat = User.USER_LAT;
-            userData.lon = User.USER_LON;
-        }
-
-    }
-
-    // 4) Github :  get username by token
-    private void requestGitHubUserData( final String accessToken ){
-        System.out.println("requestGitHubUserData=====");
-        GetAuthUserClient getAuthUserClient = new GetAuthUserClient( accessToken );
-        getAuthUserClient
-                .observable()
-                .subscribe(new Observer<com.alorma.github.sdk.bean.dto.response.User>() {
-                    @Override
-                    public void onCompleted() {
-                        System.out.println("requestGitH:onCompleted=====");
-                    }
-                    @Override
-                    public void onError(Throwable e) {
-                        System.out.println("requestGitH:Throwable=====");
-                        FirebaseCrash.report( e );
-                    }
-
-                    @Override
-                    public void onNext(com.alorma.github.sdk.bean.dto.response.User user) {
-                        System.out.println("requestGitH:onNext=====");
-                        // todo: ここでユーザーデータ取れてないんじゃないの？
-//                        User userData = firebaseController.getUserData();
-//                        userData.username = user.name;
-                        System.out.println("requestGitH:name====="+user.name);
-                        System.out.println("requestGitH:avatar_url====="+user.avatar_url);
-                        System.out.println("requestGitH:email====="+user.email);
-                        System.out.println("requestGitH:bio====="+user.bio);
-                        System.out.println("requestGitH:location====="+user.location);
-                        System.out.println("requestGitH:accessToken====="+accessToken);
-                        signInWithToken(accessToken);
-//                        userData.email = user.email;
-//                        usersRef = database.getReference("users/" + userData.userID);
-//                        firebaseController.writeUserToData(usersRef);
-
                     }
                 });
     }
@@ -553,6 +602,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
 
+        Log.d("debug", "onStatusChanged ");
         switch (status) {
             case LocationProvider.AVAILABLE:
                 Log.d("debug", "LocationProvider.AVAILABLE");
@@ -568,9 +618,11 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onProviderEnabled(String s) {
+        Log.d("debug", "onProviderEnabled ");
     }
     @Override
     public void onProviderDisabled(String s) {
+        Log.d("debug", "onProviderDisabled ");
     }
 
     // getting country from location with googleapis : coz GPS doesn't work on emulater
@@ -616,54 +668,4 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         return new BigInteger(130, random).toString(32);
     }
 
-    // 2) Github : show web for connecting with Github
-    public static class AlertDialogFragment extends DialogFragment {
-
-        private AlertDialog dialog;
-        private AlertDialog.Builder alert;
-        private CropImageView cropImageView;
-        private Button btnCancel;
-        private Button btnUpload;
-
-        public static SettingInfoFragment.AlertDialogFragment newInstance() {
-            SettingInfoFragment.AlertDialogFragment frag = new SettingInfoFragment.AlertDialogFragment();
-            Bundle args = new Bundle();
-            frag.setArguments(args);
-            return frag;
-        }
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            alert = new AlertDialog.Builder(getActivity());
-//            alert.setTitle("Are you going to upload this image?");
-
-            View alertView = getActivity().getLayoutInflater().inflate(R.layout.dialog_login_web_layout, null);
-            WebView webview = alertView.findViewById(R.id.webview);
-            webview.loadUrl(httpUrl.toString());
-
-            webview.getSettings().setJavaScriptEnabled(true);
-            webview.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-            webview.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                Uri uri = Uri.parse(url);
-                if (uri.getQueryParameter("code") != null
-                    && uri.getScheme() != null
-                    && uri.getScheme().equalsIgnoreCase("https")) {
-                String code = uri.getQueryParameter("code");
-                String state = uri.getQueryParameter("state");
-//                StartActivity startActivity = getActivity();
-                    StartActivity activity = (StartActivity) getActivity();
-                    activity.sendPost(code, state);
-            return true;
-            }
-            return super.shouldOverrideUrlLoading(view, url);
-            }
-            });
-
-            alert.setView(alertView);
-            dialog = alert.create();
-            dialog.show();
-            return dialog;
-        }
-    }
 }
